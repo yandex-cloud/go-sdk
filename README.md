@@ -19,7 +19,7 @@ go get github.com/yandex-cloud/go-sdk
 
 ```go
 sdk, err := ycsdk.Build(ctx, ycsdk.Config{
-	Credentials:        ycsdk.OAuthToken(token),
+	Credentials: ycsdk.OAuthToken(token),
 })
 if err != nil {
 	log.Fatal(err)
