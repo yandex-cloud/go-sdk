@@ -36,9 +36,9 @@ const (
 	IAMServiceID                Endpoint = "iam"
 	OperationServiceID          Endpoint = "operation"
 	ResourceManagementServiceID Endpoint = "resourcemanager"
-	//revive:disable:var-naming
+	// revive:disable:var-naming
 	ApiEndpointServiceID Endpoint = "endpoint"
-	//revive:enable:var-naming
+	// revive:enable:var-naming
 	VpcServiceID Endpoint = "vpc"
 )
 
@@ -161,14 +161,14 @@ func (sdk *SDK) ResourceManager() *resourcemanager.ResourceManager {
 	return resourcemanager.NewResourceManager(sdk.getConn(ResourceManagementServiceID))
 }
 
-//revive:disable:var-naming
+// revive:disable:var-naming
 
 // ApiEndpoint gets ApiEndpointService client
 func (sdk *SDK) ApiEndpoint() *apiendpoint.APIEndpoint {
 	return apiendpoint.NewAPIEndpoint(sdk.getConn(ApiEndpointServiceID))
 }
 
-//revive:enable:var-naming
+// revive:enable:var-naming
 
 func (sdk *SDK) Resolve(ctx context.Context, r ...Resolver) error {
 	args := make([]func() error, len(r))
