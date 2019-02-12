@@ -7,7 +7,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/mitchellh/go-testing-interface"
+	testing "github.com/mitchellh/go-testing-interface"
 )
 
 func Eventually(t testing.T, check CheckFunc, opts ...EventuallyOption) bool {

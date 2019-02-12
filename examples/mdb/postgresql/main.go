@@ -11,7 +11,7 @@ import (
 
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/postgresql/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/vpc/v1"
-	"github.com/yandex-cloud/go-sdk"
+	ycsdk "github.com/yandex-cloud/go-sdk"
 )
 
 func main() {

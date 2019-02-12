@@ -11,7 +11,7 @@ import (
 
 	yaml2json "github.com/ghodss/yaml"
 	"github.com/golang/protobuf/jsonpb"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/iam/v1"
 	"github.com/yandex-cloud/go-sdk/pkg/sdkerrors"
