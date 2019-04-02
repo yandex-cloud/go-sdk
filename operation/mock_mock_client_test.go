@@ -5,9 +5,8 @@ package operation
 import (
 	context "context"
 
-	grpc "google.golang.org/grpc"
-
 	mock "github.com/stretchr/testify/mock"
+	grpc "google.golang.org/grpc"
 
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 )
