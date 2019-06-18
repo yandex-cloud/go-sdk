@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	mysql "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/mysql/v1alpha"
+	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/mysql/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 )
 
@@ -121,6 +121,15 @@ func (c *ClusterServiceClient) ListOperations(ctx context.Context, in *mysql.Lis
 	return mysql.NewClusterServiceClient(conn).ListOperations(ctx, in, opts...)
 }
 
+// Move implements mysql.ClusterServiceClient
+func (c *ClusterServiceClient) Move(ctx context.Context, in *mysql.MoveClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return mysql.NewClusterServiceClient(conn).Move(ctx, in, opts...)
+}
+
 // Restore implements mysql.ClusterServiceClient
 func (c *ClusterServiceClient) Restore(ctx context.Context, in *mysql.RestoreClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -139,6 +148,15 @@ func (c *ClusterServiceClient) Start(ctx context.Context, in *mysql.StartCluster
 	return mysql.NewClusterServiceClient(conn).Start(ctx, in, opts...)
 }
 
+// StartFailover implements mysql.ClusterServiceClient
+func (c *ClusterServiceClient) StartFailover(ctx context.Context, in *mysql.StartClusterFailoverRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return mysql.NewClusterServiceClient(conn).StartFailover(ctx, in, opts...)
+}
+
 // Stop implements mysql.ClusterServiceClient
 func (c *ClusterServiceClient) Stop(ctx context.Context, in *mysql.StopClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -146,15 +164,6 @@ func (c *ClusterServiceClient) Stop(ctx context.Context, in *mysql.StopClusterRe
 		return nil, err
 	}
 	return mysql.NewClusterServiceClient(conn).Stop(ctx, in, opts...)
-}
-
-// Switchover implements mysql.ClusterServiceClient
-func (c *ClusterServiceClient) Switchover(ctx context.Context, in *mysql.SwitchoverClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
-	conn, err := c.getConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return mysql.NewClusterServiceClient(conn).Switchover(ctx, in, opts...)
 }
 
 // Update implements mysql.ClusterServiceClient

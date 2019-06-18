@@ -4,12 +4,18 @@
 package ycsdk
 
 import (
+	"context"
 	"crypto/rsa"
+	"fmt"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -59,6 +65,33 @@ func TestServiceAccountKey(t *testing.T) {
 	assert.True(t, sinceIssued > 0)
 	assert.True(t, sinceIssued < time.Minute)
 	assert.Equal(t, time.Hour, time.Unix(claims.ExpiresAt, 0).Sub(issuedAt))
+}
+
+func TestInstanceServiceAccount(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		const token = "AAAAAAAAAAAAAAAAAAAAAAAA"
+		const expiresIn = 43167
+		server := httptest.NewServer(http.HandlerFunc(
+			func(rw http.ResponseWriter, req *http.Request) {
+				_, err := io.WriteString(rw, fmt.Sprintf(`{
+				"access_token": %q,
+				"expires_in": %v,
+				"token_type":"Bearer"
+			}`, token, expiresIn))
+				assert.NoError(t, err)
+
+			}))
+		defer server.Close()
+		creds := newInstanceServiceAccountCredentials(server.Listener.Addr().String())
+		iamToken, err := creds.IAMToken(context.Background())
+		require.NoError(t, err)
+		assert.Equal(t, token, iamToken.IamToken)
+		expectedExpiresAt := time.Now().Add(expiresIn * time.Second)
+		actualExpiresAt, err := ptypes.Timestamp(iamToken.ExpiresAt)
+		require.NoError(t, err)
+		assert.True(t, expectedExpiresAt.After(actualExpiresAt))
+		assert.True(t, expectedExpiresAt.Add(-10*time.Second).Before(actualExpiresAt))
+	})
 }
 
 func testKey(t *testing.T) *iamkey.Key {
