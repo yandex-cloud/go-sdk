@@ -1,6 +1,7 @@
 package singleflight
 
 import (
+	"fmt"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -79,4 +80,21 @@ func TestDoAsyncDupSuppress(t *testing.T) {
 	c <- "bar"
 	wg.Wait()
 	assert.EqualValues(t, 1, atomic.LoadInt32(&calls))
+}
+
+func TestCall(t *testing.T) {
+	infl := Call{}
+	wg := sync.WaitGroup{}
+	const qty = 1000
+	wg.Add(qty)
+	for i := 0; i < qty; i++ {
+		go func(q int) {
+			infl.Do(func() interface{} {
+				return fmt.Sprintf("PAYLOAD %d", q)
+			})
+			wg.Done()
+		}(i)
+	}
+
+	wg.Wait()
 }
