@@ -13,15 +13,18 @@ import (
 	compute "github.com/yandex-cloud/go-genproto/yandex/cloud/compute/v1"
 )
 
-func TestBaseResolverFindName(t *testing.T) {
-	base := func() *BaseResolver {
-		x := &BaseResolver{Name: "name1"}
+func TestBaseNameResolverFindName(t *testing.T) {
+	base := func() *BaseNameResolver {
+		x := &BaseNameResolver{
+			BaseResolver:        BaseResolver{Name: "name1"},
+			resolvingObjectType: "test",
+		}
 		x.opts = &resolveOptions{out: &x.id}
 		return x
 	}
 	t.Run("only one correct name", func(t *testing.T) {
 		x := base()
-		err := x.findName("test", []*compute.Instance{
+		err := x.findName([]*compute.Instance{
 			{Id: "id1", Name: "name1"},
 		}, nil)
 		require.NoError(t, err)
@@ -29,7 +32,7 @@ func TestBaseResolverFindName(t *testing.T) {
 	})
 	t.Run("two records with same name", func(t *testing.T) {
 		x := base()
-		err := x.findName("test", []*compute.Instance{
+		err := x.findName([]*compute.Instance{
 			{Id: "id1", Name: "name1"},
 			{Id: "id2", Name: "name1"},
 		}, nil)
@@ -38,22 +41,22 @@ func TestBaseResolverFindName(t *testing.T) {
 	})
 	t.Run("two records with same name but not found", func(t *testing.T) {
 		x := base()
-		err := x.findName("test", []*compute.Instance{
+		err := x.findName([]*compute.Instance{
 			{Id: "id1", Name: "name2"},
 			{Id: "id2", Name: "name2"},
 		}, nil)
 		require.Error(t, err)
-		assert.Equal(t, &ErrNotFound{Caption: "test", Name: "name1"}, err)
+		assert.Equal(t, errNotFound("test", "name1"), err)
 	})
 	t.Run("resolve error", func(t *testing.T) {
 		x := base()
-		err := x.findName("test", nil, errors.New("forward this"))
+		err := x.findName(nil, errors.New("forward this"))
 		require.Error(t, err)
 		assert.Equal(t, "failed to find test with name \"name1\": forward this", err.Error())
 	})
 	t.Run("multiple items returned 1", func(t *testing.T) {
 		x := base()
-		err := x.findName("test", []*compute.Instance{
+		err := x.findName([]*compute.Instance{
 			{Id: "id1", Name: "name1"},
 			{Id: "id2", Name: "name2"},
 		}, nil)
@@ -62,7 +65,7 @@ func TestBaseResolverFindName(t *testing.T) {
 	})
 	t.Run("multiple items returned 2", func(t *testing.T) {
 		x := base()
-		err := x.findName("test", []*compute.Instance{
+		err := x.findName([]*compute.Instance{
 			{Id: "id2", Name: "name2"},
 			{Id: "id1", Name: "name1"},
 		}, nil)
