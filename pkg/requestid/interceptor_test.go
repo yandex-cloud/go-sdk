@@ -109,7 +109,10 @@ func TestWrappedRequestIDs(t *testing.T) {
 
 func TestAddClientRequestID(t *testing.T) {
 	t.Run("no outgoing context", func(t *testing.T) {
-		ctx := withClientRequestIDs(context.Background(), clientTraceID, clientRequestID)
+		ctx := withMetadata(context.Background(), map[string]string{
+			clientRequestIDHeader: clientRequestID,
+			clientTraceIDHeader:   clientTraceID,
+		})
 		md, ok := metadata.FromOutgoingContext(ctx)
 		require.True(t, ok)
 		assert.Equal(t, metadata.New(map[string]string{
@@ -120,7 +123,10 @@ func TestAddClientRequestID(t *testing.T) {
 	t.Run("with outgoing context", func(t *testing.T) {
 		ctx := context.Background()
 		ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("it-very-long-header", "foobar"))
-		ctx = withClientRequestIDs(ctx, clientTraceID, clientRequestID)
+		ctx = withMetadata(ctx, map[string]string{
+			clientRequestIDHeader: clientRequestID,
+			clientTraceIDHeader:   clientTraceID,
+		})
 		md, ok := metadata.FromOutgoingContext(ctx)
 		require.True(t, ok)
 		assert.Equal(t, metadata.New(map[string]string{
@@ -132,7 +138,10 @@ func TestAddClientRequestID(t *testing.T) {
 	t.Run("with old request-id", func(t *testing.T) {
 		ctx := context.Background()
 		ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(clientRequestIDHeader, "old"))
-		ctx = withClientRequestIDs(ctx, clientTraceID, clientRequestID)
+		ctx = withMetadata(ctx, map[string]string{
+			clientRequestIDHeader: clientRequestID,
+			clientTraceIDHeader:   clientTraceID,
+		})
 		md, ok := metadata.FromOutgoingContext(ctx)
 		require.True(t, ok)
 		assert.Equal(t, metadata.New(map[string]string{
@@ -142,7 +151,10 @@ func TestAddClientRequestID(t *testing.T) {
 	})
 	t.Run("several ids", func(t *testing.T) {
 		ctx := context.Background()
-		ctx1 := withClientRequestIDs(ctx, "trace1", "id1")
+		ctx1 := withMetadata(ctx, map[string]string{
+			clientRequestIDHeader: "id1",
+			clientTraceIDHeader:   "trace1",
+		})
 		md, ok := metadata.FromOutgoingContext(ctx1)
 		require.True(t, ok)
 		assert.Equal(t, metadata.New(map[string]string{
@@ -150,7 +162,10 @@ func TestAddClientRequestID(t *testing.T) {
 			clientRequestIDHeader: "id1",
 		}), md)
 
-		ctx2 := withClientRequestIDs(ctx1, "trace1", "id2")
+		ctx2 := withMetadata(ctx1, map[string]string{
+			clientRequestIDHeader: "id2",
+			clientTraceIDHeader:   "trace1",
+		})
 		md, ok = metadata.FromOutgoingContext(ctx2)
 		require.True(t, ok)
 		assert.Equal(t, metadata.New(map[string]string{

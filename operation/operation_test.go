@@ -161,7 +161,9 @@ func TestOperation_Wait_Failed(t *testing.T) {
 		Return(&operation.Operation{Id: id, Done: true, Result: &operation.Operation_Error{st.Proto()}}, nil)
 	err := op.Wait(ctx)
 	assert.Error(t, err)
-	assert.Equal(t, st.Err(), err)
+	assert.Equal(t, st, status.Convert(err))
+	assert.Contains(t, err.Error(), id)
+	assert.Contains(t, err.Error(), st.Err().Error())
 }
 
 func TestOperation_Wait_Interval(t *testing.T) {
