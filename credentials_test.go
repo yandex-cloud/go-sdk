@@ -92,6 +92,20 @@ func TestInstanceServiceAccount(t *testing.T) {
 		assert.True(t, expectedExpiresAt.After(actualExpiresAt))
 		assert.True(t, expectedExpiresAt.Add(-10*time.Second).Before(actualExpiresAt))
 	})
+
+	t.Run("internal error", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(
+			func(rw http.ResponseWriter, req *http.Request) {
+				rw.WriteHeader(http.StatusInternalServerError)
+				_, err := io.WriteString(rw, "ERRRORRRRR")
+				assert.NoError(t, err)
+			}))
+		defer server.Close()
+		creds := newInstanceServiceAccountCredentials(server.Listener.Addr().String())
+		_, err := creds.IAMToken(context.Background())
+		require.Error(t, err)
+		t.Log(err)
+	})
 }
 
 func testKey(t *testing.T) *iamkey.Key {

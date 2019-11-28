@@ -158,7 +158,7 @@ func TestOperation_Wait_Failed(t *testing.T) {
 	ctx := context.Background()
 	st := status.New(codes.Internal, "internal error")
 	client.On("Get", ctx, &operation.GetOperationRequest{OperationId: id}, mock.Anything).
-		Return(&operation.Operation{Id: id, Done: true, Result: &operation.Operation_Error{st.Proto()}}, nil)
+		Return(&operation.Operation{Id: id, Done: true, Result: &operation.Operation_Error{Error: st.Proto()}}, nil)
 	err := op.Wait(ctx)
 	assert.Error(t, err)
 	assert.Equal(t, st, status.Convert(err))

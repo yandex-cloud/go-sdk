@@ -23,17 +23,18 @@ func TestBackoffLinearWithJitter(t *testing.T) {
 }
 
 func TestBackoffExponentialWithJitter(t *testing.T) {
-	maxBackoffTo := time.Duration(math.Pow(2, float64(20)) * float64(defaultExponentialBackoffBase))
+	maxBackoffTo := 30 * time.Second
 	backoff := BackoffExponentialWithJitter(defaultExponentialBackoffBase, maxBackoffTo)
 
-	for attempt := 0; attempt <= 20; attempt++ {
+	for attempt := 0; attempt <= 10; attempt++ {
 		to := backoff(attempt)
-		maxTo := time.Duration(math.Pow(2, float64(attempt)) * float64(defaultExponentialBackoffBase))
-		require.True(t, to <= maxTo)
+		t.Logf("Attempt: %v, Backoff: %s", attempt, to)
+		maxTo := time.Duration(math.Pow(4, float64(attempt)) * float64(defaultExponentialBackoffBase))
+		require.True(t, to <= maxTo, "to: %v,maxTo: %v", to, maxTo)
 	}
 
 	for attempt := 20; attempt < 1000; attempt++ {
 		to := backoff(attempt)
-		require.True(t, to <= maxBackoffTo)
+		require.True(t, to <= maxBackoffTo, "to: %v, maxBackoffTo: %v", to, maxBackoffTo)
 	}
 }
