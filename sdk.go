@@ -26,11 +26,10 @@ import (
 	gen_operation "github.com/yandex-cloud/go-sdk/gen/operation"
 	"github.com/yandex-cloud/go-sdk/gen/resourcemanager"
 	"github.com/yandex-cloud/go-sdk/gen/vpc"
-	"github.com/yandex-cloud/go-sdk/gen/translate"
 	sdk_operation "github.com/yandex-cloud/go-sdk/operation"
 	"github.com/yandex-cloud/go-sdk/pkg/grpcclient"
 	"github.com/yandex-cloud/go-sdk/pkg/sdkerrors"
-	"github.com/yandex-cloud/go-sdk/pkg/singleflight"	
+	"github.com/yandex-cloud/go-sdk/pkg/singleflight"
 )
 
 type Endpoint string
@@ -49,8 +48,6 @@ const (
 	// revive:enable:var-naming
 	VpcServiceID        Endpoint = "vpc"
 	KubernetesServiceID Endpoint = "managed-kubernetes"
-
-	TranslateServiceID Endpoint = "ai-translate"
 )
 
 // Config is a config that is used to create SDK instance.
@@ -193,11 +190,6 @@ func (sdk *SDK) ApiEndpoint() *apiendpoint.APIEndpoint {
 // Kubernetes returns Kubernetes object that is used to operate on Yandex Managed Kubernetes
 func (sdk *SDK) Kubernetes() *k8s.Kubernetes {
 	return k8s.NewKubernetes(sdk.getConn(KubernetesServiceID))
-}
-
-// Translate returns Translate object that is used to operate on Yandex Translate
-func (sdk *SDK) Translate() *translate.Translate {
-	return translate.NewTranslate(sdk.getConn(TranslateServiceID))
 }
 
 // revive:enable:var-naming
