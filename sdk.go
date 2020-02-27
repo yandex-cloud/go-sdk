@@ -165,6 +165,10 @@ func (sdk *SDK) MDB() *MDB {
 	return &MDB{sdk: sdk}
 }
 
+func (sdk *SDK) Serverless() *Serverless {
+	return &Serverless{sdk: sdk}
+}
+
 func (sdk *SDK) Marketplace() *Marketplace {
 	return &Marketplace{sdk: sdk}
 }
