@@ -9,14 +9,14 @@ jobs:
     working_directory: /go/src/github.com/yandex-cloud/go-sdk
     steps:
       - checkout
-      - run: go install
+      - run: go build
 
   lint:
     docker:
       - image: golangci/golangci-lint:v1.24
     steps:
       - checkout
-      - run: golangci-lint run
+      - run: golangci-lint run -v
 
   test:
     docker:
