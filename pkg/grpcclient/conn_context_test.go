@@ -76,7 +76,8 @@ func TestNewLazyClientConnContext(t *testing.T) {
 		}()
 	}
 	time.Sleep(2 * time.Millisecond)
-	connCtx.Shutdown(ctx)
+	err := connCtx.Shutdown(ctx)
+	require.NoError(t, err)
 
 	testutil.Eventually(t, func() bool {
 		wg.Wait()
