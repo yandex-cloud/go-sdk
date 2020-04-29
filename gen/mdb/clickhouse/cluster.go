@@ -596,6 +596,15 @@ func (c *ClusterServiceClient) Stop(ctx context.Context, in *clickhouse.StopClus
 	return clickhouse.NewClusterServiceClient(conn).Stop(ctx, in, opts...)
 }
 
+// StreamLogs implements clickhouse.ClusterServiceClient
+func (c *ClusterServiceClient) StreamLogs(ctx context.Context, in *clickhouse.StreamClusterLogsRequest, opts ...grpc.CallOption) (clickhouse.ClusterService_StreamLogsClient, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return clickhouse.NewClusterServiceClient(conn).StreamLogs(ctx, in, opts...)
+}
+
 // Update implements clickhouse.ClusterServiceClient
 func (c *ClusterServiceClient) Update(ctx context.Context, in *clickhouse.UpdateClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
