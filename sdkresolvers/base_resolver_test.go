@@ -19,7 +19,10 @@ func TestBaseNameResolverFindName(t *testing.T) {
 			BaseResolver:        BaseResolver{Name: "name1"},
 			resolvingObjectType: "test",
 		}
-		x.opts = &resolveOptions{out: &x.id}
+		x.opts = &resolveOptions{
+			out:      &x.id,
+			folderID: "folder_id_value",
+		}
 		return x
 	}
 	t.Run("only one correct name", func(t *testing.T) {
@@ -37,7 +40,7 @@ func TestBaseNameResolverFindName(t *testing.T) {
 			{Id: "id2", Name: "name1"},
 		}, nil)
 		require.Error(t, err)
-		assert.Equal(t, "multiple test items with name \"name1\" found", err.Error())
+		assert.Equal(t, "multiple test items with name \"name1\" found in the folder \"folder_id_value\"", err.Error())
 	})
 	t.Run("two records with same name but not found", func(t *testing.T) {
 		x := base()
@@ -52,7 +55,7 @@ func TestBaseNameResolverFindName(t *testing.T) {
 		x := base()
 		err := x.findName(nil, errors.New("forward this"))
 		require.Error(t, err)
-		assert.Equal(t, "failed to find test with name \"name1\": forward this", err.Error())
+		assert.Equal(t, "failed to find test with name \"name1\" in the folder \"folder_id_value\": forward this", err.Error())
 	})
 	t.Run("multiple items returned 1", func(t *testing.T) {
 		x := base()
