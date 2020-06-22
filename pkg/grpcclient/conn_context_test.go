@@ -35,9 +35,11 @@ func TestDialContextTimeout(t *testing.T) {
 		grpc.WithTimeout(time.Millisecond*1), // nolint
 		grpc.WithBlock(),
 	))
-	x, err := connCtx.GetConn(context.Background(), "blablabla:1234")
+	const addr = "blablabla:1234"
+	x, err := connCtx.GetConn(context.Background(), addr)
 	require.Error(t, err)
-	assert.Equal(t, `error dialing endpoint "blablabla:1234": context deadline exceeded`, err.Error())
+	assert.Contains(t, err.Error(), addr)
+	assert.Contains(t, err.Error(), context.DeadlineExceeded.Error())
 	assert.Nil(t, x)
 }
 
