@@ -30,6 +30,14 @@ func TestOAuthToken(t *testing.T) {
 	assert.Equal(t, token, iamTokenReq.GetYandexPassportOauthToken())
 }
 
+func TestIAMToken(t *testing.T) {
+	const iamToken = "this-is-iam-token"
+	creds := NewIAMTokenCredentials(iamToken)
+	iamTokenResp, err := creds.(NonExchangeableCredentials).IAMToken(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, iamToken, iamTokenResp.GetIamToken())
+}
+
 func TestServiceAccountKey(t *testing.T) {
 	key := testKey(t)
 	creds, err := ServiceAccountKey(key)
