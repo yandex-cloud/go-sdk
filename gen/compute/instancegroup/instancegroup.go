@@ -48,6 +48,15 @@ func (c *InstanceGroupServiceClient) Delete(ctx context.Context, in *instancegro
 	return instancegroup.NewInstanceGroupServiceClient(conn).Delete(ctx, in, opts...)
 }
 
+// DeleteInstances implements instancegroup.InstanceGroupServiceClient
+func (c *InstanceGroupServiceClient) DeleteInstances(ctx context.Context, in *instancegroup.DeleteInstancesRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return instancegroup.NewInstanceGroupServiceClient(conn).DeleteInstances(ctx, in, opts...)
+}
+
 // Get implements instancegroup.InstanceGroupServiceClient
 func (c *InstanceGroupServiceClient) Get(ctx context.Context, in *instancegroup.GetInstanceGroupRequest, opts ...grpc.CallOption) (*instancegroup.InstanceGroup, error) {
 	conn, err := c.getConn(ctx)
@@ -442,6 +451,15 @@ func (c *InstanceGroupServiceClient) Stop(ctx context.Context, in *instancegroup
 		return nil, err
 	}
 	return instancegroup.NewInstanceGroupServiceClient(conn).Stop(ctx, in, opts...)
+}
+
+// StopInstances implements instancegroup.InstanceGroupServiceClient
+func (c *InstanceGroupServiceClient) StopInstances(ctx context.Context, in *instancegroup.StopInstancesRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return instancegroup.NewInstanceGroupServiceClient(conn).StopInstances(ctx, in, opts...)
 }
 
 // Update implements instancegroup.InstanceGroupServiceClient

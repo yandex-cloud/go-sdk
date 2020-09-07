@@ -68,8 +68,7 @@ func TestOperation_Fail(t *testing.T) {
 	assert.True(t, op.Done())
 	assert.False(t, op.Ok())
 	assert.True(t, op.Failed())
-	assert.Equal(t, st.Err(), op.Error())
-	assert.Equal(t, st, op.ErrorStatus())
+	assert.True(t, proto.Equal(st.Proto(), op.ErrorStatus().Proto()), "should be equal to", st)
 
 	assert.Nil(t, op.RawResponse())
 }
@@ -161,7 +160,7 @@ func TestOperation_Wait_Failed(t *testing.T) {
 		Return(&operation.Operation{Id: id, Done: true, Result: &operation.Operation_Error{Error: st.Proto()}}, nil)
 	err := op.Wait(ctx)
 	assert.Error(t, err)
-	assert.Equal(t, st, status.Convert(err))
+	assert.True(t, proto.Equal(st.Proto(), status.Convert(err).Proto()), "error should be equal to", st, "but is", status.Convert(err))
 	assert.Contains(t, err.Error(), id)
 	assert.Contains(t, err.Error(), st.Err().Error())
 }
