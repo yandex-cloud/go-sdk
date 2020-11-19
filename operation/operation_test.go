@@ -80,7 +80,7 @@ func TestOperation_Poll_Ok(t *testing.T) {
 	op := New(client, initialState)
 	ctx := context.Background()
 	newState := &Proto{Done: true, Result: &operation.Operation_Response{Response: marshalAny(t, &wrappers.StringValue{Value: "ok"})}}
-	client.On("Get", ctx, &operation.GetOperationRequest{OperationId: id}).Return(newState, nil)
+	client.On("Get", ctx, matchedBy(&operation.GetOperationRequest{OperationId: id})).Return(newState, nil)
 
 	err := op.Poll(ctx)
 	require.NoError(t, err)
@@ -96,7 +96,7 @@ func TestOperation_Poll_Fail(t *testing.T) {
 	op := New(client, initialState)
 	ctx := context.Background()
 	expectedErr := fmt.Errorf("test error")
-	client.On("Get", ctx, &operation.GetOperationRequest{OperationId: id}).Return(nil, expectedErr)
+	client.On("Get", ctx, matchedBy(&operation.GetOperationRequest{OperationId: id})).Return(nil, expectedErr)
 
 	err := op.Poll(ctx)
 	assert.Equal(t, expectedErr, err)
@@ -112,7 +112,7 @@ func TestOperation_Cancel(t *testing.T) {
 	op := New(client, initialState)
 	ctx := context.Background()
 	newState := &Proto{Id: id, Done: true}
-	client.On("Cancel", ctx, &operation.CancelOperationRequest{OperationId: id}).Return(newState, nil)
+	client.On("Cancel", ctx, matchedBy(&operation.CancelOperationRequest{OperationId: id})).Return(newState, nil)
 
 	err := op.Cancel(ctx)
 	require.NoError(t, err)
@@ -132,7 +132,7 @@ func TestOperation_Wait_Ok(t *testing.T) {
 	const interval = 10 * time.Millisecond
 	var callNo int
 	start := time.Now()
-	client.On("Get", ctx, &operation.GetOperationRequest{OperationId: id}, mock.Anything).
+	client.On("Get", ctx, matchedBy(&operation.GetOperationRequest{OperationId: id}), mock.Anything).
 		Return(func(ctx context.Context, in *operation.GetOperationRequest, _ ...grpc.CallOption) (*operation.Operation, error) {
 			assert.True(t, time.Since(start) > time.Duration(callNo)*interval)
 			callNo++
@@ -156,7 +156,7 @@ func TestOperation_Wait_Failed(t *testing.T) {
 	op := New(client, initialState)
 	ctx := context.Background()
 	st := status.New(codes.Internal, "internal error")
-	client.On("Get", ctx, &operation.GetOperationRequest{OperationId: id}, mock.Anything).
+	client.On("Get", ctx, matchedBy(&operation.GetOperationRequest{OperationId: id}), mock.Anything).
 		Return(&operation.Operation{Id: id, Done: true, Result: &operation.Operation_Error{Error: st.Proto()}}, nil)
 	err := op.Wait(ctx)
 	assert.Error(t, err)
@@ -179,7 +179,7 @@ func TestOperation_Wait_Interval(t *testing.T) {
 	expectedCalls := []string{
 		"", "1", "", "12", "",
 	}
-	client.On("Get", ctx, &operation.GetOperationRequest{OperationId: id}, mock.Anything).
+	client.On("Get", ctx, matchedBy(&operation.GetOperationRequest{OperationId: id}), mock.Anything).
 		Return(func(ctx context.Context, in *operation.GetOperationRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 			require.Equal(t, 1, len(opts))
 			opt, ok := opts[0].(grpc.HeaderCallOption)
@@ -230,7 +230,7 @@ func TestOperation_RetryNotFound(t *testing.T) {
 
 	var callNo int
 	var expectedNotFound = 3
-	client.On("Get", ctx, &operation.GetOperationRequest{OperationId: id}, mock.Anything).
+	client.On("Get", ctx, matchedBy(&operation.GetOperationRequest{OperationId: id}), mock.Anything).
 		Return(func(ctx context.Context, in *operation.GetOperationRequest, _ ...grpc.CallOption) (*operation.Operation, error) {
 			if callNo < expectedNotFound {
 				callNo++
@@ -265,4 +265,11 @@ func TestOperation_RetryNotFound(t *testing.T) {
 	}
 	client.AssertExpectations(t)
 	timer.mock.AssertExpectations(t)
+}
+
+// MatchedBy matches a protobuf message.
+func matchedBy(msg proto.Message) interface{} {
+	return mock.MatchedBy(func(actual proto.Message) bool {
+		return proto.Equal(msg, actual)
+	})
 }
