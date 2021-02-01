@@ -21,6 +21,24 @@ type RepositoryServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
 }
 
+// Create implements containerregistry.RepositoryServiceClient
+func (c *RepositoryServiceClient) Create(ctx context.Context, in *containerregistry.CreateRepositoryRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return containerregistry.NewRepositoryServiceClient(conn).Create(ctx, in, opts...)
+}
+
+// Delete implements containerregistry.RepositoryServiceClient
+func (c *RepositoryServiceClient) Delete(ctx context.Context, in *containerregistry.DeleteRepositoryRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return containerregistry.NewRepositoryServiceClient(conn).Delete(ctx, in, opts...)
+}
+
 // Get implements containerregistry.RepositoryServiceClient
 func (c *RepositoryServiceClient) Get(ctx context.Context, in *containerregistry.GetRepositoryRequest, opts ...grpc.CallOption) (*containerregistry.Repository, error) {
 	conn, err := c.getConn(ctx)
