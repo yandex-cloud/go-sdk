@@ -26,7 +26,7 @@ type ZoneServer struct {
 	handler ZoneServerHandler
 }
 
-func (s *ZoneServer) Register(ser *grpc.Server) {
+func (s *ZoneServer) GRPCTestRegister(ser *grpc.Server) {
 	compute.RegisterZoneServiceServer(ser, s)
 }
 
@@ -79,7 +79,7 @@ func initTestService(t *testing.T, handler ZoneServerHandler, interceptor grpc.D
 
 	so.s = grpc.NewServer()
 	z := &ZoneServer{handler}
-	z.Register(so.s)
+	z.GRPCTestRegister(so.s)
 
 	result := make(chan error)
 	go func() {

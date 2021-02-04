@@ -21,6 +21,7 @@ import (
 	"github.com/yandex-cloud/go-sdk/dial"
 	apiendpoint "github.com/yandex-cloud/go-sdk/gen/apiendpoint"
 	"github.com/yandex-cloud/go-sdk/gen/compute"
+	"github.com/yandex-cloud/go-sdk/gen/dns"
 	"github.com/yandex-cloud/go-sdk/gen/iam"
 	k8s "github.com/yandex-cloud/go-sdk/gen/kubernetes"
 	gen_operation "github.com/yandex-cloud/go-sdk/gen/operation"
@@ -48,6 +49,7 @@ const (
 	// revive:enable:var-naming
 	VpcServiceID        Endpoint = "vpc"
 	KubernetesServiceID Endpoint = "managed-kubernetes"
+	DNSServiceID        Endpoint = "dns"
 )
 
 // Config is a config that is used to create SDK instance.
@@ -196,6 +198,11 @@ func (sdk *SDK) ApiEndpoint() *apiendpoint.APIEndpoint {
 // Kubernetes returns Kubernetes object that is used to operate on Yandex Managed Kubernetes
 func (sdk *SDK) Kubernetes() *k8s.Kubernetes {
 	return k8s.NewKubernetes(sdk.getConn(KubernetesServiceID))
+}
+
+//DNS returns DNS object that is used to operate on Yandex DNS
+func (sdk *SDK) DNS() *dns.DNS {
+	return dns.NewDNS(sdk.getConn(DNSServiceID))
 }
 
 // AI returns AI object that is used to do AI stuff.

@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 
 	mongodb "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/mongodb/v1"
+	"github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 )
 
 //revive:disable
@@ -17,6 +18,15 @@ import (
 // lazy GRPC connection initialization.
 type BackupServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
+}
+
+// Delete implements mongodb.BackupServiceClient
+func (c *BackupServiceClient) Delete(ctx context.Context, in *mongodb.DeleteBackupRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return mongodb.NewBackupServiceClient(conn).Delete(ctx, in, opts...)
 }
 
 // Get implements mongodb.BackupServiceClient

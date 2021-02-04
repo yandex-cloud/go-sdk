@@ -192,6 +192,76 @@ func (it *RegistryAccessBindingsIterator) Error() error {
 	return it.err
 }
 
+// ListIpPermission implements containerregistry.RegistryServiceClient
+func (c *RegistryServiceClient) ListIpPermission(ctx context.Context, in *containerregistry.ListIpPermissionRequest, opts ...grpc.CallOption) (*containerregistry.ListIpPermissionsResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return containerregistry.NewRegistryServiceClient(conn).ListIpPermission(ctx, in, opts...)
+}
+
+type RegistryIpPermissionIterator struct {
+	ctx  context.Context
+	opts []grpc.CallOption
+
+	err     error
+	started bool
+
+	client  *RegistryServiceClient
+	request *containerregistry.ListIpPermissionRequest
+
+	items []*containerregistry.IpPermission
+}
+
+func (c *RegistryServiceClient) RegistryIpPermissionIterator(ctx context.Context, registryId string, opts ...grpc.CallOption) *RegistryIpPermissionIterator {
+	return &RegistryIpPermissionIterator{
+		ctx:    ctx,
+		opts:   opts,
+		client: c,
+		request: &containerregistry.ListIpPermissionRequest{
+			RegistryId: registryId,
+		},
+	}
+}
+
+func (it *RegistryIpPermissionIterator) Next() bool {
+	if it.err != nil {
+		return false
+	}
+	if len(it.items) > 1 {
+		it.items[0] = nil
+		it.items = it.items[1:]
+		return true
+	}
+	it.items = nil // consume last item, if any
+
+	if it.started {
+		return false
+	}
+	it.started = true
+
+	response, err := it.client.ListIpPermission(it.ctx, it.request, it.opts...)
+	it.err = err
+	if err != nil {
+		return false
+	}
+
+	it.items = response.Permissions
+	return len(it.items) > 0
+}
+
+func (it *RegistryIpPermissionIterator) Value() *containerregistry.IpPermission {
+	if len(it.items) == 0 {
+		panic("calling Value on empty iterator")
+	}
+	return it.items[0]
+}
+
+func (it *RegistryIpPermissionIterator) Error() error {
+	return it.err
+}
+
 // SetAccessBindings implements containerregistry.RegistryServiceClient
 func (c *RegistryServiceClient) SetAccessBindings(ctx context.Context, in *access.SetAccessBindingsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -199,6 +269,15 @@ func (c *RegistryServiceClient) SetAccessBindings(ctx context.Context, in *acces
 		return nil, err
 	}
 	return containerregistry.NewRegistryServiceClient(conn).SetAccessBindings(ctx, in, opts...)
+}
+
+// SetIpPermission implements containerregistry.RegistryServiceClient
+func (c *RegistryServiceClient) SetIpPermission(ctx context.Context, in *containerregistry.SetIpPermissionRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return containerregistry.NewRegistryServiceClient(conn).SetIpPermission(ctx, in, opts...)
 }
 
 // Update implements containerregistry.RegistryServiceClient
@@ -217,4 +296,13 @@ func (c *RegistryServiceClient) UpdateAccessBindings(ctx context.Context, in *ac
 		return nil, err
 	}
 	return containerregistry.NewRegistryServiceClient(conn).UpdateAccessBindings(ctx, in, opts...)
+}
+
+// UpdateIpPermission implements containerregistry.RegistryServiceClient
+func (c *RegistryServiceClient) UpdateIpPermission(ctx context.Context, in *containerregistry.UpdateIpPermissionRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return containerregistry.NewRegistryServiceClient(conn).UpdateIpPermission(ctx, in, opts...)
 }
