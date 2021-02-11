@@ -61,8 +61,10 @@ type FolderIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *FolderServiceClient
 	request *resourcemanager.ListFoldersRequest
@@ -70,15 +72,19 @@ type FolderIterator struct {
 	items []*resourcemanager.Folder
 }
 
-func (c *FolderServiceClient) FolderIterator(ctx context.Context, cloudId string, opts ...grpc.CallOption) *FolderIterator {
+func (c *FolderServiceClient) FolderIterator(ctx context.Context, req *resourcemanager.ListFoldersRequest, opts ...grpc.CallOption) *FolderIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &FolderIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &resourcemanager.ListFoldersRequest{
-			CloudId:  cloudId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -98,6 +104,12 @@ func (it *FolderIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -107,6 +119,38 @@ func (it *FolderIterator) Next() bool {
 	it.items = response.Folders
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *FolderIterator) Take(size int64) ([]*resourcemanager.Folder, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*resourcemanager.Folder
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *FolderIterator) TakeAll() ([]*resourcemanager.Folder, error) {
+	return it.Take(0)
 }
 
 func (it *FolderIterator) Value() *resourcemanager.Folder {
@@ -133,8 +177,10 @@ type FolderAccessBindingsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *FolderServiceClient
 	request *access.ListAccessBindingsRequest
@@ -142,15 +188,19 @@ type FolderAccessBindingsIterator struct {
 	items []*access.AccessBinding
 }
 
-func (c *FolderServiceClient) FolderAccessBindingsIterator(ctx context.Context, resourceId string, opts ...grpc.CallOption) *FolderAccessBindingsIterator {
+func (c *FolderServiceClient) FolderAccessBindingsIterator(ctx context.Context, req *access.ListAccessBindingsRequest, opts ...grpc.CallOption) *FolderAccessBindingsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &FolderAccessBindingsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &access.ListAccessBindingsRequest{
-			ResourceId: resourceId,
-			PageSize:   1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -170,6 +220,12 @@ func (it *FolderAccessBindingsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListAccessBindings(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -179,6 +235,38 @@ func (it *FolderAccessBindingsIterator) Next() bool {
 	it.items = response.AccessBindings
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *FolderAccessBindingsIterator) Take(size int64) ([]*access.AccessBinding, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*access.AccessBinding
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *FolderAccessBindingsIterator) TakeAll() ([]*access.AccessBinding, error) {
+	return it.Take(0)
 }
 
 func (it *FolderAccessBindingsIterator) Value() *access.AccessBinding {
@@ -205,8 +293,10 @@ type FolderOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *FolderServiceClient
 	request *resourcemanager.ListFolderOperationsRequest
@@ -214,15 +304,19 @@ type FolderOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *FolderServiceClient) FolderOperationsIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *FolderOperationsIterator {
+func (c *FolderServiceClient) FolderOperationsIterator(ctx context.Context, req *resourcemanager.ListFolderOperationsRequest, opts ...grpc.CallOption) *FolderOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &FolderOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &resourcemanager.ListFolderOperationsRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -242,6 +336,12 @@ func (it *FolderOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -251,6 +351,38 @@ func (it *FolderOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *FolderOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *FolderOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *FolderOperationsIterator) Value() *operation.Operation {

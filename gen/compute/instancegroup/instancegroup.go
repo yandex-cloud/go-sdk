@@ -79,8 +79,10 @@ type InstanceGroupIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *InstanceGroupServiceClient
 	request *instancegroup.ListInstanceGroupsRequest
@@ -88,15 +90,19 @@ type InstanceGroupIterator struct {
 	items []*instancegroup.InstanceGroup
 }
 
-func (c *InstanceGroupServiceClient) InstanceGroupIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *InstanceGroupIterator {
+func (c *InstanceGroupServiceClient) InstanceGroupIterator(ctx context.Context, req *instancegroup.ListInstanceGroupsRequest, opts ...grpc.CallOption) *InstanceGroupIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &InstanceGroupIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &instancegroup.ListInstanceGroupsRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -116,6 +122,12 @@ func (it *InstanceGroupIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -125,6 +137,38 @@ func (it *InstanceGroupIterator) Next() bool {
 	it.items = response.InstanceGroups
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *InstanceGroupIterator) Take(size int64) ([]*instancegroup.InstanceGroup, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*instancegroup.InstanceGroup
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *InstanceGroupIterator) TakeAll() ([]*instancegroup.InstanceGroup, error) {
+	return it.Take(0)
 }
 
 func (it *InstanceGroupIterator) Value() *instancegroup.InstanceGroup {
@@ -151,8 +195,10 @@ type InstanceGroupAccessBindingsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *InstanceGroupServiceClient
 	request *access.ListAccessBindingsRequest
@@ -160,15 +206,19 @@ type InstanceGroupAccessBindingsIterator struct {
 	items []*access.AccessBinding
 }
 
-func (c *InstanceGroupServiceClient) InstanceGroupAccessBindingsIterator(ctx context.Context, resourceId string, opts ...grpc.CallOption) *InstanceGroupAccessBindingsIterator {
+func (c *InstanceGroupServiceClient) InstanceGroupAccessBindingsIterator(ctx context.Context, req *access.ListAccessBindingsRequest, opts ...grpc.CallOption) *InstanceGroupAccessBindingsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &InstanceGroupAccessBindingsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &access.ListAccessBindingsRequest{
-			ResourceId: resourceId,
-			PageSize:   1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -188,6 +238,12 @@ func (it *InstanceGroupAccessBindingsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListAccessBindings(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -197,6 +253,38 @@ func (it *InstanceGroupAccessBindingsIterator) Next() bool {
 	it.items = response.AccessBindings
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *InstanceGroupAccessBindingsIterator) Take(size int64) ([]*access.AccessBinding, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*access.AccessBinding
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *InstanceGroupAccessBindingsIterator) TakeAll() ([]*access.AccessBinding, error) {
+	return it.Take(0)
 }
 
 func (it *InstanceGroupAccessBindingsIterator) Value() *access.AccessBinding {
@@ -223,8 +311,10 @@ type InstanceGroupInstancesIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *InstanceGroupServiceClient
 	request *instancegroup.ListInstanceGroupInstancesRequest
@@ -232,15 +322,19 @@ type InstanceGroupInstancesIterator struct {
 	items []*instancegroup.ManagedInstance
 }
 
-func (c *InstanceGroupServiceClient) InstanceGroupInstancesIterator(ctx context.Context, instanceGroupId string, opts ...grpc.CallOption) *InstanceGroupInstancesIterator {
+func (c *InstanceGroupServiceClient) InstanceGroupInstancesIterator(ctx context.Context, req *instancegroup.ListInstanceGroupInstancesRequest, opts ...grpc.CallOption) *InstanceGroupInstancesIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &InstanceGroupInstancesIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &instancegroup.ListInstanceGroupInstancesRequest{
-			InstanceGroupId: instanceGroupId,
-			PageSize:        1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -260,6 +354,12 @@ func (it *InstanceGroupInstancesIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListInstances(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -269,6 +369,38 @@ func (it *InstanceGroupInstancesIterator) Next() bool {
 	it.items = response.Instances
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *InstanceGroupInstancesIterator) Take(size int64) ([]*instancegroup.ManagedInstance, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*instancegroup.ManagedInstance
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *InstanceGroupInstancesIterator) TakeAll() ([]*instancegroup.ManagedInstance, error) {
+	return it.Take(0)
 }
 
 func (it *InstanceGroupInstancesIterator) Value() *instancegroup.ManagedInstance {
@@ -295,8 +427,10 @@ type InstanceGroupLogRecordsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *InstanceGroupServiceClient
 	request *instancegroup.ListInstanceGroupLogRecordsRequest
@@ -304,15 +438,19 @@ type InstanceGroupLogRecordsIterator struct {
 	items []*instancegroup.LogRecord
 }
 
-func (c *InstanceGroupServiceClient) InstanceGroupLogRecordsIterator(ctx context.Context, instanceGroupId string, opts ...grpc.CallOption) *InstanceGroupLogRecordsIterator {
+func (c *InstanceGroupServiceClient) InstanceGroupLogRecordsIterator(ctx context.Context, req *instancegroup.ListInstanceGroupLogRecordsRequest, opts ...grpc.CallOption) *InstanceGroupLogRecordsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &InstanceGroupLogRecordsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &instancegroup.ListInstanceGroupLogRecordsRequest{
-			InstanceGroupId: instanceGroupId,
-			PageSize:        1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -332,6 +470,12 @@ func (it *InstanceGroupLogRecordsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListLogRecords(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -341,6 +485,38 @@ func (it *InstanceGroupLogRecordsIterator) Next() bool {
 	it.items = response.LogRecords
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *InstanceGroupLogRecordsIterator) Take(size int64) ([]*instancegroup.LogRecord, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*instancegroup.LogRecord
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *InstanceGroupLogRecordsIterator) TakeAll() ([]*instancegroup.LogRecord, error) {
+	return it.Take(0)
 }
 
 func (it *InstanceGroupLogRecordsIterator) Value() *instancegroup.LogRecord {
@@ -367,8 +543,10 @@ type InstanceGroupOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *InstanceGroupServiceClient
 	request *instancegroup.ListInstanceGroupOperationsRequest
@@ -376,15 +554,19 @@ type InstanceGroupOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *InstanceGroupServiceClient) InstanceGroupOperationsIterator(ctx context.Context, instanceGroupId string, opts ...grpc.CallOption) *InstanceGroupOperationsIterator {
+func (c *InstanceGroupServiceClient) InstanceGroupOperationsIterator(ctx context.Context, req *instancegroup.ListInstanceGroupOperationsRequest, opts ...grpc.CallOption) *InstanceGroupOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &InstanceGroupOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &instancegroup.ListInstanceGroupOperationsRequest{
-			InstanceGroupId: instanceGroupId,
-			PageSize:        1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -404,6 +586,12 @@ func (it *InstanceGroupOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -413,6 +601,38 @@ func (it *InstanceGroupOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *InstanceGroupOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *InstanceGroupOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *InstanceGroupOperationsIterator) Value() *operation.Operation {

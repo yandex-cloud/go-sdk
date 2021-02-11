@@ -51,8 +51,10 @@ type JobIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *JobServiceClient
 	request *dataproc.ListJobsRequest
@@ -60,15 +62,19 @@ type JobIterator struct {
 	items []*dataproc.Job
 }
 
-func (c *JobServiceClient) JobIterator(ctx context.Context, clusterId string, opts ...grpc.CallOption) *JobIterator {
+func (c *JobServiceClient) JobIterator(ctx context.Context, req *dataproc.ListJobsRequest, opts ...grpc.CallOption) *JobIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &JobIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &dataproc.ListJobsRequest{
-			ClusterId: clusterId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -88,6 +94,12 @@ func (it *JobIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -97,6 +109,38 @@ func (it *JobIterator) Next() bool {
 	it.items = response.Jobs
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *JobIterator) Take(size int64) ([]*dataproc.Job, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*dataproc.Job
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *JobIterator) TakeAll() ([]*dataproc.Job, error) {
+	return it.Take(0)
 }
 
 func (it *JobIterator) Value() *dataproc.Job {

@@ -96,8 +96,10 @@ type NetworkLoadBalancerIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *NetworkLoadBalancerServiceClient
 	request *loadbalancer.ListNetworkLoadBalancersRequest
@@ -105,15 +107,19 @@ type NetworkLoadBalancerIterator struct {
 	items []*loadbalancer.NetworkLoadBalancer
 }
 
-func (c *NetworkLoadBalancerServiceClient) NetworkLoadBalancerIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *NetworkLoadBalancerIterator {
+func (c *NetworkLoadBalancerServiceClient) NetworkLoadBalancerIterator(ctx context.Context, req *loadbalancer.ListNetworkLoadBalancersRequest, opts ...grpc.CallOption) *NetworkLoadBalancerIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &NetworkLoadBalancerIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &loadbalancer.ListNetworkLoadBalancersRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -133,6 +139,12 @@ func (it *NetworkLoadBalancerIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -142,6 +154,38 @@ func (it *NetworkLoadBalancerIterator) Next() bool {
 	it.items = response.NetworkLoadBalancers
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *NetworkLoadBalancerIterator) Take(size int64) ([]*loadbalancer.NetworkLoadBalancer, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*loadbalancer.NetworkLoadBalancer
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *NetworkLoadBalancerIterator) TakeAll() ([]*loadbalancer.NetworkLoadBalancer, error) {
+	return it.Take(0)
 }
 
 func (it *NetworkLoadBalancerIterator) Value() *loadbalancer.NetworkLoadBalancer {
@@ -168,8 +212,10 @@ type NetworkLoadBalancerOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *NetworkLoadBalancerServiceClient
 	request *loadbalancer.ListNetworkLoadBalancerOperationsRequest
@@ -177,15 +223,19 @@ type NetworkLoadBalancerOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *NetworkLoadBalancerServiceClient) NetworkLoadBalancerOperationsIterator(ctx context.Context, networkLoadBalancerId string, opts ...grpc.CallOption) *NetworkLoadBalancerOperationsIterator {
+func (c *NetworkLoadBalancerServiceClient) NetworkLoadBalancerOperationsIterator(ctx context.Context, req *loadbalancer.ListNetworkLoadBalancerOperationsRequest, opts ...grpc.CallOption) *NetworkLoadBalancerOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &NetworkLoadBalancerOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &loadbalancer.ListNetworkLoadBalancerOperationsRequest{
-			NetworkLoadBalancerId: networkLoadBalancerId,
-			PageSize:              1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -205,6 +255,12 @@ func (it *NetworkLoadBalancerOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -214,6 +270,38 @@ func (it *NetworkLoadBalancerOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *NetworkLoadBalancerOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *NetworkLoadBalancerOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *NetworkLoadBalancerOperationsIterator) Value() *operation.Operation {

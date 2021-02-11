@@ -60,8 +60,10 @@ type RouteTableIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *RouteTableServiceClient
 	request *vpc.ListRouteTablesRequest
@@ -69,15 +71,19 @@ type RouteTableIterator struct {
 	items []*vpc.RouteTable
 }
 
-func (c *RouteTableServiceClient) RouteTableIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *RouteTableIterator {
+func (c *RouteTableServiceClient) RouteTableIterator(ctx context.Context, req *vpc.ListRouteTablesRequest, opts ...grpc.CallOption) *RouteTableIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &RouteTableIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &vpc.ListRouteTablesRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -97,6 +103,12 @@ func (it *RouteTableIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -106,6 +118,38 @@ func (it *RouteTableIterator) Next() bool {
 	it.items = response.RouteTables
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *RouteTableIterator) Take(size int64) ([]*vpc.RouteTable, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*vpc.RouteTable
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *RouteTableIterator) TakeAll() ([]*vpc.RouteTable, error) {
+	return it.Take(0)
 }
 
 func (it *RouteTableIterator) Value() *vpc.RouteTable {
@@ -132,8 +176,10 @@ type RouteTableOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *RouteTableServiceClient
 	request *vpc.ListRouteTableOperationsRequest
@@ -141,15 +187,19 @@ type RouteTableOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *RouteTableServiceClient) RouteTableOperationsIterator(ctx context.Context, routeTableId string, opts ...grpc.CallOption) *RouteTableOperationsIterator {
+func (c *RouteTableServiceClient) RouteTableOperationsIterator(ctx context.Context, req *vpc.ListRouteTableOperationsRequest, opts ...grpc.CallOption) *RouteTableOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &RouteTableOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &vpc.ListRouteTableOperationsRequest{
-			RouteTableId: routeTableId,
-			PageSize:     1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -169,6 +219,12 @@ func (it *RouteTableOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -178,6 +234,38 @@ func (it *RouteTableOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *RouteTableOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *RouteTableOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *RouteTableOperationsIterator) Value() *operation.Operation {

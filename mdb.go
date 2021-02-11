@@ -5,6 +5,7 @@ package ycsdk
 
 import (
 	"github.com/yandex-cloud/go-sdk/gen/mdb/clickhouse"
+	"github.com/yandex-cloud/go-sdk/gen/mdb/elasticsearch"
 	"github.com/yandex-cloud/go-sdk/gen/mdb/kafka"
 	"github.com/yandex-cloud/go-sdk/gen/mdb/mongodb"
 	"github.com/yandex-cloud/go-sdk/gen/mdb/mysql"
@@ -21,6 +22,7 @@ const (
 	MDBMySQLServiceID      Endpoint = "managed-mysql"
 	MDBKafkaServiceID      Endpoint = "managed-kafka"
 	MDBSQLServerServiceID  Endpoint = "managed-sqlserver"
+	MDBElasticSearchID     Endpoint = "managed-elasticsearch"
 )
 
 type MDB struct {
@@ -53,4 +55,8 @@ func (m *MDB) MySQL() *mysql.MySQL {
 
 func (m *MDB) SQLServer() *sqlserver.SQLServer {
 	return sqlserver.NewSQLServer(m.sdk.getConn(MDBSQLServerServiceID))
+}
+
+func (m *MDB) ElasticSearch() *elasticsearch.ElasticSearch {
+	return elasticsearch.NewElasticSearch(m.sdk.getConn(MDBElasticSearchID))
 }

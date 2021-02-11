@@ -41,8 +41,10 @@ type BackupIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *BackupServiceClient
 	request *clickhouse.ListBackupsRequest
@@ -50,15 +52,19 @@ type BackupIterator struct {
 	items []*clickhouse.Backup
 }
 
-func (c *BackupServiceClient) BackupIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *BackupIterator {
+func (c *BackupServiceClient) BackupIterator(ctx context.Context, req *clickhouse.ListBackupsRequest, opts ...grpc.CallOption) *BackupIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &BackupIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &clickhouse.ListBackupsRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -78,6 +84,12 @@ func (it *BackupIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -87,6 +99,38 @@ func (it *BackupIterator) Next() bool {
 	it.items = response.Backups
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *BackupIterator) Take(size int64) ([]*clickhouse.Backup, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*clickhouse.Backup
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *BackupIterator) TakeAll() ([]*clickhouse.Backup, error) {
+	return it.Take(0)
 }
 
 func (it *BackupIterator) Value() *clickhouse.Backup {

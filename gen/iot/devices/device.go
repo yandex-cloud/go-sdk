@@ -105,8 +105,10 @@ type DeviceCertificatesIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *DeviceServiceClient
 	request *devices.ListDeviceCertificatesRequest
@@ -114,14 +116,19 @@ type DeviceCertificatesIterator struct {
 	items []*devices.DeviceCertificate
 }
 
-func (c *DeviceServiceClient) DeviceCertificatesIterator(ctx context.Context, deviceId string, opts ...grpc.CallOption) *DeviceCertificatesIterator {
+func (c *DeviceServiceClient) DeviceCertificatesIterator(ctx context.Context, req *devices.ListDeviceCertificatesRequest, opts ...grpc.CallOption) *DeviceCertificatesIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &DeviceCertificatesIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &devices.ListDeviceCertificatesRequest{
-			DeviceId: deviceId,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -151,6 +158,38 @@ func (it *DeviceCertificatesIterator) Next() bool {
 	return len(it.items) > 0
 }
 
+func (it *DeviceCertificatesIterator) Take(size int64) ([]*devices.DeviceCertificate, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*devices.DeviceCertificate
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *DeviceCertificatesIterator) TakeAll() ([]*devices.DeviceCertificate, error) {
+	return it.Take(0)
+}
+
 func (it *DeviceCertificatesIterator) Value() *devices.DeviceCertificate {
 	if len(it.items) == 0 {
 		panic("calling Value on empty iterator")
@@ -175,8 +214,10 @@ type DeviceOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *DeviceServiceClient
 	request *devices.ListDeviceOperationsRequest
@@ -184,15 +225,19 @@ type DeviceOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *DeviceServiceClient) DeviceOperationsIterator(ctx context.Context, deviceId string, opts ...grpc.CallOption) *DeviceOperationsIterator {
+func (c *DeviceServiceClient) DeviceOperationsIterator(ctx context.Context, req *devices.ListDeviceOperationsRequest, opts ...grpc.CallOption) *DeviceOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &DeviceOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &devices.ListDeviceOperationsRequest{
-			DeviceId: deviceId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -212,6 +257,12 @@ func (it *DeviceOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -221,6 +272,38 @@ func (it *DeviceOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *DeviceOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *DeviceOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *DeviceOperationsIterator) Value() *operation.Operation {
@@ -247,8 +330,10 @@ type DevicePasswordsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *DeviceServiceClient
 	request *devices.ListDevicePasswordsRequest
@@ -256,14 +341,19 @@ type DevicePasswordsIterator struct {
 	items []*devices.DevicePassword
 }
 
-func (c *DeviceServiceClient) DevicePasswordsIterator(ctx context.Context, deviceId string, opts ...grpc.CallOption) *DevicePasswordsIterator {
+func (c *DeviceServiceClient) DevicePasswordsIterator(ctx context.Context, req *devices.ListDevicePasswordsRequest, opts ...grpc.CallOption) *DevicePasswordsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &DevicePasswordsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &devices.ListDevicePasswordsRequest{
-			DeviceId: deviceId,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -291,6 +381,38 @@ func (it *DevicePasswordsIterator) Next() bool {
 
 	it.items = response.Passwords
 	return len(it.items) > 0
+}
+
+func (it *DevicePasswordsIterator) Take(size int64) ([]*devices.DevicePassword, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*devices.DevicePassword
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *DevicePasswordsIterator) TakeAll() ([]*devices.DevicePassword, error) {
+	return it.Take(0)
 }
 
 func (it *DevicePasswordsIterator) Value() *devices.DevicePassword {

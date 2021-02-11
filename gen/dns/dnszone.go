@@ -70,8 +70,10 @@ type DnsZoneIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *DnsZoneServiceClient
 	request *dns.ListDnsZonesRequest
@@ -79,15 +81,19 @@ type DnsZoneIterator struct {
 	items []*dns.DnsZone
 }
 
-func (c *DnsZoneServiceClient) DnsZoneIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *DnsZoneIterator {
+func (c *DnsZoneServiceClient) DnsZoneIterator(ctx context.Context, req *dns.ListDnsZonesRequest, opts ...grpc.CallOption) *DnsZoneIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &DnsZoneIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &dns.ListDnsZonesRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -107,6 +113,12 @@ func (it *DnsZoneIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -116,6 +128,38 @@ func (it *DnsZoneIterator) Next() bool {
 	it.items = response.DnsZones
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *DnsZoneIterator) Take(size int64) ([]*dns.DnsZone, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*dns.DnsZone
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *DnsZoneIterator) TakeAll() ([]*dns.DnsZone, error) {
+	return it.Take(0)
 }
 
 func (it *DnsZoneIterator) Value() *dns.DnsZone {
@@ -142,8 +186,10 @@ type DnsZoneAccessBindingsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *DnsZoneServiceClient
 	request *access.ListAccessBindingsRequest
@@ -151,15 +197,19 @@ type DnsZoneAccessBindingsIterator struct {
 	items []*access.AccessBinding
 }
 
-func (c *DnsZoneServiceClient) DnsZoneAccessBindingsIterator(ctx context.Context, resourceId string, opts ...grpc.CallOption) *DnsZoneAccessBindingsIterator {
+func (c *DnsZoneServiceClient) DnsZoneAccessBindingsIterator(ctx context.Context, req *access.ListAccessBindingsRequest, opts ...grpc.CallOption) *DnsZoneAccessBindingsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &DnsZoneAccessBindingsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &access.ListAccessBindingsRequest{
-			ResourceId: resourceId,
-			PageSize:   1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -179,6 +229,12 @@ func (it *DnsZoneAccessBindingsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListAccessBindings(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -188,6 +244,38 @@ func (it *DnsZoneAccessBindingsIterator) Next() bool {
 	it.items = response.AccessBindings
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *DnsZoneAccessBindingsIterator) Take(size int64) ([]*access.AccessBinding, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*access.AccessBinding
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *DnsZoneAccessBindingsIterator) TakeAll() ([]*access.AccessBinding, error) {
+	return it.Take(0)
 }
 
 func (it *DnsZoneAccessBindingsIterator) Value() *access.AccessBinding {
@@ -214,8 +302,10 @@ type DnsZoneOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *DnsZoneServiceClient
 	request *dns.ListDnsZoneOperationsRequest
@@ -223,15 +313,19 @@ type DnsZoneOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *DnsZoneServiceClient) DnsZoneOperationsIterator(ctx context.Context, dnsZoneId string, opts ...grpc.CallOption) *DnsZoneOperationsIterator {
+func (c *DnsZoneServiceClient) DnsZoneOperationsIterator(ctx context.Context, req *dns.ListDnsZoneOperationsRequest, opts ...grpc.CallOption) *DnsZoneOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &DnsZoneOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &dns.ListDnsZoneOperationsRequest{
-			DnsZoneId: dnsZoneId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -251,6 +345,12 @@ func (it *DnsZoneOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -260,6 +360,38 @@ func (it *DnsZoneOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *DnsZoneOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *DnsZoneOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *DnsZoneOperationsIterator) Value() *operation.Operation {
@@ -286,8 +418,10 @@ type DnsZoneRecordSetsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *DnsZoneServiceClient
 	request *dns.ListDnsZoneRecordSetsRequest
@@ -295,15 +429,19 @@ type DnsZoneRecordSetsIterator struct {
 	items []*dns.RecordSet
 }
 
-func (c *DnsZoneServiceClient) DnsZoneRecordSetsIterator(ctx context.Context, dnsZoneId string, opts ...grpc.CallOption) *DnsZoneRecordSetsIterator {
+func (c *DnsZoneServiceClient) DnsZoneRecordSetsIterator(ctx context.Context, req *dns.ListDnsZoneRecordSetsRequest, opts ...grpc.CallOption) *DnsZoneRecordSetsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &DnsZoneRecordSetsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &dns.ListDnsZoneRecordSetsRequest{
-			DnsZoneId: dnsZoneId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -323,6 +461,12 @@ func (it *DnsZoneRecordSetsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListRecordSets(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -332,6 +476,38 @@ func (it *DnsZoneRecordSetsIterator) Next() bool {
 	it.items = response.RecordSets
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *DnsZoneRecordSetsIterator) Take(size int64) ([]*dns.RecordSet, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*dns.RecordSet
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *DnsZoneRecordSetsIterator) TakeAll() ([]*dns.RecordSet, error) {
+	return it.Take(0)
 }
 
 func (it *DnsZoneRecordSetsIterator) Value() *dns.RecordSet {

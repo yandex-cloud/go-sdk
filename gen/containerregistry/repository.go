@@ -21,15 +21,6 @@ type RepositoryServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
 }
 
-// Create implements containerregistry.RepositoryServiceClient
-func (c *RepositoryServiceClient) Create(ctx context.Context, in *containerregistry.CreateRepositoryRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
-	conn, err := c.getConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return containerregistry.NewRepositoryServiceClient(conn).Create(ctx, in, opts...)
-}
-
 // Delete implements containerregistry.RepositoryServiceClient
 func (c *RepositoryServiceClient) Delete(ctx context.Context, in *containerregistry.DeleteRepositoryRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -70,8 +61,10 @@ type RepositoryIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *RepositoryServiceClient
 	request *containerregistry.ListRepositoriesRequest
@@ -79,15 +72,19 @@ type RepositoryIterator struct {
 	items []*containerregistry.Repository
 }
 
-func (c *RepositoryServiceClient) RepositoryIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *RepositoryIterator {
+func (c *RepositoryServiceClient) RepositoryIterator(ctx context.Context, req *containerregistry.ListRepositoriesRequest, opts ...grpc.CallOption) *RepositoryIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &RepositoryIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &containerregistry.ListRepositoriesRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -107,6 +104,12 @@ func (it *RepositoryIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -116,6 +119,38 @@ func (it *RepositoryIterator) Next() bool {
 	it.items = response.Repositories
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *RepositoryIterator) Take(size int64) ([]*containerregistry.Repository, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*containerregistry.Repository
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *RepositoryIterator) TakeAll() ([]*containerregistry.Repository, error) {
+	return it.Take(0)
 }
 
 func (it *RepositoryIterator) Value() *containerregistry.Repository {
@@ -142,8 +177,10 @@ type RepositoryAccessBindingsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *RepositoryServiceClient
 	request *access.ListAccessBindingsRequest
@@ -151,15 +188,19 @@ type RepositoryAccessBindingsIterator struct {
 	items []*access.AccessBinding
 }
 
-func (c *RepositoryServiceClient) RepositoryAccessBindingsIterator(ctx context.Context, resourceId string, opts ...grpc.CallOption) *RepositoryAccessBindingsIterator {
+func (c *RepositoryServiceClient) RepositoryAccessBindingsIterator(ctx context.Context, req *access.ListAccessBindingsRequest, opts ...grpc.CallOption) *RepositoryAccessBindingsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &RepositoryAccessBindingsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &access.ListAccessBindingsRequest{
-			ResourceId: resourceId,
-			PageSize:   1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -179,6 +220,12 @@ func (it *RepositoryAccessBindingsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListAccessBindings(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -188,6 +235,38 @@ func (it *RepositoryAccessBindingsIterator) Next() bool {
 	it.items = response.AccessBindings
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *RepositoryAccessBindingsIterator) Take(size int64) ([]*access.AccessBinding, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*access.AccessBinding
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *RepositoryAccessBindingsIterator) TakeAll() ([]*access.AccessBinding, error) {
+	return it.Take(0)
 }
 
 func (it *RepositoryAccessBindingsIterator) Value() *access.AccessBinding {
@@ -217,4 +296,13 @@ func (c *RepositoryServiceClient) UpdateAccessBindings(ctx context.Context, in *
 		return nil, err
 	}
 	return containerregistry.NewRepositoryServiceClient(conn).UpdateAccessBindings(ctx, in, opts...)
+}
+
+// Upsert implements containerregistry.RepositoryServiceClient
+func (c *RepositoryServiceClient) Upsert(ctx context.Context, in *containerregistry.UpsertRepositoryRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return containerregistry.NewRepositoryServiceClient(conn).Upsert(ctx, in, opts...)
 }

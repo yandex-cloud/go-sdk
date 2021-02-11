@@ -69,8 +69,10 @@ type AddressIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *AddressServiceClient
 	request *vpc.ListAddressesRequest
@@ -78,15 +80,19 @@ type AddressIterator struct {
 	items []*vpc.Address
 }
 
-func (c *AddressServiceClient) AddressIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *AddressIterator {
+func (c *AddressServiceClient) AddressIterator(ctx context.Context, req *vpc.ListAddressesRequest, opts ...grpc.CallOption) *AddressIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &AddressIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &vpc.ListAddressesRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -106,6 +112,12 @@ func (it *AddressIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -115,6 +127,38 @@ func (it *AddressIterator) Next() bool {
 	it.items = response.Addresses
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *AddressIterator) Take(size int64) ([]*vpc.Address, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*vpc.Address
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *AddressIterator) TakeAll() ([]*vpc.Address, error) {
+	return it.Take(0)
 }
 
 func (it *AddressIterator) Value() *vpc.Address {
@@ -141,8 +185,10 @@ type AddressOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *AddressServiceClient
 	request *vpc.ListAddressOperationsRequest
@@ -150,15 +196,19 @@ type AddressOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *AddressServiceClient) AddressOperationsIterator(ctx context.Context, addressId string, opts ...grpc.CallOption) *AddressOperationsIterator {
+func (c *AddressServiceClient) AddressOperationsIterator(ctx context.Context, req *vpc.ListAddressOperationsRequest, opts ...grpc.CallOption) *AddressOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &AddressOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &vpc.ListAddressOperationsRequest{
-			AddressId: addressId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -178,6 +228,12 @@ func (it *AddressOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -187,6 +243,38 @@ func (it *AddressOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *AddressOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *AddressOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *AddressOperationsIterator) Value() *operation.Operation {

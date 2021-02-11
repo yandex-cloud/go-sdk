@@ -168,8 +168,10 @@ type ClusterIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ClusterServiceClient
 	request *clickhouse.ListClustersRequest
@@ -177,15 +179,19 @@ type ClusterIterator struct {
 	items []*clickhouse.Cluster
 }
 
-func (c *ClusterServiceClient) ClusterIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *ClusterIterator {
+func (c *ClusterServiceClient) ClusterIterator(ctx context.Context, req *clickhouse.ListClustersRequest, opts ...grpc.CallOption) *ClusterIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ClusterIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &clickhouse.ListClustersRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -205,6 +211,12 @@ func (it *ClusterIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -214,6 +226,38 @@ func (it *ClusterIterator) Next() bool {
 	it.items = response.Clusters
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ClusterIterator) Take(size int64) ([]*clickhouse.Cluster, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*clickhouse.Cluster
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ClusterIterator) TakeAll() ([]*clickhouse.Cluster, error) {
+	return it.Take(0)
 }
 
 func (it *ClusterIterator) Value() *clickhouse.Cluster {
@@ -240,8 +284,10 @@ type ClusterBackupsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ClusterServiceClient
 	request *clickhouse.ListClusterBackupsRequest
@@ -249,15 +295,19 @@ type ClusterBackupsIterator struct {
 	items []*clickhouse.Backup
 }
 
-func (c *ClusterServiceClient) ClusterBackupsIterator(ctx context.Context, clusterId string, opts ...grpc.CallOption) *ClusterBackupsIterator {
+func (c *ClusterServiceClient) ClusterBackupsIterator(ctx context.Context, req *clickhouse.ListClusterBackupsRequest, opts ...grpc.CallOption) *ClusterBackupsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ClusterBackupsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &clickhouse.ListClusterBackupsRequest{
-			ClusterId: clusterId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -277,6 +327,12 @@ func (it *ClusterBackupsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListBackups(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -286,6 +342,38 @@ func (it *ClusterBackupsIterator) Next() bool {
 	it.items = response.Backups
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ClusterBackupsIterator) Take(size int64) ([]*clickhouse.Backup, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*clickhouse.Backup
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ClusterBackupsIterator) TakeAll() ([]*clickhouse.Backup, error) {
+	return it.Take(0)
 }
 
 func (it *ClusterBackupsIterator) Value() *clickhouse.Backup {
@@ -312,8 +400,10 @@ type ClusterHostsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ClusterServiceClient
 	request *clickhouse.ListClusterHostsRequest
@@ -321,15 +411,19 @@ type ClusterHostsIterator struct {
 	items []*clickhouse.Host
 }
 
-func (c *ClusterServiceClient) ClusterHostsIterator(ctx context.Context, clusterId string, opts ...grpc.CallOption) *ClusterHostsIterator {
+func (c *ClusterServiceClient) ClusterHostsIterator(ctx context.Context, req *clickhouse.ListClusterHostsRequest, opts ...grpc.CallOption) *ClusterHostsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ClusterHostsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &clickhouse.ListClusterHostsRequest{
-			ClusterId: clusterId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -349,6 +443,12 @@ func (it *ClusterHostsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListHosts(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -358,6 +458,38 @@ func (it *ClusterHostsIterator) Next() bool {
 	it.items = response.Hosts
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ClusterHostsIterator) Take(size int64) ([]*clickhouse.Host, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*clickhouse.Host
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ClusterHostsIterator) TakeAll() ([]*clickhouse.Host, error) {
+	return it.Take(0)
 }
 
 func (it *ClusterHostsIterator) Value() *clickhouse.Host {
@@ -384,8 +516,10 @@ type ClusterLogsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ClusterServiceClient
 	request *clickhouse.ListClusterLogsRequest
@@ -393,15 +527,19 @@ type ClusterLogsIterator struct {
 	items []*clickhouse.LogRecord
 }
 
-func (c *ClusterServiceClient) ClusterLogsIterator(ctx context.Context, clusterId string, opts ...grpc.CallOption) *ClusterLogsIterator {
+func (c *ClusterServiceClient) ClusterLogsIterator(ctx context.Context, req *clickhouse.ListClusterLogsRequest, opts ...grpc.CallOption) *ClusterLogsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ClusterLogsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &clickhouse.ListClusterLogsRequest{
-			ClusterId: clusterId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -421,6 +559,12 @@ func (it *ClusterLogsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListLogs(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -430,6 +574,38 @@ func (it *ClusterLogsIterator) Next() bool {
 	it.items = response.Logs
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ClusterLogsIterator) Take(size int64) ([]*clickhouse.LogRecord, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*clickhouse.LogRecord
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ClusterLogsIterator) TakeAll() ([]*clickhouse.LogRecord, error) {
+	return it.Take(0)
 }
 
 func (it *ClusterLogsIterator) Value() *clickhouse.LogRecord {
@@ -456,8 +632,10 @@ type ClusterOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ClusterServiceClient
 	request *clickhouse.ListClusterOperationsRequest
@@ -465,15 +643,19 @@ type ClusterOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *ClusterServiceClient) ClusterOperationsIterator(ctx context.Context, clusterId string, opts ...grpc.CallOption) *ClusterOperationsIterator {
+func (c *ClusterServiceClient) ClusterOperationsIterator(ctx context.Context, req *clickhouse.ListClusterOperationsRequest, opts ...grpc.CallOption) *ClusterOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ClusterOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &clickhouse.ListClusterOperationsRequest{
-			ClusterId: clusterId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -493,6 +675,12 @@ func (it *ClusterOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -502,6 +690,38 @@ func (it *ClusterOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ClusterOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ClusterOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *ClusterOperationsIterator) Value() *operation.Operation {
@@ -528,8 +748,10 @@ type ClusterShardGroupsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ClusterServiceClient
 	request *clickhouse.ListClusterShardGroupsRequest
@@ -537,15 +759,19 @@ type ClusterShardGroupsIterator struct {
 	items []*clickhouse.ShardGroup
 }
 
-func (c *ClusterServiceClient) ClusterShardGroupsIterator(ctx context.Context, clusterId string, opts ...grpc.CallOption) *ClusterShardGroupsIterator {
+func (c *ClusterServiceClient) ClusterShardGroupsIterator(ctx context.Context, req *clickhouse.ListClusterShardGroupsRequest, opts ...grpc.CallOption) *ClusterShardGroupsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ClusterShardGroupsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &clickhouse.ListClusterShardGroupsRequest{
-			ClusterId: clusterId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -565,6 +791,12 @@ func (it *ClusterShardGroupsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListShardGroups(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -574,6 +806,38 @@ func (it *ClusterShardGroupsIterator) Next() bool {
 	it.items = response.ShardGroups
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ClusterShardGroupsIterator) Take(size int64) ([]*clickhouse.ShardGroup, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*clickhouse.ShardGroup
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ClusterShardGroupsIterator) TakeAll() ([]*clickhouse.ShardGroup, error) {
+	return it.Take(0)
 }
 
 func (it *ClusterShardGroupsIterator) Value() *clickhouse.ShardGroup {
@@ -600,8 +864,10 @@ type ClusterShardsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ClusterServiceClient
 	request *clickhouse.ListClusterShardsRequest
@@ -609,15 +875,19 @@ type ClusterShardsIterator struct {
 	items []*clickhouse.Shard
 }
 
-func (c *ClusterServiceClient) ClusterShardsIterator(ctx context.Context, clusterId string, opts ...grpc.CallOption) *ClusterShardsIterator {
+func (c *ClusterServiceClient) ClusterShardsIterator(ctx context.Context, req *clickhouse.ListClusterShardsRequest, opts ...grpc.CallOption) *ClusterShardsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ClusterShardsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &clickhouse.ListClusterShardsRequest{
-			ClusterId: clusterId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -637,6 +907,12 @@ func (it *ClusterShardsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListShards(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -646,6 +922,38 @@ func (it *ClusterShardsIterator) Next() bool {
 	it.items = response.Shards
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ClusterShardsIterator) Take(size int64) ([]*clickhouse.Shard, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*clickhouse.Shard
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ClusterShardsIterator) TakeAll() ([]*clickhouse.Shard, error) {
+	return it.Take(0)
 }
 
 func (it *ClusterShardsIterator) Value() *clickhouse.Shard {

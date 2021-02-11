@@ -60,8 +60,10 @@ type NetworkIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *NetworkServiceClient
 	request *vpc.ListNetworksRequest
@@ -69,15 +71,19 @@ type NetworkIterator struct {
 	items []*vpc.Network
 }
 
-func (c *NetworkServiceClient) NetworkIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *NetworkIterator {
+func (c *NetworkServiceClient) NetworkIterator(ctx context.Context, req *vpc.ListNetworksRequest, opts ...grpc.CallOption) *NetworkIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &NetworkIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &vpc.ListNetworksRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -97,6 +103,12 @@ func (it *NetworkIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -106,6 +118,38 @@ func (it *NetworkIterator) Next() bool {
 	it.items = response.Networks
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *NetworkIterator) Take(size int64) ([]*vpc.Network, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*vpc.Network
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *NetworkIterator) TakeAll() ([]*vpc.Network, error) {
+	return it.Take(0)
 }
 
 func (it *NetworkIterator) Value() *vpc.Network {
@@ -132,8 +176,10 @@ type NetworkOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *NetworkServiceClient
 	request *vpc.ListNetworkOperationsRequest
@@ -141,15 +187,19 @@ type NetworkOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *NetworkServiceClient) NetworkOperationsIterator(ctx context.Context, networkId string, opts ...grpc.CallOption) *NetworkOperationsIterator {
+func (c *NetworkServiceClient) NetworkOperationsIterator(ctx context.Context, req *vpc.ListNetworkOperationsRequest, opts ...grpc.CallOption) *NetworkOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &NetworkOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &vpc.ListNetworkOperationsRequest{
-			NetworkId: networkId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -169,6 +219,12 @@ func (it *NetworkOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -178,6 +234,38 @@ func (it *NetworkOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *NetworkOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *NetworkOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *NetworkOperationsIterator) Value() *operation.Operation {
@@ -204,8 +292,10 @@ type NetworkSubnetsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *NetworkServiceClient
 	request *vpc.ListNetworkSubnetsRequest
@@ -213,15 +303,19 @@ type NetworkSubnetsIterator struct {
 	items []*vpc.Subnet
 }
 
-func (c *NetworkServiceClient) NetworkSubnetsIterator(ctx context.Context, networkId string, opts ...grpc.CallOption) *NetworkSubnetsIterator {
+func (c *NetworkServiceClient) NetworkSubnetsIterator(ctx context.Context, req *vpc.ListNetworkSubnetsRequest, opts ...grpc.CallOption) *NetworkSubnetsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &NetworkSubnetsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &vpc.ListNetworkSubnetsRequest{
-			NetworkId: networkId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -241,6 +335,12 @@ func (it *NetworkSubnetsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListSubnets(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -250,6 +350,38 @@ func (it *NetworkSubnetsIterator) Next() bool {
 	it.items = response.Subnets
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *NetworkSubnetsIterator) Take(size int64) ([]*vpc.Subnet, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*vpc.Subnet
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *NetworkSubnetsIterator) TakeAll() ([]*vpc.Subnet, error) {
+	return it.Take(0)
 }
 
 func (it *NetworkSubnetsIterator) Value() *vpc.Subnet {

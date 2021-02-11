@@ -60,8 +60,10 @@ type KeyIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *KeyServiceClient
 	request *iam.ListKeysRequest
@@ -69,15 +71,19 @@ type KeyIterator struct {
 	items []*iam.Key
 }
 
-func (c *KeyServiceClient) KeyIterator(ctx context.Context, serviceAccountId string, opts ...grpc.CallOption) *KeyIterator {
+func (c *KeyServiceClient) KeyIterator(ctx context.Context, req *iam.ListKeysRequest, opts ...grpc.CallOption) *KeyIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &KeyIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &iam.ListKeysRequest{
-			ServiceAccountId: serviceAccountId,
-			PageSize:         1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -97,6 +103,12 @@ func (it *KeyIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -106,6 +118,38 @@ func (it *KeyIterator) Next() bool {
 	it.items = response.Keys
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *KeyIterator) Take(size int64) ([]*iam.Key, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*iam.Key
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *KeyIterator) TakeAll() ([]*iam.Key, error) {
+	return it.Take(0)
 }
 
 func (it *KeyIterator) Value() *iam.Key {
@@ -132,8 +176,10 @@ type KeyOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *KeyServiceClient
 	request *iam.ListKeyOperationsRequest
@@ -141,15 +187,19 @@ type KeyOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *KeyServiceClient) KeyOperationsIterator(ctx context.Context, keyId string, opts ...grpc.CallOption) *KeyOperationsIterator {
+func (c *KeyServiceClient) KeyOperationsIterator(ctx context.Context, req *iam.ListKeyOperationsRequest, opts ...grpc.CallOption) *KeyOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &KeyOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &iam.ListKeyOperationsRequest{
-			KeyId:    keyId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -169,6 +219,12 @@ func (it *KeyOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -178,6 +234,38 @@ func (it *KeyOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *KeyOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *KeyOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *KeyOperationsIterator) Value() *operation.Operation {

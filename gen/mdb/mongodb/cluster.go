@@ -123,8 +123,10 @@ type ClusterIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ClusterServiceClient
 	request *mongodb.ListClustersRequest
@@ -132,15 +134,19 @@ type ClusterIterator struct {
 	items []*mongodb.Cluster
 }
 
-func (c *ClusterServiceClient) ClusterIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *ClusterIterator {
+func (c *ClusterServiceClient) ClusterIterator(ctx context.Context, req *mongodb.ListClustersRequest, opts ...grpc.CallOption) *ClusterIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ClusterIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &mongodb.ListClustersRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -160,6 +166,12 @@ func (it *ClusterIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -169,6 +181,38 @@ func (it *ClusterIterator) Next() bool {
 	it.items = response.Clusters
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ClusterIterator) Take(size int64) ([]*mongodb.Cluster, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*mongodb.Cluster
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ClusterIterator) TakeAll() ([]*mongodb.Cluster, error) {
+	return it.Take(0)
 }
 
 func (it *ClusterIterator) Value() *mongodb.Cluster {
@@ -195,8 +239,10 @@ type ClusterBackupsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ClusterServiceClient
 	request *mongodb.ListClusterBackupsRequest
@@ -204,15 +250,19 @@ type ClusterBackupsIterator struct {
 	items []*mongodb.Backup
 }
 
-func (c *ClusterServiceClient) ClusterBackupsIterator(ctx context.Context, clusterId string, opts ...grpc.CallOption) *ClusterBackupsIterator {
+func (c *ClusterServiceClient) ClusterBackupsIterator(ctx context.Context, req *mongodb.ListClusterBackupsRequest, opts ...grpc.CallOption) *ClusterBackupsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ClusterBackupsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &mongodb.ListClusterBackupsRequest{
-			ClusterId: clusterId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -232,6 +282,12 @@ func (it *ClusterBackupsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListBackups(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -241,6 +297,38 @@ func (it *ClusterBackupsIterator) Next() bool {
 	it.items = response.Backups
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ClusterBackupsIterator) Take(size int64) ([]*mongodb.Backup, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*mongodb.Backup
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ClusterBackupsIterator) TakeAll() ([]*mongodb.Backup, error) {
+	return it.Take(0)
 }
 
 func (it *ClusterBackupsIterator) Value() *mongodb.Backup {
@@ -267,8 +355,10 @@ type ClusterHostsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ClusterServiceClient
 	request *mongodb.ListClusterHostsRequest
@@ -276,15 +366,19 @@ type ClusterHostsIterator struct {
 	items []*mongodb.Host
 }
 
-func (c *ClusterServiceClient) ClusterHostsIterator(ctx context.Context, clusterId string, opts ...grpc.CallOption) *ClusterHostsIterator {
+func (c *ClusterServiceClient) ClusterHostsIterator(ctx context.Context, req *mongodb.ListClusterHostsRequest, opts ...grpc.CallOption) *ClusterHostsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ClusterHostsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &mongodb.ListClusterHostsRequest{
-			ClusterId: clusterId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -304,6 +398,12 @@ func (it *ClusterHostsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListHosts(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -313,6 +413,38 @@ func (it *ClusterHostsIterator) Next() bool {
 	it.items = response.Hosts
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ClusterHostsIterator) Take(size int64) ([]*mongodb.Host, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*mongodb.Host
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ClusterHostsIterator) TakeAll() ([]*mongodb.Host, error) {
+	return it.Take(0)
 }
 
 func (it *ClusterHostsIterator) Value() *mongodb.Host {
@@ -339,8 +471,10 @@ type ClusterLogsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ClusterServiceClient
 	request *mongodb.ListClusterLogsRequest
@@ -348,15 +482,19 @@ type ClusterLogsIterator struct {
 	items []*mongodb.LogRecord
 }
 
-func (c *ClusterServiceClient) ClusterLogsIterator(ctx context.Context, clusterId string, opts ...grpc.CallOption) *ClusterLogsIterator {
+func (c *ClusterServiceClient) ClusterLogsIterator(ctx context.Context, req *mongodb.ListClusterLogsRequest, opts ...grpc.CallOption) *ClusterLogsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ClusterLogsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &mongodb.ListClusterLogsRequest{
-			ClusterId: clusterId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -376,6 +514,12 @@ func (it *ClusterLogsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListLogs(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -385,6 +529,38 @@ func (it *ClusterLogsIterator) Next() bool {
 	it.items = response.Logs
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ClusterLogsIterator) Take(size int64) ([]*mongodb.LogRecord, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*mongodb.LogRecord
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ClusterLogsIterator) TakeAll() ([]*mongodb.LogRecord, error) {
+	return it.Take(0)
 }
 
 func (it *ClusterLogsIterator) Value() *mongodb.LogRecord {
@@ -411,8 +587,10 @@ type ClusterOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ClusterServiceClient
 	request *mongodb.ListClusterOperationsRequest
@@ -420,15 +598,19 @@ type ClusterOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *ClusterServiceClient) ClusterOperationsIterator(ctx context.Context, clusterId string, opts ...grpc.CallOption) *ClusterOperationsIterator {
+func (c *ClusterServiceClient) ClusterOperationsIterator(ctx context.Context, req *mongodb.ListClusterOperationsRequest, opts ...grpc.CallOption) *ClusterOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ClusterOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &mongodb.ListClusterOperationsRequest{
-			ClusterId: clusterId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -448,6 +630,12 @@ func (it *ClusterOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -457,6 +645,38 @@ func (it *ClusterOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ClusterOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ClusterOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *ClusterOperationsIterator) Value() *operation.Operation {
@@ -483,8 +703,10 @@ type ClusterShardsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ClusterServiceClient
 	request *mongodb.ListClusterShardsRequest
@@ -492,15 +714,19 @@ type ClusterShardsIterator struct {
 	items []*mongodb.Shard
 }
 
-func (c *ClusterServiceClient) ClusterShardsIterator(ctx context.Context, clusterId string, opts ...grpc.CallOption) *ClusterShardsIterator {
+func (c *ClusterServiceClient) ClusterShardsIterator(ctx context.Context, req *mongodb.ListClusterShardsRequest, opts ...grpc.CallOption) *ClusterShardsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ClusterShardsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &mongodb.ListClusterShardsRequest{
-			ClusterId: clusterId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -520,6 +746,12 @@ func (it *ClusterShardsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListShards(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -529,6 +761,38 @@ func (it *ClusterShardsIterator) Next() bool {
 	it.items = response.Shards
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ClusterShardsIterator) Take(size int64) ([]*mongodb.Shard, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*mongodb.Shard
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ClusterShardsIterator) TakeAll() ([]*mongodb.Shard, error) {
+	return it.Take(0)
 }
 
 func (it *ClusterShardsIterator) Value() *mongodb.Shard {

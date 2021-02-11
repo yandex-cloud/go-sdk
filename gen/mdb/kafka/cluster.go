@@ -60,8 +60,10 @@ type ClusterIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ClusterServiceClient
 	request *kafka.ListClustersRequest
@@ -69,15 +71,19 @@ type ClusterIterator struct {
 	items []*kafka.Cluster
 }
 
-func (c *ClusterServiceClient) ClusterIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *ClusterIterator {
+func (c *ClusterServiceClient) ClusterIterator(ctx context.Context, req *kafka.ListClustersRequest, opts ...grpc.CallOption) *ClusterIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ClusterIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &kafka.ListClustersRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -97,6 +103,12 @@ func (it *ClusterIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -106,6 +118,38 @@ func (it *ClusterIterator) Next() bool {
 	it.items = response.Clusters
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ClusterIterator) Take(size int64) ([]*kafka.Cluster, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*kafka.Cluster
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ClusterIterator) TakeAll() ([]*kafka.Cluster, error) {
+	return it.Take(0)
 }
 
 func (it *ClusterIterator) Value() *kafka.Cluster {
@@ -132,8 +176,10 @@ type ClusterHostsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ClusterServiceClient
 	request *kafka.ListClusterHostsRequest
@@ -141,15 +187,19 @@ type ClusterHostsIterator struct {
 	items []*kafka.Host
 }
 
-func (c *ClusterServiceClient) ClusterHostsIterator(ctx context.Context, clusterId string, opts ...grpc.CallOption) *ClusterHostsIterator {
+func (c *ClusterServiceClient) ClusterHostsIterator(ctx context.Context, req *kafka.ListClusterHostsRequest, opts ...grpc.CallOption) *ClusterHostsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ClusterHostsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &kafka.ListClusterHostsRequest{
-			ClusterId: clusterId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -169,6 +219,12 @@ func (it *ClusterHostsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListHosts(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -178,6 +234,38 @@ func (it *ClusterHostsIterator) Next() bool {
 	it.items = response.Hosts
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ClusterHostsIterator) Take(size int64) ([]*kafka.Host, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*kafka.Host
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ClusterHostsIterator) TakeAll() ([]*kafka.Host, error) {
+	return it.Take(0)
 }
 
 func (it *ClusterHostsIterator) Value() *kafka.Host {
@@ -204,8 +292,10 @@ type ClusterLogsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ClusterServiceClient
 	request *kafka.ListClusterLogsRequest
@@ -213,15 +303,19 @@ type ClusterLogsIterator struct {
 	items []*kafka.LogRecord
 }
 
-func (c *ClusterServiceClient) ClusterLogsIterator(ctx context.Context, clusterId string, opts ...grpc.CallOption) *ClusterLogsIterator {
+func (c *ClusterServiceClient) ClusterLogsIterator(ctx context.Context, req *kafka.ListClusterLogsRequest, opts ...grpc.CallOption) *ClusterLogsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ClusterLogsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &kafka.ListClusterLogsRequest{
-			ClusterId: clusterId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -241,6 +335,12 @@ func (it *ClusterLogsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListLogs(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -250,6 +350,38 @@ func (it *ClusterLogsIterator) Next() bool {
 	it.items = response.Logs
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ClusterLogsIterator) Take(size int64) ([]*kafka.LogRecord, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*kafka.LogRecord
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ClusterLogsIterator) TakeAll() ([]*kafka.LogRecord, error) {
+	return it.Take(0)
 }
 
 func (it *ClusterLogsIterator) Value() *kafka.LogRecord {
@@ -276,8 +408,10 @@ type ClusterOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ClusterServiceClient
 	request *kafka.ListClusterOperationsRequest
@@ -285,15 +419,19 @@ type ClusterOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *ClusterServiceClient) ClusterOperationsIterator(ctx context.Context, clusterId string, opts ...grpc.CallOption) *ClusterOperationsIterator {
+func (c *ClusterServiceClient) ClusterOperationsIterator(ctx context.Context, req *kafka.ListClusterOperationsRequest, opts ...grpc.CallOption) *ClusterOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ClusterOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &kafka.ListClusterOperationsRequest{
-			ClusterId: clusterId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -313,6 +451,12 @@ func (it *ClusterOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -322,6 +466,38 @@ func (it *ClusterOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ClusterOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ClusterOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *ClusterOperationsIterator) Value() *operation.Operation {

@@ -41,8 +41,10 @@ type TranslationLanguagesIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *TranslationServiceClient
 	request *translate.ListLanguagesRequest
@@ -50,14 +52,19 @@ type TranslationLanguagesIterator struct {
 	items []*translate.Language
 }
 
-func (c *TranslationServiceClient) TranslationLanguagesIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *TranslationLanguagesIterator {
+func (c *TranslationServiceClient) TranslationLanguagesIterator(ctx context.Context, req *translate.ListLanguagesRequest, opts ...grpc.CallOption) *TranslationLanguagesIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &TranslationLanguagesIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &translate.ListLanguagesRequest{
-			FolderId: folderId,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -85,6 +92,38 @@ func (it *TranslationLanguagesIterator) Next() bool {
 
 	it.items = response.Languages
 	return len(it.items) > 0
+}
+
+func (it *TranslationLanguagesIterator) Take(size int64) ([]*translate.Language, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*translate.Language
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *TranslationLanguagesIterator) TakeAll() ([]*translate.Language, error) {
+	return it.Take(0)
 }
 
 func (it *TranslationLanguagesIterator) Value() *translate.Language {

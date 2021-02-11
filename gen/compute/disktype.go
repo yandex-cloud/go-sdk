@@ -41,8 +41,10 @@ type DiskTypeIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *DiskTypeServiceClient
 	request *compute.ListDiskTypesRequest
@@ -50,14 +52,19 @@ type DiskTypeIterator struct {
 	items []*compute.DiskType
 }
 
-func (c *DiskTypeServiceClient) DiskTypeIterator(ctx context.Context, opts ...grpc.CallOption) *DiskTypeIterator {
+func (c *DiskTypeServiceClient) DiskTypeIterator(ctx context.Context, req *compute.ListDiskTypesRequest, opts ...grpc.CallOption) *DiskTypeIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &DiskTypeIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &compute.ListDiskTypesRequest{
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -77,6 +84,12 @@ func (it *DiskTypeIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -86,6 +99,38 @@ func (it *DiskTypeIterator) Next() bool {
 	it.items = response.DiskTypes
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *DiskTypeIterator) Take(size int64) ([]*compute.DiskType, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*compute.DiskType
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *DiskTypeIterator) TakeAll() ([]*compute.DiskType, error) {
+	return it.Take(0)
 }
 
 func (it *DiskTypeIterator) Value() *compute.DiskType {

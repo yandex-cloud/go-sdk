@@ -60,8 +60,10 @@ type SnapshotIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *SnapshotServiceClient
 	request *compute.ListSnapshotsRequest
@@ -69,15 +71,19 @@ type SnapshotIterator struct {
 	items []*compute.Snapshot
 }
 
-func (c *SnapshotServiceClient) SnapshotIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *SnapshotIterator {
+func (c *SnapshotServiceClient) SnapshotIterator(ctx context.Context, req *compute.ListSnapshotsRequest, opts ...grpc.CallOption) *SnapshotIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &SnapshotIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &compute.ListSnapshotsRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -97,6 +103,12 @@ func (it *SnapshotIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -106,6 +118,38 @@ func (it *SnapshotIterator) Next() bool {
 	it.items = response.Snapshots
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *SnapshotIterator) Take(size int64) ([]*compute.Snapshot, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*compute.Snapshot
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *SnapshotIterator) TakeAll() ([]*compute.Snapshot, error) {
+	return it.Take(0)
 }
 
 func (it *SnapshotIterator) Value() *compute.Snapshot {
@@ -132,8 +176,10 @@ type SnapshotOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *SnapshotServiceClient
 	request *compute.ListSnapshotOperationsRequest
@@ -141,15 +187,19 @@ type SnapshotOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *SnapshotServiceClient) SnapshotOperationsIterator(ctx context.Context, snapshotId string, opts ...grpc.CallOption) *SnapshotOperationsIterator {
+func (c *SnapshotServiceClient) SnapshotOperationsIterator(ctx context.Context, req *compute.ListSnapshotOperationsRequest, opts ...grpc.CallOption) *SnapshotOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &SnapshotOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &compute.ListSnapshotOperationsRequest{
-			SnapshotId: snapshotId,
-			PageSize:   1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -169,6 +219,12 @@ func (it *SnapshotOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -178,6 +234,38 @@ func (it *SnapshotOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *SnapshotOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *SnapshotOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *SnapshotOperationsIterator) Value() *operation.Operation {

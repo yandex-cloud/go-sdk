@@ -32,8 +32,10 @@ type VersionIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *VersionServiceClient
 	request *k8s.ListVersionsRequest
@@ -41,12 +43,19 @@ type VersionIterator struct {
 	items []*k8s.AvailableVersions
 }
 
-func (c *VersionServiceClient) VersionIterator(ctx context.Context, opts ...grpc.CallOption) *VersionIterator {
+func (c *VersionServiceClient) VersionIterator(ctx context.Context, req *k8s.ListVersionsRequest, opts ...grpc.CallOption) *VersionIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &VersionIterator{
-		ctx:     ctx,
-		opts:    opts,
-		client:  c,
-		request: &k8s.ListVersionsRequest{},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -74,6 +83,38 @@ func (it *VersionIterator) Next() bool {
 
 	it.items = response.AvailableVersions
 	return len(it.items) > 0
+}
+
+func (it *VersionIterator) Take(size int64) ([]*k8s.AvailableVersions, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*k8s.AvailableVersions
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *VersionIterator) TakeAll() ([]*k8s.AvailableVersions, error) {
+	return it.Take(0)
 }
 
 func (it *VersionIterator) Value() *k8s.AvailableVersions {

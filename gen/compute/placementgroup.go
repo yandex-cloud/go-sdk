@@ -60,8 +60,10 @@ type PlacementGroupIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *PlacementGroupServiceClient
 	request *compute.ListPlacementGroupsRequest
@@ -69,15 +71,19 @@ type PlacementGroupIterator struct {
 	items []*compute.PlacementGroup
 }
 
-func (c *PlacementGroupServiceClient) PlacementGroupIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *PlacementGroupIterator {
+func (c *PlacementGroupServiceClient) PlacementGroupIterator(ctx context.Context, req *compute.ListPlacementGroupsRequest, opts ...grpc.CallOption) *PlacementGroupIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &PlacementGroupIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &compute.ListPlacementGroupsRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -97,6 +103,12 @@ func (it *PlacementGroupIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -106,6 +118,38 @@ func (it *PlacementGroupIterator) Next() bool {
 	it.items = response.PlacementGroups
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *PlacementGroupIterator) Take(size int64) ([]*compute.PlacementGroup, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*compute.PlacementGroup
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *PlacementGroupIterator) TakeAll() ([]*compute.PlacementGroup, error) {
+	return it.Take(0)
 }
 
 func (it *PlacementGroupIterator) Value() *compute.PlacementGroup {
@@ -132,8 +176,10 @@ type PlacementGroupInstancesIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *PlacementGroupServiceClient
 	request *compute.ListPlacementGroupInstancesRequest
@@ -141,15 +187,19 @@ type PlacementGroupInstancesIterator struct {
 	items []*compute.Instance
 }
 
-func (c *PlacementGroupServiceClient) PlacementGroupInstancesIterator(ctx context.Context, placementGroupId string, opts ...grpc.CallOption) *PlacementGroupInstancesIterator {
+func (c *PlacementGroupServiceClient) PlacementGroupInstancesIterator(ctx context.Context, req *compute.ListPlacementGroupInstancesRequest, opts ...grpc.CallOption) *PlacementGroupInstancesIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &PlacementGroupInstancesIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &compute.ListPlacementGroupInstancesRequest{
-			PlacementGroupId: placementGroupId,
-			PageSize:         1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -169,6 +219,12 @@ func (it *PlacementGroupInstancesIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListInstances(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -178,6 +234,38 @@ func (it *PlacementGroupInstancesIterator) Next() bool {
 	it.items = response.Instances
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *PlacementGroupInstancesIterator) Take(size int64) ([]*compute.Instance, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*compute.Instance
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *PlacementGroupInstancesIterator) TakeAll() ([]*compute.Instance, error) {
+	return it.Take(0)
 }
 
 func (it *PlacementGroupInstancesIterator) Value() *compute.Instance {
@@ -204,8 +292,10 @@ type PlacementGroupOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *PlacementGroupServiceClient
 	request *compute.ListPlacementGroupOperationsRequest
@@ -213,15 +303,19 @@ type PlacementGroupOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *PlacementGroupServiceClient) PlacementGroupOperationsIterator(ctx context.Context, placementGroupId string, opts ...grpc.CallOption) *PlacementGroupOperationsIterator {
+func (c *PlacementGroupServiceClient) PlacementGroupOperationsIterator(ctx context.Context, req *compute.ListPlacementGroupOperationsRequest, opts ...grpc.CallOption) *PlacementGroupOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &PlacementGroupOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &compute.ListPlacementGroupOperationsRequest{
-			PlacementGroupId: placementGroupId,
-			PageSize:         1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -241,6 +335,12 @@ func (it *PlacementGroupOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -250,6 +350,38 @@ func (it *PlacementGroupOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *PlacementGroupOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *PlacementGroupOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *PlacementGroupOperationsIterator) Value() *operation.Operation {

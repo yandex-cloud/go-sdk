@@ -61,8 +61,10 @@ type RegistryIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *RegistryServiceClient
 	request *containerregistry.ListRegistriesRequest
@@ -70,15 +72,19 @@ type RegistryIterator struct {
 	items []*containerregistry.Registry
 }
 
-func (c *RegistryServiceClient) RegistryIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *RegistryIterator {
+func (c *RegistryServiceClient) RegistryIterator(ctx context.Context, req *containerregistry.ListRegistriesRequest, opts ...grpc.CallOption) *RegistryIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &RegistryIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &containerregistry.ListRegistriesRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -98,6 +104,12 @@ func (it *RegistryIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -107,6 +119,38 @@ func (it *RegistryIterator) Next() bool {
 	it.items = response.Registries
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *RegistryIterator) Take(size int64) ([]*containerregistry.Registry, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*containerregistry.Registry
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *RegistryIterator) TakeAll() ([]*containerregistry.Registry, error) {
+	return it.Take(0)
 }
 
 func (it *RegistryIterator) Value() *containerregistry.Registry {
@@ -133,8 +177,10 @@ type RegistryAccessBindingsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *RegistryServiceClient
 	request *access.ListAccessBindingsRequest
@@ -142,15 +188,19 @@ type RegistryAccessBindingsIterator struct {
 	items []*access.AccessBinding
 }
 
-func (c *RegistryServiceClient) RegistryAccessBindingsIterator(ctx context.Context, resourceId string, opts ...grpc.CallOption) *RegistryAccessBindingsIterator {
+func (c *RegistryServiceClient) RegistryAccessBindingsIterator(ctx context.Context, req *access.ListAccessBindingsRequest, opts ...grpc.CallOption) *RegistryAccessBindingsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &RegistryAccessBindingsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &access.ListAccessBindingsRequest{
-			ResourceId: resourceId,
-			PageSize:   1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -170,6 +220,12 @@ func (it *RegistryAccessBindingsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListAccessBindings(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -179,6 +235,38 @@ func (it *RegistryAccessBindingsIterator) Next() bool {
 	it.items = response.AccessBindings
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *RegistryAccessBindingsIterator) Take(size int64) ([]*access.AccessBinding, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*access.AccessBinding
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *RegistryAccessBindingsIterator) TakeAll() ([]*access.AccessBinding, error) {
+	return it.Take(0)
 }
 
 func (it *RegistryAccessBindingsIterator) Value() *access.AccessBinding {
@@ -205,8 +293,10 @@ type RegistryIpPermissionIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *RegistryServiceClient
 	request *containerregistry.ListIpPermissionRequest
@@ -214,14 +304,19 @@ type RegistryIpPermissionIterator struct {
 	items []*containerregistry.IpPermission
 }
 
-func (c *RegistryServiceClient) RegistryIpPermissionIterator(ctx context.Context, registryId string, opts ...grpc.CallOption) *RegistryIpPermissionIterator {
+func (c *RegistryServiceClient) RegistryIpPermissionIterator(ctx context.Context, req *containerregistry.ListIpPermissionRequest, opts ...grpc.CallOption) *RegistryIpPermissionIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &RegistryIpPermissionIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &containerregistry.ListIpPermissionRequest{
-			RegistryId: registryId,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -249,6 +344,38 @@ func (it *RegistryIpPermissionIterator) Next() bool {
 
 	it.items = response.Permissions
 	return len(it.items) > 0
+}
+
+func (it *RegistryIpPermissionIterator) Take(size int64) ([]*containerregistry.IpPermission, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*containerregistry.IpPermission
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *RegistryIpPermissionIterator) TakeAll() ([]*containerregistry.IpPermission, error) {
+	return it.Take(0)
 }
 
 func (it *RegistryIpPermissionIterator) Value() *containerregistry.IpPermission {

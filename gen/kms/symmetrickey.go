@@ -70,8 +70,10 @@ type SymmetricKeyIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *SymmetricKeyServiceClient
 	request *kms.ListSymmetricKeysRequest
@@ -79,15 +81,19 @@ type SymmetricKeyIterator struct {
 	items []*kms.SymmetricKey
 }
 
-func (c *SymmetricKeyServiceClient) SymmetricKeyIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *SymmetricKeyIterator {
+func (c *SymmetricKeyServiceClient) SymmetricKeyIterator(ctx context.Context, req *kms.ListSymmetricKeysRequest, opts ...grpc.CallOption) *SymmetricKeyIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &SymmetricKeyIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &kms.ListSymmetricKeysRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -107,6 +113,12 @@ func (it *SymmetricKeyIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -116,6 +128,38 @@ func (it *SymmetricKeyIterator) Next() bool {
 	it.items = response.Keys
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *SymmetricKeyIterator) Take(size int64) ([]*kms.SymmetricKey, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*kms.SymmetricKey
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *SymmetricKeyIterator) TakeAll() ([]*kms.SymmetricKey, error) {
+	return it.Take(0)
 }
 
 func (it *SymmetricKeyIterator) Value() *kms.SymmetricKey {
@@ -142,8 +186,10 @@ type SymmetricKeyAccessBindingsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *SymmetricKeyServiceClient
 	request *access.ListAccessBindingsRequest
@@ -151,15 +197,19 @@ type SymmetricKeyAccessBindingsIterator struct {
 	items []*access.AccessBinding
 }
 
-func (c *SymmetricKeyServiceClient) SymmetricKeyAccessBindingsIterator(ctx context.Context, resourceId string, opts ...grpc.CallOption) *SymmetricKeyAccessBindingsIterator {
+func (c *SymmetricKeyServiceClient) SymmetricKeyAccessBindingsIterator(ctx context.Context, req *access.ListAccessBindingsRequest, opts ...grpc.CallOption) *SymmetricKeyAccessBindingsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &SymmetricKeyAccessBindingsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &access.ListAccessBindingsRequest{
-			ResourceId: resourceId,
-			PageSize:   1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -179,6 +229,12 @@ func (it *SymmetricKeyAccessBindingsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListAccessBindings(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -188,6 +244,38 @@ func (it *SymmetricKeyAccessBindingsIterator) Next() bool {
 	it.items = response.AccessBindings
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *SymmetricKeyAccessBindingsIterator) Take(size int64) ([]*access.AccessBinding, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*access.AccessBinding
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *SymmetricKeyAccessBindingsIterator) TakeAll() ([]*access.AccessBinding, error) {
+	return it.Take(0)
 }
 
 func (it *SymmetricKeyAccessBindingsIterator) Value() *access.AccessBinding {
@@ -214,8 +302,10 @@ type SymmetricKeyOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *SymmetricKeyServiceClient
 	request *kms.ListSymmetricKeyOperationsRequest
@@ -223,15 +313,19 @@ type SymmetricKeyOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *SymmetricKeyServiceClient) SymmetricKeyOperationsIterator(ctx context.Context, keyId string, opts ...grpc.CallOption) *SymmetricKeyOperationsIterator {
+func (c *SymmetricKeyServiceClient) SymmetricKeyOperationsIterator(ctx context.Context, req *kms.ListSymmetricKeyOperationsRequest, opts ...grpc.CallOption) *SymmetricKeyOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &SymmetricKeyOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &kms.ListSymmetricKeyOperationsRequest{
-			KeyId:    keyId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -251,6 +345,12 @@ func (it *SymmetricKeyOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -260,6 +360,38 @@ func (it *SymmetricKeyOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *SymmetricKeyOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *SymmetricKeyOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *SymmetricKeyOperationsIterator) Value() *operation.Operation {
@@ -286,8 +418,10 @@ type SymmetricKeyVersionsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *SymmetricKeyServiceClient
 	request *kms.ListSymmetricKeyVersionsRequest
@@ -295,15 +429,19 @@ type SymmetricKeyVersionsIterator struct {
 	items []*kms.SymmetricKeyVersion
 }
 
-func (c *SymmetricKeyServiceClient) SymmetricKeyVersionsIterator(ctx context.Context, keyId string, opts ...grpc.CallOption) *SymmetricKeyVersionsIterator {
+func (c *SymmetricKeyServiceClient) SymmetricKeyVersionsIterator(ctx context.Context, req *kms.ListSymmetricKeyVersionsRequest, opts ...grpc.CallOption) *SymmetricKeyVersionsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &SymmetricKeyVersionsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &kms.ListSymmetricKeyVersionsRequest{
-			KeyId:    keyId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -323,6 +461,12 @@ func (it *SymmetricKeyVersionsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListVersions(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -332,6 +476,38 @@ func (it *SymmetricKeyVersionsIterator) Next() bool {
 	it.items = response.KeyVersions
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *SymmetricKeyVersionsIterator) Take(size int64) ([]*kms.SymmetricKeyVersion, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*kms.SymmetricKeyVersion
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *SymmetricKeyVersionsIterator) TakeAll() ([]*kms.SymmetricKeyVersion, error) {
+	return it.Take(0)
 }
 
 func (it *SymmetricKeyVersionsIterator) Value() *kms.SymmetricKeyVersion {

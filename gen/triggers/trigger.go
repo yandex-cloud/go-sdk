@@ -60,8 +60,10 @@ type TriggerIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *TriggerServiceClient
 	request *triggers.ListTriggersRequest
@@ -69,15 +71,19 @@ type TriggerIterator struct {
 	items []*triggers.Trigger
 }
 
-func (c *TriggerServiceClient) TriggerIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *TriggerIterator {
+func (c *TriggerServiceClient) TriggerIterator(ctx context.Context, req *triggers.ListTriggersRequest, opts ...grpc.CallOption) *TriggerIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &TriggerIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &triggers.ListTriggersRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -97,6 +103,12 @@ func (it *TriggerIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -106,6 +118,38 @@ func (it *TriggerIterator) Next() bool {
 	it.items = response.Triggers
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *TriggerIterator) Take(size int64) ([]*triggers.Trigger, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*triggers.Trigger
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *TriggerIterator) TakeAll() ([]*triggers.Trigger, error) {
+	return it.Take(0)
 }
 
 func (it *TriggerIterator) Value() *triggers.Trigger {
@@ -132,8 +176,10 @@ type TriggerOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *TriggerServiceClient
 	request *triggers.ListTriggerOperationsRequest
@@ -141,15 +187,19 @@ type TriggerOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *TriggerServiceClient) TriggerOperationsIterator(ctx context.Context, triggerId string, opts ...grpc.CallOption) *TriggerOperationsIterator {
+func (c *TriggerServiceClient) TriggerOperationsIterator(ctx context.Context, req *triggers.ListTriggerOperationsRequest, opts ...grpc.CallOption) *TriggerOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &TriggerOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &triggers.ListTriggerOperationsRequest{
-			TriggerId: triggerId,
-			PageSize:  1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -169,6 +219,12 @@ func (it *TriggerOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -178,6 +234,38 @@ func (it *TriggerOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *TriggerOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *TriggerOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *TriggerOperationsIterator) Value() *operation.Operation {

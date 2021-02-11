@@ -60,8 +60,10 @@ type NodeGroupIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *NodeGroupServiceClient
 	request *k8s.ListNodeGroupsRequest
@@ -69,15 +71,19 @@ type NodeGroupIterator struct {
 	items []*k8s.NodeGroup
 }
 
-func (c *NodeGroupServiceClient) NodeGroupIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *NodeGroupIterator {
+func (c *NodeGroupServiceClient) NodeGroupIterator(ctx context.Context, req *k8s.ListNodeGroupsRequest, opts ...grpc.CallOption) *NodeGroupIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &NodeGroupIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &k8s.ListNodeGroupsRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -97,6 +103,12 @@ func (it *NodeGroupIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -106,6 +118,38 @@ func (it *NodeGroupIterator) Next() bool {
 	it.items = response.NodeGroups
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *NodeGroupIterator) Take(size int64) ([]*k8s.NodeGroup, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*k8s.NodeGroup
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *NodeGroupIterator) TakeAll() ([]*k8s.NodeGroup, error) {
+	return it.Take(0)
 }
 
 func (it *NodeGroupIterator) Value() *k8s.NodeGroup {
@@ -132,8 +176,10 @@ type NodeGroupNodesIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *NodeGroupServiceClient
 	request *k8s.ListNodeGroupNodesRequest
@@ -141,15 +187,19 @@ type NodeGroupNodesIterator struct {
 	items []*k8s.Node
 }
 
-func (c *NodeGroupServiceClient) NodeGroupNodesIterator(ctx context.Context, nodeGroupId string, opts ...grpc.CallOption) *NodeGroupNodesIterator {
+func (c *NodeGroupServiceClient) NodeGroupNodesIterator(ctx context.Context, req *k8s.ListNodeGroupNodesRequest, opts ...grpc.CallOption) *NodeGroupNodesIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &NodeGroupNodesIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &k8s.ListNodeGroupNodesRequest{
-			NodeGroupId: nodeGroupId,
-			PageSize:    1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -169,6 +219,12 @@ func (it *NodeGroupNodesIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListNodes(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -178,6 +234,38 @@ func (it *NodeGroupNodesIterator) Next() bool {
 	it.items = response.Nodes
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *NodeGroupNodesIterator) Take(size int64) ([]*k8s.Node, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*k8s.Node
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *NodeGroupNodesIterator) TakeAll() ([]*k8s.Node, error) {
+	return it.Take(0)
 }
 
 func (it *NodeGroupNodesIterator) Value() *k8s.Node {
@@ -204,8 +292,10 @@ type NodeGroupOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *NodeGroupServiceClient
 	request *k8s.ListNodeGroupOperationsRequest
@@ -213,15 +303,19 @@ type NodeGroupOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *NodeGroupServiceClient) NodeGroupOperationsIterator(ctx context.Context, nodeGroupId string, opts ...grpc.CallOption) *NodeGroupOperationsIterator {
+func (c *NodeGroupServiceClient) NodeGroupOperationsIterator(ctx context.Context, req *k8s.ListNodeGroupOperationsRequest, opts ...grpc.CallOption) *NodeGroupOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &NodeGroupOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &k8s.ListNodeGroupOperationsRequest{
-			NodeGroupId: nodeGroupId,
-			PageSize:    1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -241,6 +335,12 @@ func (it *NodeGroupOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -250,6 +350,38 @@ func (it *NodeGroupOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *NodeGroupOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *NodeGroupOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *NodeGroupOperationsIterator) Value() *operation.Operation {

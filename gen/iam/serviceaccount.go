@@ -61,8 +61,10 @@ type ServiceAccountIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ServiceAccountServiceClient
 	request *iam.ListServiceAccountsRequest
@@ -70,15 +72,19 @@ type ServiceAccountIterator struct {
 	items []*iam.ServiceAccount
 }
 
-func (c *ServiceAccountServiceClient) ServiceAccountIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *ServiceAccountIterator {
+func (c *ServiceAccountServiceClient) ServiceAccountIterator(ctx context.Context, req *iam.ListServiceAccountsRequest, opts ...grpc.CallOption) *ServiceAccountIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ServiceAccountIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &iam.ListServiceAccountsRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -98,6 +104,12 @@ func (it *ServiceAccountIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -107,6 +119,38 @@ func (it *ServiceAccountIterator) Next() bool {
 	it.items = response.ServiceAccounts
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ServiceAccountIterator) Take(size int64) ([]*iam.ServiceAccount, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*iam.ServiceAccount
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ServiceAccountIterator) TakeAll() ([]*iam.ServiceAccount, error) {
+	return it.Take(0)
 }
 
 func (it *ServiceAccountIterator) Value() *iam.ServiceAccount {
@@ -133,8 +177,10 @@ type ServiceAccountAccessBindingsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ServiceAccountServiceClient
 	request *access.ListAccessBindingsRequest
@@ -142,15 +188,19 @@ type ServiceAccountAccessBindingsIterator struct {
 	items []*access.AccessBinding
 }
 
-func (c *ServiceAccountServiceClient) ServiceAccountAccessBindingsIterator(ctx context.Context, resourceId string, opts ...grpc.CallOption) *ServiceAccountAccessBindingsIterator {
+func (c *ServiceAccountServiceClient) ServiceAccountAccessBindingsIterator(ctx context.Context, req *access.ListAccessBindingsRequest, opts ...grpc.CallOption) *ServiceAccountAccessBindingsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ServiceAccountAccessBindingsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &access.ListAccessBindingsRequest{
-			ResourceId: resourceId,
-			PageSize:   1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -170,6 +220,12 @@ func (it *ServiceAccountAccessBindingsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListAccessBindings(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -179,6 +235,38 @@ func (it *ServiceAccountAccessBindingsIterator) Next() bool {
 	it.items = response.AccessBindings
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ServiceAccountAccessBindingsIterator) Take(size int64) ([]*access.AccessBinding, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*access.AccessBinding
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ServiceAccountAccessBindingsIterator) TakeAll() ([]*access.AccessBinding, error) {
+	return it.Take(0)
 }
 
 func (it *ServiceAccountAccessBindingsIterator) Value() *access.AccessBinding {
@@ -205,8 +293,10 @@ type ServiceAccountOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ServiceAccountServiceClient
 	request *iam.ListServiceAccountOperationsRequest
@@ -214,15 +304,19 @@ type ServiceAccountOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *ServiceAccountServiceClient) ServiceAccountOperationsIterator(ctx context.Context, serviceAccountId string, opts ...grpc.CallOption) *ServiceAccountOperationsIterator {
+func (c *ServiceAccountServiceClient) ServiceAccountOperationsIterator(ctx context.Context, req *iam.ListServiceAccountOperationsRequest, opts ...grpc.CallOption) *ServiceAccountOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ServiceAccountOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &iam.ListServiceAccountOperationsRequest{
-			ServiceAccountId: serviceAccountId,
-			PageSize:         1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -242,6 +336,12 @@ func (it *ServiceAccountOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -251,6 +351,38 @@ func (it *ServiceAccountOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ServiceAccountOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ServiceAccountOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *ServiceAccountOperationsIterator) Value() *operation.Operation {

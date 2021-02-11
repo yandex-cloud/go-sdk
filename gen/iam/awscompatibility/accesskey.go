@@ -60,8 +60,10 @@ type AccessKeyIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *AccessKeyServiceClient
 	request *awscompatibility.ListAccessKeysRequest
@@ -69,15 +71,19 @@ type AccessKeyIterator struct {
 	items []*awscompatibility.AccessKey
 }
 
-func (c *AccessKeyServiceClient) AccessKeyIterator(ctx context.Context, serviceAccountId string, opts ...grpc.CallOption) *AccessKeyIterator {
+func (c *AccessKeyServiceClient) AccessKeyIterator(ctx context.Context, req *awscompatibility.ListAccessKeysRequest, opts ...grpc.CallOption) *AccessKeyIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &AccessKeyIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &awscompatibility.ListAccessKeysRequest{
-			ServiceAccountId: serviceAccountId,
-			PageSize:         1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -97,6 +103,12 @@ func (it *AccessKeyIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -106,6 +118,38 @@ func (it *AccessKeyIterator) Next() bool {
 	it.items = response.AccessKeys
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *AccessKeyIterator) Take(size int64) ([]*awscompatibility.AccessKey, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*awscompatibility.AccessKey
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *AccessKeyIterator) TakeAll() ([]*awscompatibility.AccessKey, error) {
+	return it.Take(0)
 }
 
 func (it *AccessKeyIterator) Value() *awscompatibility.AccessKey {
@@ -132,8 +176,10 @@ type AccessKeyOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *AccessKeyServiceClient
 	request *awscompatibility.ListAccessKeyOperationsRequest
@@ -141,15 +187,19 @@ type AccessKeyOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *AccessKeyServiceClient) AccessKeyOperationsIterator(ctx context.Context, accessKeyId string, opts ...grpc.CallOption) *AccessKeyOperationsIterator {
+func (c *AccessKeyServiceClient) AccessKeyOperationsIterator(ctx context.Context, req *awscompatibility.ListAccessKeyOperationsRequest, opts ...grpc.CallOption) *AccessKeyOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &AccessKeyOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &awscompatibility.ListAccessKeyOperationsRequest{
-			AccessKeyId: accessKeyId,
-			PageSize:    1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -169,6 +219,12 @@ func (it *AccessKeyOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -178,6 +234,38 @@ func (it *AccessKeyOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *AccessKeyOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *AccessKeyOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *AccessKeyOperationsIterator) Value() *operation.Operation {

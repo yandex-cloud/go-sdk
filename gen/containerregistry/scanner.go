@@ -60,8 +60,10 @@ type ScannerVulnerabilitiesIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ScannerServiceClient
 	request *containerregistry.ListVulnerabilitiesRequest
@@ -69,15 +71,19 @@ type ScannerVulnerabilitiesIterator struct {
 	items []*containerregistry.Vulnerability
 }
 
-func (c *ScannerServiceClient) ScannerVulnerabilitiesIterator(ctx context.Context, scanResultId string, opts ...grpc.CallOption) *ScannerVulnerabilitiesIterator {
+func (c *ScannerServiceClient) ScannerVulnerabilitiesIterator(ctx context.Context, req *containerregistry.ListVulnerabilitiesRequest, opts ...grpc.CallOption) *ScannerVulnerabilitiesIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ScannerVulnerabilitiesIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &containerregistry.ListVulnerabilitiesRequest{
-			ScanResultId: scanResultId,
-			PageSize:     1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -97,6 +103,12 @@ func (it *ScannerVulnerabilitiesIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListVulnerabilities(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -106,6 +118,38 @@ func (it *ScannerVulnerabilitiesIterator) Next() bool {
 	it.items = response.Vulnerabilities
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ScannerVulnerabilitiesIterator) Take(size int64) ([]*containerregistry.Vulnerability, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*containerregistry.Vulnerability
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ScannerVulnerabilitiesIterator) TakeAll() ([]*containerregistry.Vulnerability, error) {
+	return it.Take(0)
 }
 
 func (it *ScannerVulnerabilitiesIterator) Value() *containerregistry.Vulnerability {

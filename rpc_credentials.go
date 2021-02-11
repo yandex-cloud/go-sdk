@@ -101,10 +101,16 @@ func (c *rpcCredentials) updateToken(ctx context.Context, currentState rpcCreden
 	if err != nil {
 		return "", sdkerrors.WithMessage(err, "iam token create failed")
 	}
-	expiresAt, expiresAtErr := ptypes.Timestamp(resp.ExpiresAt)
-	if expiresAtErr != nil {
-		grpclog.Warningf("invalid IAM Token expires_at: %s", expiresAtErr)
-		// Fallback to short term caching.
+	var expiresAt time.Time
+	if resp.ExpiresAt != nil {
+		var expiresAtErr error
+		expiresAt, expiresAtErr = ptypes.Timestamp(resp.ExpiresAt)
+		if expiresAtErr != nil {
+			grpclog.Warningf("invalid IAM Token expires_at: %s", expiresAtErr)
+			// Fallback to short term caching.
+			expiresAt = time.Now().Add(time.Minute)
+		}
+	} else {
 		expiresAt = time.Now().Add(time.Minute)
 	}
 	c.currentState = rpcCredentialsState{

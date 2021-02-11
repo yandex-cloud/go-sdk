@@ -60,8 +60,10 @@ type DiskIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *DiskServiceClient
 	request *compute.ListDisksRequest
@@ -69,15 +71,19 @@ type DiskIterator struct {
 	items []*compute.Disk
 }
 
-func (c *DiskServiceClient) DiskIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *DiskIterator {
+func (c *DiskServiceClient) DiskIterator(ctx context.Context, req *compute.ListDisksRequest, opts ...grpc.CallOption) *DiskIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &DiskIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &compute.ListDisksRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -97,6 +103,12 @@ func (it *DiskIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -106,6 +118,38 @@ func (it *DiskIterator) Next() bool {
 	it.items = response.Disks
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *DiskIterator) Take(size int64) ([]*compute.Disk, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*compute.Disk
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *DiskIterator) TakeAll() ([]*compute.Disk, error) {
+	return it.Take(0)
 }
 
 func (it *DiskIterator) Value() *compute.Disk {
@@ -132,8 +176,10 @@ type DiskOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *DiskServiceClient
 	request *compute.ListDiskOperationsRequest
@@ -141,15 +187,19 @@ type DiskOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *DiskServiceClient) DiskOperationsIterator(ctx context.Context, diskId string, opts ...grpc.CallOption) *DiskOperationsIterator {
+func (c *DiskServiceClient) DiskOperationsIterator(ctx context.Context, req *compute.ListDiskOperationsRequest, opts ...grpc.CallOption) *DiskOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &DiskOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &compute.ListDiskOperationsRequest{
-			DiskId:   diskId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -169,6 +219,12 @@ func (it *DiskOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -178,6 +234,38 @@ func (it *DiskOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *DiskOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *DiskOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *DiskOperationsIterator) Value() *operation.Operation {

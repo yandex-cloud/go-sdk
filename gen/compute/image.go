@@ -69,8 +69,10 @@ type ImageIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ImageServiceClient
 	request *compute.ListImagesRequest
@@ -78,15 +80,19 @@ type ImageIterator struct {
 	items []*compute.Image
 }
 
-func (c *ImageServiceClient) ImageIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *ImageIterator {
+func (c *ImageServiceClient) ImageIterator(ctx context.Context, req *compute.ListImagesRequest, opts ...grpc.CallOption) *ImageIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ImageIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &compute.ListImagesRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -106,6 +112,12 @@ func (it *ImageIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -115,6 +127,38 @@ func (it *ImageIterator) Next() bool {
 	it.items = response.Images
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ImageIterator) Take(size int64) ([]*compute.Image, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*compute.Image
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ImageIterator) TakeAll() ([]*compute.Image, error) {
+	return it.Take(0)
 }
 
 func (it *ImageIterator) Value() *compute.Image {
@@ -141,8 +185,10 @@ type ImageOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ImageServiceClient
 	request *compute.ListImageOperationsRequest
@@ -150,15 +196,19 @@ type ImageOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *ImageServiceClient) ImageOperationsIterator(ctx context.Context, imageId string, opts ...grpc.CallOption) *ImageOperationsIterator {
+func (c *ImageServiceClient) ImageOperationsIterator(ctx context.Context, req *compute.ListImageOperationsRequest, opts ...grpc.CallOption) *ImageOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ImageOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &compute.ListImageOperationsRequest{
-			ImageId:  imageId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -178,6 +228,12 @@ func (it *ImageOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -187,6 +243,38 @@ func (it *ImageOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ImageOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ImageOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *ImageOperationsIterator) Value() *operation.Operation {

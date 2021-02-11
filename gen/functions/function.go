@@ -88,8 +88,10 @@ type FunctionIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *FunctionServiceClient
 	request *functions.ListFunctionsRequest
@@ -97,15 +99,19 @@ type FunctionIterator struct {
 	items []*functions.Function
 }
 
-func (c *FunctionServiceClient) FunctionIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *FunctionIterator {
+func (c *FunctionServiceClient) FunctionIterator(ctx context.Context, req *functions.ListFunctionsRequest, opts ...grpc.CallOption) *FunctionIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &FunctionIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &functions.ListFunctionsRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -125,6 +131,12 @@ func (it *FunctionIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -134,6 +146,38 @@ func (it *FunctionIterator) Next() bool {
 	it.items = response.Functions
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *FunctionIterator) Take(size int64) ([]*functions.Function, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*functions.Function
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *FunctionIterator) TakeAll() ([]*functions.Function, error) {
+	return it.Take(0)
 }
 
 func (it *FunctionIterator) Value() *functions.Function {
@@ -160,8 +204,10 @@ type FunctionAccessBindingsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *FunctionServiceClient
 	request *access.ListAccessBindingsRequest
@@ -169,15 +215,19 @@ type FunctionAccessBindingsIterator struct {
 	items []*access.AccessBinding
 }
 
-func (c *FunctionServiceClient) FunctionAccessBindingsIterator(ctx context.Context, resourceId string, opts ...grpc.CallOption) *FunctionAccessBindingsIterator {
+func (c *FunctionServiceClient) FunctionAccessBindingsIterator(ctx context.Context, req *access.ListAccessBindingsRequest, opts ...grpc.CallOption) *FunctionAccessBindingsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &FunctionAccessBindingsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &access.ListAccessBindingsRequest{
-			ResourceId: resourceId,
-			PageSize:   1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -197,6 +247,12 @@ func (it *FunctionAccessBindingsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListAccessBindings(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -206,6 +262,38 @@ func (it *FunctionAccessBindingsIterator) Next() bool {
 	it.items = response.AccessBindings
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *FunctionAccessBindingsIterator) Take(size int64) ([]*access.AccessBinding, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*access.AccessBinding
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *FunctionAccessBindingsIterator) TakeAll() ([]*access.AccessBinding, error) {
+	return it.Take(0)
 }
 
 func (it *FunctionAccessBindingsIterator) Value() *access.AccessBinding {
@@ -232,8 +320,10 @@ type FunctionOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *FunctionServiceClient
 	request *functions.ListFunctionOperationsRequest
@@ -241,15 +331,19 @@ type FunctionOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *FunctionServiceClient) FunctionOperationsIterator(ctx context.Context, functionId string, opts ...grpc.CallOption) *FunctionOperationsIterator {
+func (c *FunctionServiceClient) FunctionOperationsIterator(ctx context.Context, req *functions.ListFunctionOperationsRequest, opts ...grpc.CallOption) *FunctionOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &FunctionOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &functions.ListFunctionOperationsRequest{
-			FunctionId: functionId,
-			PageSize:   1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -269,6 +363,12 @@ func (it *FunctionOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -278,6 +378,38 @@ func (it *FunctionOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *FunctionOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *FunctionOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *FunctionOperationsIterator) Value() *operation.Operation {
@@ -304,8 +436,10 @@ type FunctionRuntimesIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *FunctionServiceClient
 	request *functions.ListRuntimesRequest
@@ -313,12 +447,19 @@ type FunctionRuntimesIterator struct {
 	items []string
 }
 
-func (c *FunctionServiceClient) FunctionRuntimesIterator(ctx context.Context, opts ...grpc.CallOption) *FunctionRuntimesIterator {
+func (c *FunctionServiceClient) FunctionRuntimesIterator(ctx context.Context, req *functions.ListRuntimesRequest, opts ...grpc.CallOption) *FunctionRuntimesIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &FunctionRuntimesIterator{
-		ctx:     ctx,
-		opts:    opts,
-		client:  c,
-		request: &functions.ListRuntimesRequest{},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -347,6 +488,38 @@ func (it *FunctionRuntimesIterator) Next() bool {
 	return len(it.items) > 0
 }
 
+func (it *FunctionRuntimesIterator) Take(size int64) ([]string, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []string
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *FunctionRuntimesIterator) TakeAll() ([]string, error) {
+	return it.Take(0)
+}
+
 func (it *FunctionRuntimesIterator) Value() string {
 	if len(it.items) == 0 {
 		panic("calling Value on empty iterator")
@@ -371,8 +544,10 @@ type FunctionTagHistoryIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *FunctionServiceClient
 	request *functions.ListFunctionTagHistoryRequest
@@ -380,15 +555,19 @@ type FunctionTagHistoryIterator struct {
 	items []*functions.ListFunctionTagHistoryResponse_FunctionTagHistoryRecord
 }
 
-func (c *FunctionServiceClient) FunctionTagHistoryIterator(ctx context.Context, functionId string, opts ...grpc.CallOption) *FunctionTagHistoryIterator {
+func (c *FunctionServiceClient) FunctionTagHistoryIterator(ctx context.Context, req *functions.ListFunctionTagHistoryRequest, opts ...grpc.CallOption) *FunctionTagHistoryIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &FunctionTagHistoryIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &functions.ListFunctionTagHistoryRequest{
-			FunctionId: functionId,
-			PageSize:   1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -408,6 +587,12 @@ func (it *FunctionTagHistoryIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListTagHistory(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -417,6 +602,38 @@ func (it *FunctionTagHistoryIterator) Next() bool {
 	it.items = response.FunctionTagHistoryRecord
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *FunctionTagHistoryIterator) Take(size int64) ([]*functions.ListFunctionTagHistoryResponse_FunctionTagHistoryRecord, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*functions.ListFunctionTagHistoryResponse_FunctionTagHistoryRecord
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *FunctionTagHistoryIterator) TakeAll() ([]*functions.ListFunctionTagHistoryResponse_FunctionTagHistoryRecord, error) {
+	return it.Take(0)
 }
 
 func (it *FunctionTagHistoryIterator) Value() *functions.ListFunctionTagHistoryResponse_FunctionTagHistoryRecord {

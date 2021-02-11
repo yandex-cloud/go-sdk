@@ -60,8 +60,10 @@ type HostGroupIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *HostGroupServiceClient
 	request *compute.ListHostGroupsRequest
@@ -69,15 +71,19 @@ type HostGroupIterator struct {
 	items []*compute.HostGroup
 }
 
-func (c *HostGroupServiceClient) HostGroupIterator(ctx context.Context, folderId string, opts ...grpc.CallOption) *HostGroupIterator {
+func (c *HostGroupServiceClient) HostGroupIterator(ctx context.Context, req *compute.ListHostGroupsRequest, opts ...grpc.CallOption) *HostGroupIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &HostGroupIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &compute.ListHostGroupsRequest{
-			FolderId: folderId,
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -97,6 +103,12 @@ func (it *HostGroupIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -106,6 +118,38 @@ func (it *HostGroupIterator) Next() bool {
 	it.items = response.HostGroups
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *HostGroupIterator) Take(size int64) ([]*compute.HostGroup, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*compute.HostGroup
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *HostGroupIterator) TakeAll() ([]*compute.HostGroup, error) {
+	return it.Take(0)
 }
 
 func (it *HostGroupIterator) Value() *compute.HostGroup {
@@ -132,8 +176,10 @@ type HostGroupHostsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *HostGroupServiceClient
 	request *compute.ListHostGroupHostsRequest
@@ -141,15 +187,19 @@ type HostGroupHostsIterator struct {
 	items []*compute.Host
 }
 
-func (c *HostGroupServiceClient) HostGroupHostsIterator(ctx context.Context, hostGroupId string, opts ...grpc.CallOption) *HostGroupHostsIterator {
+func (c *HostGroupServiceClient) HostGroupHostsIterator(ctx context.Context, req *compute.ListHostGroupHostsRequest, opts ...grpc.CallOption) *HostGroupHostsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &HostGroupHostsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &compute.ListHostGroupHostsRequest{
-			HostGroupId: hostGroupId,
-			PageSize:    1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -169,6 +219,12 @@ func (it *HostGroupHostsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListHosts(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -178,6 +234,38 @@ func (it *HostGroupHostsIterator) Next() bool {
 	it.items = response.Hosts
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *HostGroupHostsIterator) Take(size int64) ([]*compute.Host, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*compute.Host
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *HostGroupHostsIterator) TakeAll() ([]*compute.Host, error) {
+	return it.Take(0)
 }
 
 func (it *HostGroupHostsIterator) Value() *compute.Host {
@@ -204,8 +292,10 @@ type HostGroupInstancesIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *HostGroupServiceClient
 	request *compute.ListHostGroupInstancesRequest
@@ -213,15 +303,19 @@ type HostGroupInstancesIterator struct {
 	items []*compute.Instance
 }
 
-func (c *HostGroupServiceClient) HostGroupInstancesIterator(ctx context.Context, hostGroupId string, opts ...grpc.CallOption) *HostGroupInstancesIterator {
+func (c *HostGroupServiceClient) HostGroupInstancesIterator(ctx context.Context, req *compute.ListHostGroupInstancesRequest, opts ...grpc.CallOption) *HostGroupInstancesIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &HostGroupInstancesIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &compute.ListHostGroupInstancesRequest{
-			HostGroupId: hostGroupId,
-			PageSize:    1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -241,6 +335,12 @@ func (it *HostGroupInstancesIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListInstances(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -250,6 +350,38 @@ func (it *HostGroupInstancesIterator) Next() bool {
 	it.items = response.Instances
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *HostGroupInstancesIterator) Take(size int64) ([]*compute.Instance, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*compute.Instance
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *HostGroupInstancesIterator) TakeAll() ([]*compute.Instance, error) {
+	return it.Take(0)
 }
 
 func (it *HostGroupInstancesIterator) Value() *compute.Instance {
@@ -276,8 +408,10 @@ type HostGroupOperationsIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *HostGroupServiceClient
 	request *compute.ListHostGroupOperationsRequest
@@ -285,15 +419,19 @@ type HostGroupOperationsIterator struct {
 	items []*operation.Operation
 }
 
-func (c *HostGroupServiceClient) HostGroupOperationsIterator(ctx context.Context, hostGroupId string, opts ...grpc.CallOption) *HostGroupOperationsIterator {
+func (c *HostGroupServiceClient) HostGroupOperationsIterator(ctx context.Context, req *compute.ListHostGroupOperationsRequest, opts ...grpc.CallOption) *HostGroupOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &HostGroupOperationsIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &compute.ListHostGroupOperationsRequest{
-			HostGroupId: hostGroupId,
-			PageSize:    1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -313,6 +451,12 @@ func (it *HostGroupOperationsIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -322,6 +466,38 @@ func (it *HostGroupOperationsIterator) Next() bool {
 	it.items = response.Operations
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *HostGroupOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *HostGroupOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
 }
 
 func (it *HostGroupOperationsIterator) Value() *operation.Operation {

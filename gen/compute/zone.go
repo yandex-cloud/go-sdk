@@ -41,8 +41,10 @@ type ZoneIterator struct {
 	ctx  context.Context
 	opts []grpc.CallOption
 
-	err     error
-	started bool
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
 
 	client  *ZoneServiceClient
 	request *compute.ListZonesRequest
@@ -50,14 +52,19 @@ type ZoneIterator struct {
 	items []*compute.Zone
 }
 
-func (c *ZoneServiceClient) ZoneIterator(ctx context.Context, opts ...grpc.CallOption) *ZoneIterator {
+func (c *ZoneServiceClient) ZoneIterator(ctx context.Context, req *compute.ListZonesRequest, opts ...grpc.CallOption) *ZoneIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
 	return &ZoneIterator{
-		ctx:    ctx,
-		opts:   opts,
-		client: c,
-		request: &compute.ListZonesRequest{
-			PageSize: 1000,
-		},
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
 	}
 }
 
@@ -77,6 +84,12 @@ func (it *ZoneIterator) Next() bool {
 	}
 	it.started = true
 
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
 	if err != nil {
@@ -86,6 +99,38 @@ func (it *ZoneIterator) Next() bool {
 	it.items = response.Zones
 	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
+}
+
+func (it *ZoneIterator) Take(size int64) ([]*compute.Zone, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*compute.Zone
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ZoneIterator) TakeAll() ([]*compute.Zone, error) {
+	return it.Take(0)
 }
 
 func (it *ZoneIterator) Value() *compute.Zone {
