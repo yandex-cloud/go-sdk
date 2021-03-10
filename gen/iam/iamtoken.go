@@ -27,3 +27,12 @@ func (c *IamTokenServiceClient) Create(ctx context.Context, in *iam.CreateIamTok
 	}
 	return iam.NewIamTokenServiceClient(conn).Create(ctx, in, opts...)
 }
+
+// CreateForServiceAccount implements iam.IamTokenServiceClient
+func (c *IamTokenServiceClient) CreateForServiceAccount(ctx context.Context, in *iam.CreateIamTokenForServiceAccountRequest, opts ...grpc.CallOption) (*iam.CreateIamTokenResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return iam.NewIamTokenServiceClient(conn).CreateForServiceAccount(ctx, in, opts...)
+}
