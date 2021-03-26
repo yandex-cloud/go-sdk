@@ -27,6 +27,7 @@ import (
 	gen_operation "github.com/yandex-cloud/go-sdk/gen/operation"
 	"github.com/yandex-cloud/go-sdk/gen/resourcemanager"
 	"github.com/yandex-cloud/go-sdk/gen/vpc"
+	"github.com/yandex-cloud/go-sdk/gen/ydb"
 	sdk_operation "github.com/yandex-cloud/go-sdk/operation"
 	"github.com/yandex-cloud/go-sdk/pkg/grpcclient"
 	"github.com/yandex-cloud/go-sdk/pkg/sdkerrors"
@@ -50,6 +51,7 @@ const (
 	VpcServiceID        Endpoint = "vpc"
 	KubernetesServiceID Endpoint = "managed-kubernetes"
 	DNSServiceID        Endpoint = "dns"
+	YDBServiceID        Endpoint = "ydb"
 )
 
 // Config is a config that is used to create SDK instance.
@@ -312,4 +314,9 @@ func (sdk *SDK) CreateIAMToken(ctx context.Context) (*iampb.CreateIamTokenRespon
 	default:
 		return nil, fmt.Errorf("credentials type %T is not supported yet", creds)
 	}
+}
+
+//YDB returns object for Yandex Database operations.
+func (sdk *SDK) YDB() *ydb.YDB {
+	return ydb.NewYDB(sdk.getConn(YDBServiceID))
 }
