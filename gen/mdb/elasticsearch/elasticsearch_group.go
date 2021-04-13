@@ -32,3 +32,8 @@ func (e *ElasticSearch) ResourcePreset() *ResourcePresetServiceClient {
 func (e *ElasticSearch) User() *UserServiceClient {
 	return &UserServiceClient{getConn: e.getConn}
 }
+
+// Auth gets AuthService client
+func (e *ElasticSearch) Auth() *AuthServiceClient {
+	return &AuthServiceClient{getConn: e.getConn}
+}

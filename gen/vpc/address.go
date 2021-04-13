@@ -288,6 +288,15 @@ func (it *AddressOperationsIterator) Error() error {
 	return it.err
 }
 
+// Move implements vpc.AddressServiceClient
+func (c *AddressServiceClient) Move(ctx context.Context, in *vpc.MoveAddressRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return vpc.NewAddressServiceClient(conn).Move(ctx, in, opts...)
+}
+
 // Update implements vpc.AddressServiceClient
 func (c *AddressServiceClient) Update(ctx context.Context, in *vpc.UpdateAddressRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
