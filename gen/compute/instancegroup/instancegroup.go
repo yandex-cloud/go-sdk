@@ -646,6 +646,24 @@ func (it *InstanceGroupOperationsIterator) Error() error {
 	return it.err
 }
 
+// PauseProcesses implements instancegroup.InstanceGroupServiceClient
+func (c *InstanceGroupServiceClient) PauseProcesses(ctx context.Context, in *instancegroup.PauseInstanceGroupProcessesRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return instancegroup.NewInstanceGroupServiceClient(conn).PauseProcesses(ctx, in, opts...)
+}
+
+// ResumeProcesses implements instancegroup.InstanceGroupServiceClient
+func (c *InstanceGroupServiceClient) ResumeProcesses(ctx context.Context, in *instancegroup.ResumeInstanceGroupProcessesRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return instancegroup.NewInstanceGroupServiceClient(conn).ResumeProcesses(ctx, in, opts...)
+}
+
 // SetAccessBindings implements instancegroup.InstanceGroupServiceClient
 func (c *InstanceGroupServiceClient) SetAccessBindings(ctx context.Context, in *access.SetAccessBindingsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)

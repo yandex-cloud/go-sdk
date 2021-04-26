@@ -21,6 +21,15 @@ type ApiGatewayServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
 }
 
+// AddDomain implements apigateway.ApiGatewayServiceClient
+func (c *ApiGatewayServiceClient) AddDomain(ctx context.Context, in *apigateway.AddDomainRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return apigateway.NewApiGatewayServiceClient(conn).AddDomain(ctx, in, opts...)
+}
+
 // Create implements apigateway.ApiGatewayServiceClient
 func (c *ApiGatewayServiceClient) Create(ctx context.Context, in *apigateway.CreateApiGatewayRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -403,6 +412,15 @@ func (it *ApiGatewayOperationsIterator) Value() *operation.Operation {
 
 func (it *ApiGatewayOperationsIterator) Error() error {
 	return it.err
+}
+
+// RemoveDomain implements apigateway.ApiGatewayServiceClient
+func (c *ApiGatewayServiceClient) RemoveDomain(ctx context.Context, in *apigateway.RemoveDomainRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return apigateway.NewApiGatewayServiceClient(conn).RemoveDomain(ctx, in, opts...)
 }
 
 // SetAccessBindings implements apigateway.ApiGatewayServiceClient
