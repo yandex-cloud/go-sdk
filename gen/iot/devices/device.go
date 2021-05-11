@@ -83,6 +83,15 @@ func (c *DeviceServiceClient) Get(ctx context.Context, in *devices.GetDeviceRequ
 	return devices.NewDeviceServiceClient(conn).Get(ctx, in, opts...)
 }
 
+// GetByName implements devices.DeviceServiceClient
+func (c *DeviceServiceClient) GetByName(ctx context.Context, in *devices.GetByNameDeviceRequest, opts ...grpc.CallOption) (*devices.Device, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return devices.NewDeviceServiceClient(conn).GetByName(ctx, in, opts...)
+}
+
 // List implements devices.DeviceServiceClient
 func (c *DeviceServiceClient) List(ctx context.Context, in *devices.ListDevicesRequest, opts ...grpc.CallOption) (*devices.ListDevicesResponse, error) {
 	conn, err := c.getConn(ctx)

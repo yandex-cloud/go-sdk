@@ -83,6 +83,15 @@ func (c *RegistryServiceClient) Get(ctx context.Context, in *devices.GetRegistry
 	return devices.NewRegistryServiceClient(conn).Get(ctx, in, opts...)
 }
 
+// GetByName implements devices.RegistryServiceClient
+func (c *RegistryServiceClient) GetByName(ctx context.Context, in *devices.GetByNameRegistryRequest, opts ...grpc.CallOption) (*devices.Registry, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return devices.NewRegistryServiceClient(conn).GetByName(ctx, in, opts...)
+}
+
 // List implements devices.RegistryServiceClient
 func (c *RegistryServiceClient) List(ctx context.Context, in *devices.ListRegistriesRequest, opts ...grpc.CallOption) (*devices.ListRegistriesResponse, error) {
 	conn, err := c.getConn(ctx)
