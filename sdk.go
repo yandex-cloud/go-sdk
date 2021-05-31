@@ -18,6 +18,7 @@ import (
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/endpoint"
 	iampb "github.com/yandex-cloud/go-genproto/yandex/cloud/iam/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
+	_ "github.com/yandex-cloud/go-genproto/yandex/cloud/quota" // Used in Operation.error.details
 	"github.com/yandex-cloud/go-sdk/dial"
 	apiendpoint "github.com/yandex-cloud/go-sdk/gen/apiendpoint"
 	"github.com/yandex-cloud/go-sdk/gen/compute"
