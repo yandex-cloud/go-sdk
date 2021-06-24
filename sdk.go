@@ -106,12 +106,18 @@ func Build(ctx context.Context, conf Config, customOpts ...grpc.DialOption) (*SD
 	default:
 		return nil, fmt.Errorf("unsupported credentials type %T", creds)
 	}
+	sdk := &SDK{
+		cc:   nil, // Later
+		conf: conf,
+	}
+	tokenMiddleware := NewIAMTokenMiddleware(sdk, now)
 	var dialOpts []grpc.DialOption
+	dialOpts = append(dialOpts,
+		grpc.WithContextDialer(dial.NewProxyDialer(dial.NewDialer())),
+		grpc.WithChainUnaryInterceptor(tokenMiddleware.InterceptUnary),
+		grpc.WithChainStreamInterceptor(tokenMiddleware.InterceptStream),
+	)
 
-	dialOpts = append(dialOpts, grpc.WithContextDialer(dial.NewProxyDialer(dial.NewDialer())))
-
-	rpcCreds := newRPCCredentials(conf.Plaintext)
-	dialOpts = append(dialOpts, grpc.WithPerRPCCredentials(rpcCreds))
 	if conf.DialContextTimeout > 0 {
 		dialOpts = append(dialOpts, grpc.WithBlock(), grpc.WithTimeout(conf.DialContextTimeout)) // nolint
 	}
@@ -127,13 +133,7 @@ func Build(ctx context.Context, conf Config, customOpts ...grpc.DialOption) (*SD
 	}
 	// Append custom options after default, to allow to customize dialer and etc.
 	dialOpts = append(dialOpts, customOpts...)
-
-	cc := grpcclient.NewLazyConnContext(grpcclient.DialOptions(dialOpts...))
-	sdk := &SDK{
-		cc:   cc,
-		conf: conf,
-	}
-	rpcCreds.Init(sdk.CreateIAMToken)
+	sdk.cc = grpcclient.NewLazyConnContext(grpcclient.DialOptions(dialOpts...))
 	return sdk, nil
 }
 
@@ -211,6 +211,11 @@ func (sdk *SDK) DNS() *dns.DNS {
 // AI returns AI object that is used to do AI stuff.
 func (sdk *SDK) AI() *AI {
 	return &AI{sdk: sdk}
+}
+
+// YDB returns object for Yandex Database operations.
+func (sdk *SDK) YDB() *ydb.YDB {
+	return ydb.NewYDB(sdk.getConn(YDBServiceID))
 }
 
 func (sdk *SDK) Resolve(ctx context.Context, r ...Resolver) error {
@@ -317,7 +322,17 @@ func (sdk *SDK) CreateIAMToken(ctx context.Context) (*iampb.CreateIamTokenRespon
 	}
 }
 
-//YDB returns object for Yandex Database operations.
-func (sdk *SDK) YDB() *ydb.YDB {
-	return ydb.NewYDB(sdk.getConn(YDBServiceID))
+func (sdk *SDK) CreateIAMTokenForServiceAccount(ctx context.Context, serviceAccountID string) (*iampb.CreateIamTokenResponse, error) {
+	token, err := sdk.IAM().IamToken().CreateForServiceAccount(ctx, &iampb.CreateIamTokenForServiceAccountRequest{
+		ServiceAccountId: serviceAccountID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &iampb.CreateIamTokenResponse{
+		IamToken:  token.IamToken,
+		ExpiresAt: token.ExpiresAt,
+	}, nil
 }
+
+var now = time.Now

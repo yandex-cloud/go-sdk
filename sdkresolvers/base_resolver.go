@@ -20,11 +20,12 @@ func CreateResolverFilter(nameField string, value string) string {
 }
 
 type resolveOptions struct {
-	out          *string
-	folderID     string
-	cloudID      string
-	clusterID    string
-	federationID string
+	out            *string
+	folderID       string
+	cloudID        string
+	organizationID string
+	clusterID      string
+	federationID   string
 }
 
 type ResolveOption func(*resolveOptions)
@@ -46,6 +47,13 @@ func FolderID(folderID string) ResolveOption {
 func CloudID(cloudID string) ResolveOption {
 	return func(o *resolveOptions) {
 		o.cloudID = cloudID
+	}
+}
+
+// OrganizationID specifies organization id for resolvers that need it, e.g. OrganizationSamlFederationResolver
+func OrganizationID(organizationID string) ResolveOption {
+	return func(o *resolveOptions) {
+		o.organizationID = organizationID
 	}
 }
 
@@ -138,6 +146,10 @@ func (r *BaseResolver) CloudID() string {
 	return r.opts.cloudID
 }
 
+func (r *BaseResolver) OrganizationID() string {
+	return r.opts.organizationID
+}
+
 func (r *BaseResolver) ClusterID() string {
 	return r.opts.clusterID
 }
@@ -185,6 +197,15 @@ func (r *BaseNameResolver) ensureFolderID() error {
 func (r *BaseNameResolver) ensureCloudID() error {
 	if r.CloudID() == "" {
 		err := &ErrNotFound{error: fmt.Sprintf("can't resolve %v without cloud id specified", r.resolvingObjectType)}
+		return r.SetErr(err)
+	}
+
+	return nil
+}
+
+func (r *BaseNameResolver) ensureOrganizationID() error {
+	if r.OrganizationID() == "" {
+		err := &ErrNotFound{error: fmt.Sprintf("can't resolve %v without organization id specified", r.resolvingObjectType)}
 		return r.SetErr(err)
 	}
 
