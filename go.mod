@@ -12,7 +12,7 @@ require (
 	github.com/mitchellh/go-testing-interface v1.0.0
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/testify v1.5.1
-	github.com/yandex-cloud/go-genproto v0.0.0-20210624105554-57ddfa443e1f
+	github.com/yandex-cloud/go-genproto v0.0.0-20210712094235-fa381d7693d5
 	golang.org/x/net v0.0.0-20200320220750-118fecf932d8
 	google.golang.org/genproto v0.0.0-20200323114720-3f67cca34472
 	google.golang.org/grpc v1.28.0

@@ -725,3 +725,12 @@ func (c *ClusterServiceClient) Update(ctx context.Context, in *mysql.UpdateClust
 	}
 	return mysql.NewClusterServiceClient(conn).Update(ctx, in, opts...)
 }
+
+// UpdateHosts implements mysql.ClusterServiceClient
+func (c *ClusterServiceClient) UpdateHosts(ctx context.Context, in *mysql.UpdateClusterHostsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return mysql.NewClusterServiceClient(conn).UpdateHosts(ctx, in, opts...)
+}

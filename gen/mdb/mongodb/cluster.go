@@ -860,6 +860,15 @@ func (c *ClusterServiceClient) Start(ctx context.Context, in *mongodb.StartClust
 	return mongodb.NewClusterServiceClient(conn).Start(ctx, in, opts...)
 }
 
+// StepdownHosts implements mongodb.ClusterServiceClient
+func (c *ClusterServiceClient) StepdownHosts(ctx context.Context, in *mongodb.StepdownHostsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return mongodb.NewClusterServiceClient(conn).StepdownHosts(ctx, in, opts...)
+}
+
 // Stop implements mongodb.ClusterServiceClient
 func (c *ClusterServiceClient) Stop(ctx context.Context, in *mongodb.StopClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
