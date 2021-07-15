@@ -3,6 +3,7 @@ package ycsdk
 import (
 	"github.com/yandex-cloud/go-sdk/gen/apigateway"
 	"github.com/yandex-cloud/go-sdk/gen/functions"
+	"github.com/yandex-cloud/go-sdk/gen/mdbproxy"
 	"github.com/yandex-cloud/go-sdk/gen/triggers"
 )
 
@@ -14,6 +15,7 @@ const (
 	FunctionServiceID   Endpoint = "serverless-functions"
 	TriggerServiceID    Endpoint = "serverless-triggers"
 	APIGatewayServiceID Endpoint = "serverless-apigateway"
+	MDBProxyServiceID   Endpoint = "mdbproxy"
 )
 
 func (s *Serverless) Functions() *functions.Function {
@@ -26,4 +28,8 @@ func (s *Serverless) Triggers() *triggers.Trigger {
 
 func (s *Serverless) APIGateway() *apigateway.Apigateway {
 	return apigateway.NewApigateway(s.sdk.getConn(APIGatewayServiceID))
+}
+
+func (s *Serverless) MDBProxy() *mdbproxy.Proxy {
+	return mdbproxy.NewProxy(s.sdk.getConn(MDBProxyServiceID))
 }

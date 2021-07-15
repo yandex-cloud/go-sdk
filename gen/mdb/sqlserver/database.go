@@ -162,3 +162,12 @@ func (it *DatabaseIterator) Value() *sqlserver.Database {
 func (it *DatabaseIterator) Error() error {
 	return it.err
 }
+
+// Restore implements sqlserver.DatabaseServiceClient
+func (c *DatabaseServiceClient) Restore(ctx context.Context, in *sqlserver.RestoreDatabaseRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return sqlserver.NewDatabaseServiceClient(conn).Restore(ctx, in, opts...)
+}
