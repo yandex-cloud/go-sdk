@@ -101,6 +101,113 @@ func (c *DeviceServiceClient) List(ctx context.Context, in *devices.ListDevicesR
 	return devices.NewDeviceServiceClient(conn).List(ctx, in, opts...)
 }
 
+type DeviceIterator struct {
+	ctx  context.Context
+	opts []grpc.CallOption
+
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
+
+	client  *DeviceServiceClient
+	request *devices.ListDevicesRequest
+
+	items []*devices.Device
+}
+
+func (c *DeviceServiceClient) DeviceIterator(ctx context.Context, req *devices.ListDevicesRequest, opts ...grpc.CallOption) *DeviceIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
+	return &DeviceIterator{
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
+	}
+}
+
+func (it *DeviceIterator) Next() bool {
+	if it.err != nil {
+		return false
+	}
+	if len(it.items) > 1 {
+		it.items[0] = nil
+		it.items = it.items[1:]
+		return true
+	}
+	it.items = nil // consume last item, if any
+
+	if it.started && it.request.PageToken == "" {
+		return false
+	}
+	it.started = true
+
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
+	response, err := it.client.List(it.ctx, it.request, it.opts...)
+	it.err = err
+	if err != nil {
+		return false
+	}
+
+	it.items = response.Devices
+	it.request.PageToken = response.NextPageToken
+	return len(it.items) > 0
+}
+
+func (it *DeviceIterator) Take(size int64) ([]*devices.Device, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*devices.Device
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *DeviceIterator) TakeAll() ([]*devices.Device, error) {
+	return it.Take(0)
+}
+
+func (it *DeviceIterator) Value() *devices.Device {
+	if len(it.items) == 0 {
+		panic("calling Value on empty iterator")
+	}
+	return it.items[0]
+}
+
+func (it *DeviceIterator) Error() error {
+	return it.err
+}
+
 // ListCertificates implements devices.DeviceServiceClient
 func (c *DeviceServiceClient) ListCertificates(ctx context.Context, in *devices.ListDeviceCertificatesRequest, opts ...grpc.CallOption) (*devices.ListDeviceCertificatesResponse, error) {
 	conn, err := c.getConn(ctx)
