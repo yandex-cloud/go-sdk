@@ -26,6 +26,8 @@ import (
 	"github.com/yandex-cloud/go-sdk/gen/iam"
 	k8s "github.com/yandex-cloud/go-sdk/gen/kubernetes"
 	gen_operation "github.com/yandex-cloud/go-sdk/gen/operation"
+	"github.com/yandex-cloud/go-sdk/gen/organizationmanager"
+	organizationmanagersaml "github.com/yandex-cloud/go-sdk/gen/organizationmanager/saml"
 	"github.com/yandex-cloud/go-sdk/gen/resourcemanager"
 	"github.com/yandex-cloud/go-sdk/gen/vpc"
 	"github.com/yandex-cloud/go-sdk/gen/ydb"
@@ -40,12 +42,13 @@ type Endpoint string
 const (
 	DefaultPageSize int64 = 1000
 
-	ComputeServiceID            Endpoint = "compute"
-	IAMServiceID                Endpoint = "iam"
-	OperationServiceID          Endpoint = "operation"
-	ResourceManagementServiceID Endpoint = "resource-manager"
-	StorageServiceID            Endpoint = "storage"
-	SerialSSHServiceID          Endpoint = "serialssh"
+	ComputeServiceID                Endpoint = "compute"
+	IAMServiceID                    Endpoint = "iam"
+	OperationServiceID              Endpoint = "operation"
+	OrganizationManagementServiceID Endpoint = "organization-manager"
+	ResourceManagementServiceID     Endpoint = "resource-manager"
+	StorageServiceID                Endpoint = "storage"
+	SerialSSHServiceID              Endpoint = "serialssh"
 	// revive:disable:var-naming
 	ApiEndpointServiceID Endpoint = "endpoint"
 	// revive:enable:var-naming
@@ -182,6 +185,14 @@ func (sdk *SDK) Marketplace() *Marketplace {
 func (sdk *SDK) Operation() *gen_operation.OperationServiceClient {
 	group := gen_operation.NewOperation(sdk.getConn(OperationServiceID))
 	return group.Operation()
+}
+
+func (sdk *SDK) OrganizationManager() *organizationmanager.OrganizationManager {
+	return organizationmanager.NewOrganizationManager(sdk.getConn(OrganizationManagementServiceID))
+}
+
+func (sdk *SDK) OrganizationManagerSAML() *organizationmanagersaml.OrganizationManagerSAML {
+	return organizationmanagersaml.NewOrganizationManagerSAML(sdk.getConn(OrganizationManagementServiceID))
 }
 
 // ResourceManager returns ResourceManager object that is used to operate on Folders and Clouds
