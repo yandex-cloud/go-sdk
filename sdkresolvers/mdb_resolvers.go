@@ -7,6 +7,7 @@ import (
 
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/clickhouse/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/elasticsearch/v1"
+	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/greenplum/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/kafka/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/mongodb/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/mysql/v1"
@@ -153,6 +154,30 @@ func (r *sqlServerClusterResolver) Run(ctx context.Context, sdk *ycsdk.SDK, opts
 	}
 
 	resp, err := sdk.MDB().SQLServer().Cluster().List(ctx, &sqlserver.ListClustersRequest{
+		FolderId: r.FolderID(),
+		Filter:   CreateResolverFilter("name", r.Name),
+		PageSize: DefaultResolverPageSize,
+	})
+	return r.findName(resp.GetClusters(), err)
+}
+
+func GreenplumClusterResolver(name string, opts ...ResolveOption) ycsdk.Resolver {
+	return &greenplumClusterResolver{
+		BaseNameResolver: NewBaseNameResolver(name, "cluster", opts...),
+	}
+}
+
+type greenplumClusterResolver struct {
+	BaseNameResolver
+}
+
+func (r *greenplumClusterResolver) Run(ctx context.Context, sdk *ycsdk.SDK, opts ...grpc.CallOption) error {
+	err := r.ensureFolderID()
+	if err != nil {
+		return err
+	}
+
+	resp, err := sdk.MDB().Greenplum().Cluster().List(ctx, &greenplum.ListClustersRequest{
 		FolderId: r.FolderID(),
 		Filter:   CreateResolverFilter("name", r.Name),
 		PageSize: DefaultResolverPageSize,
