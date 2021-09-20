@@ -67,3 +67,8 @@ func (c *Compute) HostType() *HostTypeServiceClient {
 func (c *Compute) DiskPlacementGroup() *DiskPlacementGroupServiceClient {
 	return &DiskPlacementGroupServiceClient{getConn: c.getConn}
 }
+
+// Filesystem gets FilesystemService client
+func (c *Compute) Filesystem() *FilesystemServiceClient {
+	return &FilesystemServiceClient{getConn: c.getConn}
+}

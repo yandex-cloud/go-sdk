@@ -38,6 +38,15 @@ func (c *InstanceServiceClient) AttachDisk(ctx context.Context, in *compute.Atta
 	return compute.NewInstanceServiceClient(conn).AttachDisk(ctx, in, opts...)
 }
 
+// AttachFilesystem implements compute.InstanceServiceClient
+func (c *InstanceServiceClient) AttachFilesystem(ctx context.Context, in *compute.AttachInstanceFilesystemRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return compute.NewInstanceServiceClient(conn).AttachFilesystem(ctx, in, opts...)
+}
+
 // Create implements compute.InstanceServiceClient
 func (c *InstanceServiceClient) Create(ctx context.Context, in *compute.CreateInstanceRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -63,6 +72,15 @@ func (c *InstanceServiceClient) DetachDisk(ctx context.Context, in *compute.Deta
 		return nil, err
 	}
 	return compute.NewInstanceServiceClient(conn).DetachDisk(ctx, in, opts...)
+}
+
+// DetachFilesystem implements compute.InstanceServiceClient
+func (c *InstanceServiceClient) DetachFilesystem(ctx context.Context, in *compute.DetachInstanceFilesystemRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return compute.NewInstanceServiceClient(conn).DetachFilesystem(ctx, in, opts...)
 }
 
 // Get implements compute.InstanceServiceClient

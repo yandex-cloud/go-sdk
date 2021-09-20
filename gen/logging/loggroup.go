@@ -48,15 +48,6 @@ func (c *LogGroupServiceClient) Get(ctx context.Context, in *logging.GetLogGroup
 	return logging.NewLogGroupServiceClient(conn).Get(ctx, in, opts...)
 }
 
-// GetDefault implements logging.LogGroupServiceClient
-func (c *LogGroupServiceClient) GetDefault(ctx context.Context, in *logging.GetDefaultLogGroupRequest, opts ...grpc.CallOption) (*logging.LogGroup, error) {
-	conn, err := c.getConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return logging.NewLogGroupServiceClient(conn).GetDefault(ctx, in, opts...)
-}
-
 // List implements logging.LogGroupServiceClient
 func (c *LogGroupServiceClient) List(ctx context.Context, in *logging.ListLogGroupsRequest, opts ...grpc.CallOption) (*logging.ListLogGroupsResponse, error) {
 	conn, err := c.getConn(ctx)
