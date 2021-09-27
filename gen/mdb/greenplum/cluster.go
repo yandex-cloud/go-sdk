@@ -528,3 +528,12 @@ func (c *ClusterServiceClient) Stop(ctx context.Context, in *greenplum.StopClust
 	}
 	return greenplum.NewClusterServiceClient(conn).Stop(ctx, in, opts...)
 }
+
+// Update implements greenplum.ClusterServiceClient
+func (c *ClusterServiceClient) Update(ctx context.Context, in *greenplum.UpdateClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return greenplum.NewClusterServiceClient(conn).Update(ctx, in, opts...)
+}
