@@ -20,6 +20,15 @@ type SubnetServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
 }
 
+// AddCidrBlocks implements vpc.SubnetServiceClient
+func (c *SubnetServiceClient) AddCidrBlocks(ctx context.Context, in *vpc.AddSubnetCidrBlocksRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return vpc.NewSubnetServiceClient(conn).AddCidrBlocks(ctx, in, opts...)
+}
+
 // Create implements vpc.SubnetServiceClient
 func (c *SubnetServiceClient) Create(ctx context.Context, in *vpc.CreateSubnetRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -402,6 +411,15 @@ func (c *SubnetServiceClient) Move(ctx context.Context, in *vpc.MoveSubnetReques
 		return nil, err
 	}
 	return vpc.NewSubnetServiceClient(conn).Move(ctx, in, opts...)
+}
+
+// RemoveCidrBlocks implements vpc.SubnetServiceClient
+func (c *SubnetServiceClient) RemoveCidrBlocks(ctx context.Context, in *vpc.RemoveSubnetCidrBlocksRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return vpc.NewSubnetServiceClient(conn).RemoveCidrBlocks(ctx, in, opts...)
 }
 
 // Update implements vpc.SubnetServiceClient
