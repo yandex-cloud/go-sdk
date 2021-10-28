@@ -9,20 +9,20 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 )
 
 func TestOperation_Metadata_Unmarshal(t *testing.T) {
-	expected := &wrappers.StringValue{Value: "metadata"}
+	expected := &wrapperspb.StringValue{Value: "metadata"}
 	op := New(nil, &Proto{Metadata: marshalAny(t, expected)})
 	actual, err := op.Metadata()
 	require.NoError(t, err)
@@ -49,7 +49,7 @@ func TestOperation_Running(t *testing.T) {
 }
 
 func TestOperation_Ok(t *testing.T) {
-	resp := &wrappers.StringValue{Value: "response"}
+	resp := &wrapperspb.StringValue{Value: "response"}
 	op := New(nil, &Proto{Done: true, Result: &operation.Operation_Response{Response: marshalAny(t, resp)}})
 	assert.True(t, op.Done())
 	assert.True(t, op.Ok())
@@ -79,7 +79,7 @@ func TestOperation_Poll_Ok(t *testing.T) {
 	initialState := &Proto{Id: id}
 	op := New(client, initialState)
 	ctx := context.Background()
-	newState := &Proto{Done: true, Result: &operation.Operation_Response{Response: marshalAny(t, &wrappers.StringValue{Value: "ok"})}}
+	newState := &Proto{Done: true, Result: &operation.Operation_Response{Response: marshalAny(t, &wrapperspb.StringValue{Value: "ok"})}}
 	client.On("Get", ctx, matchedBy(&operation.GetOperationRequest{OperationId: id})).Return(newState, nil)
 
 	err := op.Poll(ctx)

@@ -7,7 +7,7 @@ import (
 	"log"
 
 	"github.com/c2h5oh/datasize"
-	"google.golang.org/genproto/protobuf/field_mask"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/postgresql/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/vpc/v1"
@@ -166,7 +166,7 @@ func addClusterHost(ctx context.Context, sdk *ycsdk.SDK, cluster *postgresql.Clu
 
 func changeClusterDescription(ctx context.Context, sdk *ycsdk.SDK, cluster *postgresql.Cluster) {
 	fmt.Printf("Updating cluster %s\n", cluster.Id)
-	mask := &field_mask.FieldMask{
+	mask := &fieldmaskpb.FieldMask{
 		Paths: []string{
 			"description",
 		},

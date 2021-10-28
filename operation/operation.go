@@ -5,25 +5,23 @@ package operation
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/any"
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 	"github.com/yandex-cloud/go-sdk/pkg/sdkerrors"
 )
 
 // dummy import to avoid problems, when client app tries to unmarshall operation with empty response
-var _ = empty.Empty{}
+var _ = emptypb.Empty{}
 
 type Client = operation.OperationServiceClient
 type Proto = operation.Operation
@@ -59,18 +57,14 @@ func (o *Operation) Description() string { return o.proto.Description }
 func (o *Operation) CreatedBy() string   { return o.proto.CreatedBy }
 
 func (o *Operation) CreatedAt() time.Time {
-	ts, err := ptypes.Timestamp(o.proto.CreatedAt)
-	if err != nil {
-		panic(fmt.Sprintf("invalid created at: %v", err))
-	}
-	return ts
+	return o.proto.CreatedAt.AsTime()
 }
 
 func (o *Operation) Metadata() (proto.Message, error) {
 	return UnmarshalAny(o.RawMetadata())
 }
 
-func (o *Operation) RawMetadata() *any.Any { return o.proto.Metadata }
+func (o *Operation) RawMetadata() *anypb.Any { return o.proto.Metadata }
 
 func (o *Operation) Error() error {
 	st := o.ErrorStatus()
@@ -96,7 +90,7 @@ func (o *Operation) Response() (proto.Message, error) {
 	return UnmarshalAny(resp)
 }
 
-func (o *Operation) RawResponse() *any.Any {
+func (o *Operation) RawResponse() *anypb.Any {
 	return o.proto.GetResponse()
 }
 
