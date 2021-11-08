@@ -6,12 +6,12 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/any"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
-func marshalAny(t *testing.T, msg proto.Message) *any.Any {
+func marshalAny(t *testing.T, msg proto.Message) *anypb.Any {
 	any, err := ptypes.MarshalAny(msg)
 	require.NoError(t, err)
 	return any
