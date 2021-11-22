@@ -15,7 +15,6 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -95,7 +94,7 @@ func TestInstanceServiceAccount(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, token, iamToken.IamToken)
 		expectedExpiresAt := time.Now().Add(expiresIn * time.Second)
-		actualExpiresAt, err := ptypes.Timestamp(iamToken.ExpiresAt)
+		actualExpiresAt, err := iamToken.ExpiresAt.AsTime(), iamToken.ExpiresAt.CheckValid()
 		require.NoError(t, err)
 		assert.True(t, expectedExpiresAt.After(actualExpiresAt))
 		assert.True(t, expectedExpiresAt.Add(-10*time.Second).Before(actualExpiresAt))

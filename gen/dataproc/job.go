@@ -20,6 +20,15 @@ type JobServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
 }
 
+// Cancel implements dataproc.JobServiceClient
+func (c *JobServiceClient) Cancel(ctx context.Context, in *dataproc.CancelJobRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return dataproc.NewJobServiceClient(conn).Cancel(ctx, in, opts...)
+}
+
 // Create implements dataproc.JobServiceClient
 func (c *JobServiceClient) Create(ctx context.Context, in *dataproc.CreateJobRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)

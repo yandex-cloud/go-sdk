@@ -17,10 +17,10 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	iampb "github.com/yandex-cloud/go-genproto/yandex/cloud/iam/v1"
 	"github.com/yandex-cloud/go-sdk/iamkey"
@@ -235,7 +235,7 @@ func (c *instanceServiceAccountCredentials) iamToken(ctx context.Context) (*iamp
 		grpclog.Errorf("Failed to unmarshal instance metadata service SA token response body.\nError: %s\nBody:\n%s", err, body)
 		return nil, sdkerrors.WithMessage(err, "body unmarshal failed")
 	}
-	expiresAt := ptypes.TimestampNow()
+	expiresAt := timestamppb.Now()
 	expiresAt.Seconds += tokenResponse.ExpiresIn - 1
 	expiresAt.Nanos = 0 // Truncate is for readability.
 	return &iampb.CreateIamTokenResponse{

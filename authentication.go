@@ -8,7 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
@@ -167,7 +166,7 @@ func (c *IamTokenMiddleware) updateToken(ctx context.Context, subject authSubjec
 	if err != nil {
 		return "", sdkerrors.WithMessage(err, "iam token create failed")
 	}
-	expiresAt, expiresAtErr := ptypes.Timestamp(resp.ExpiresAt)
+	expiresAt, expiresAtErr := resp.ExpiresAt.AsTime(), resp.ExpiresAt.CheckValid()
 	if expiresAtErr != nil {
 		grpclog.Warningf("invalid IAM Token expires_at: %s", expiresAtErr)
 		// Fallback to short term caching.
