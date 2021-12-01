@@ -520,6 +520,15 @@ func (c *ClusterServiceClient) Move(ctx context.Context, in *kafka.MoveClusterRe
 	return kafka.NewClusterServiceClient(conn).Move(ctx, in, opts...)
 }
 
+// RescheduleMaintenance implements kafka.ClusterServiceClient
+func (c *ClusterServiceClient) RescheduleMaintenance(ctx context.Context, in *kafka.RescheduleMaintenanceRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return kafka.NewClusterServiceClient(conn).RescheduleMaintenance(ctx, in, opts...)
+}
+
 // Start implements kafka.ClusterServiceClient
 func (c *ClusterServiceClient) Start(ctx context.Context, in *kafka.StartClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)

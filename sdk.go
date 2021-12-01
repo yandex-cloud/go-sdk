@@ -145,6 +145,11 @@ func (sdk *SDK) Shutdown(ctx context.Context) error {
 	return sdk.cc.Shutdown(ctx)
 }
 
+func (sdk *SDK) CheckEndpointConnection(ctx context.Context, endpoint Endpoint) error {
+	_, err := sdk.getConn(endpoint)(ctx)
+	return err
+}
+
 // WrapOperation wraps operation proto message to
 func (sdk *SDK) WrapOperation(op *operation.Operation, err error) (*sdk_operation.Operation, error) {
 	if err != nil {

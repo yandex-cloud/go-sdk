@@ -5,6 +5,7 @@ package ycsdk
 
 import (
 	"context"
+	"crypto"
 	"crypto/rsa"
 	"encoding/json"
 	"errors"
@@ -15,7 +16,7 @@ import (
 	"net/http/httputil"
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	jwt "github.com/dgrijalva/jwt-go/v4"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
@@ -133,9 +134,9 @@ func (b *serviceAccountJWTBuilder) issueToken() *jwt.Token {
 	issuedAt := time.Now()
 	token := jwt.NewWithClaims(jwtSigningMethodPS256WithSaltLengthEqualsHash, jwt.StandardClaims{
 		Issuer:    b.key.GetServiceAccountId(),
-		IssuedAt:  issuedAt.Unix(),
-		ExpiresAt: issuedAt.Add(time.Hour).Unix(),
-		Audience:  "https://iam.api.cloud.yandex.net/iam/v1/tokens",
+		IssuedAt:  jwt.At(issuedAt),
+		ExpiresAt: jwt.At(issuedAt.Add(time.Hour)),
+		Audience:  jwt.ClaimStrings{"https://iam.api.cloud.yandex.net/iam/v1/tokens"},
 	})
 	token.Header["kid"] = b.key.Id
 	return token
@@ -146,6 +147,7 @@ func (b *serviceAccountJWTBuilder) issueToken() *jwt.Token {
 var jwtSigningMethodPS256WithSaltLengthEqualsHash = &jwt.SigningMethodRSAPSS{
 	SigningMethodRSA: jwt.SigningMethodPS256.SigningMethodRSA,
 	Options: &rsa.PSSOptions{
+		Hash:       crypto.SHA256,
 		SaltLength: rsa.PSSSaltLengthEqualsHash,
 	},
 }

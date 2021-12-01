@@ -5,6 +5,7 @@ package ycsdk
 
 import (
 	"context"
+	"crypto"
 	"crypto/rsa"
 	"fmt"
 	"io"
@@ -14,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	jwt "github.com/dgrijalva/jwt-go/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -57,6 +58,7 @@ func TestServiceAccountKey(t *testing.T) {
 	method := &jwt.SigningMethodRSAPSS{
 		SigningMethodRSA: jwt.SigningMethodPS256.SigningMethodRSA,
 		Options: &rsa.PSSOptions{
+			Hash:       crypto.SHA256,
 			SaltLength: rsa.PSSSaltLengthEqualsHash,
 		},
 	}
@@ -66,12 +68,12 @@ func TestServiceAccountKey(t *testing.T) {
 	claims := jot.Claims.(*jwt.StandardClaims)
 	assert.Equal(t, key.Id, jot.Header["kid"])
 	assert.Equal(t, key.GetServiceAccountId(), claims.Issuer)
-	assert.Equal(t, "https://iam.api.cloud.yandex.net/iam/v1/tokens", claims.Audience)
-	issuedAt := time.Unix(claims.IssuedAt, 0)
+	assert.Contains(t, claims.Audience, "https://iam.api.cloud.yandex.net/iam/v1/tokens")
+	issuedAt := claims.IssuedAt.Time
 	sinceIssued := time.Since(issuedAt)
 	assert.True(t, sinceIssued > 0)
 	assert.True(t, sinceIssued < time.Minute)
-	assert.Equal(t, time.Hour, time.Unix(claims.ExpiresAt, 0).Sub(issuedAt))
+	assert.Equal(t, time.Hour, claims.ExpiresAt.Sub(issuedAt))
 }
 
 func TestInstanceServiceAccount(t *testing.T) {
