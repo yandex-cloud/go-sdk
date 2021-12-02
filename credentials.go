@@ -16,7 +16,7 @@ import (
 	"net/http/httputil"
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go/v4"
+	jwt "github.com/golang-jwt/jwt/v4"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
@@ -132,10 +132,10 @@ func (b *serviceAccountJWTBuilder) SignedToken() (string, error) {
 
 func (b *serviceAccountJWTBuilder) issueToken() *jwt.Token {
 	issuedAt := time.Now()
-	token := jwt.NewWithClaims(jwtSigningMethodPS256WithSaltLengthEqualsHash, jwt.StandardClaims{
+	token := jwt.NewWithClaims(jwtSigningMethodPS256WithSaltLengthEqualsHash, jwt.RegisteredClaims{
 		Issuer:    b.key.GetServiceAccountId(),
-		IssuedAt:  jwt.At(issuedAt),
-		ExpiresAt: jwt.At(issuedAt.Add(time.Hour)),
+		IssuedAt:  jwt.NewNumericDate(issuedAt),
+		ExpiresAt: jwt.NewNumericDate(issuedAt.Add(time.Hour)),
 		Audience:  jwt.ClaimStrings{"https://iam.api.cloud.yandex.net/iam/v1/tokens"},
 	})
 	token.Header["kid"] = b.key.Id

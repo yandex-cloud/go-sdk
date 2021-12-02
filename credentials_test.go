@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go/v4"
+	jwt "github.com/golang-jwt/jwt/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -48,7 +48,7 @@ func TestServiceAccountKey(t *testing.T) {
 	require.NotEmpty(t, iamTokenReq.GetJwt())
 
 	parser := jwt.Parser{}
-	jot, parts, err := parser.ParseUnverified(iamTokenReq.GetJwt(), &jwt.StandardClaims{})
+	jot, parts, err := parser.ParseUnverified(iamTokenReq.GetJwt(), &jwt.RegisteredClaims{})
 	require.NoError(t, err)
 
 	publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(key.PublicKey))
@@ -65,7 +65,7 @@ func TestServiceAccountKey(t *testing.T) {
 	err = method.Verify(strings.Join(parts[:2], "."), parts[2], publicKey)
 	require.NoError(t, err, "token verification failed")
 
-	claims := jot.Claims.(*jwt.StandardClaims)
+	claims := jot.Claims.(*jwt.RegisteredClaims)
 	assert.Equal(t, key.Id, jot.Header["kid"])
 	assert.Equal(t, key.GetServiceAccountId(), claims.Issuer)
 	assert.Contains(t, claims.Audience, "https://iam.api.cloud.yandex.net/iam/v1/tokens")
