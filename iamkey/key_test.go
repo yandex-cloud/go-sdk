@@ -10,9 +10,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/encoding/prototext"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -54,7 +54,7 @@ func testKey(t *testing.T) *Key {
 	data, err := ioutil.ReadFile("../test_data/service_account_key.pb")
 	require.NoError(t, err)
 	key := &Key{}
-	err = proto.UnmarshalText(string(data), key)
+	err = prototext.Unmarshal(data, key)
 	require.NoError(t, err)
 	return key
 }

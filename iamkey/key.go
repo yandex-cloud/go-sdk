@@ -4,13 +4,12 @@
 package iamkey
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 
 	yaml2json "github.com/ghodss/yaml"
-	"github.com/golang/protobuf/jsonpb"
+	"google.golang.org/protobuf/encoding/protojson"
 	yaml "gopkg.in/yaml.v2"
 
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/iam/v1"
@@ -59,17 +58,11 @@ func New(created *iam.CreateKeyResponse) *Key {
 // UnmarshalJSON unmarshals IAM Key JSON data.
 // Both snake_case (gRPC API) and camelCase (REST API) fields are accepted.
 func (m *Key) UnmarshalJSON(data []byte) error {
-	return jsonpb.Unmarshal(bytes.NewReader(data), m)
+	return protojson.Unmarshal(data, m)
 }
 
 func (m *Key) MarshalJSON() ([]byte, error) {
-	marshaller := &jsonpb.Marshaler{OrigName: true}
-	buf := &bytes.Buffer{}
-	err := marshaller.Marshal(buf, m)
-	if err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
+	return protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
 }
 
 // UnmarshalYAML unmarshals IAM Key YAML data.

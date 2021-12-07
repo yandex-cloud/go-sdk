@@ -33,7 +33,7 @@ func TestOAuthToken(t *testing.T) {
 func TestIAMToken(t *testing.T) {
 	const iamToken = "this-is-iam-token"
 	creds := NewIAMTokenCredentials(iamToken)
-	iamTokenResp, err := creds.(NonExchangeableCredentials).IAMToken(context.Background())
+	iamTokenResp, err := creds.IAMToken(context.Background())
 	require.NoError(t, err)
 	assert.Equal(t, iamToken, iamTokenResp.GetIamToken())
 }

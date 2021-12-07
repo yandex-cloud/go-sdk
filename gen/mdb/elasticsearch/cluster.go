@@ -538,6 +538,15 @@ func (c *ClusterServiceClient) Move(ctx context.Context, in *elasticsearch.MoveC
 	return elasticsearch.NewClusterServiceClient(conn).Move(ctx, in, opts...)
 }
 
+// RescheduleMaintenance implements elasticsearch.ClusterServiceClient
+func (c *ClusterServiceClient) RescheduleMaintenance(ctx context.Context, in *elasticsearch.RescheduleMaintenanceRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return elasticsearch.NewClusterServiceClient(conn).RescheduleMaintenance(ctx, in, opts...)
+}
+
 // Start implements elasticsearch.ClusterServiceClient
 func (c *ClusterServiceClient) Start(ctx context.Context, in *elasticsearch.StartClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
