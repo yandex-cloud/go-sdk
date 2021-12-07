@@ -16,7 +16,7 @@ jobs:
       - image: golangci/golangci-lint:v1.43
     steps:
       - checkout
-      - run: golangci-lint run -v
+      - run: golangci-lint run -v --timeout=3m
 
   test:
     docker:
