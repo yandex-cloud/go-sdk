@@ -37,3 +37,8 @@ func (e *ElasticSearch) User() *UserServiceClient {
 func (e *ElasticSearch) Auth() *AuthServiceClient {
 	return &AuthServiceClient{getConn: e.getConn}
 }
+
+// Backup gets BackupService client
+func (e *ElasticSearch) Backup() *BackupServiceClient {
+	return &BackupServiceClient{getConn: e.getConn}
+}
