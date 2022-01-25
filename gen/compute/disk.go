@@ -279,6 +279,15 @@ func (it *DiskOperationsIterator) Error() error {
 	return it.err
 }
 
+// Move implements compute.DiskServiceClient
+func (c *DiskServiceClient) Move(ctx context.Context, in *compute.MoveDiskRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return compute.NewDiskServiceClient(conn).Move(ctx, in, opts...)
+}
+
 // Update implements compute.DiskServiceClient
 func (c *DiskServiceClient) Update(ctx context.Context, in *compute.UpdateDiskRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)

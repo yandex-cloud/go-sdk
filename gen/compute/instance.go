@@ -333,6 +333,15 @@ func (it *InstanceOperationsIterator) Error() error {
 	return it.err
 }
 
+// Move implements compute.InstanceServiceClient
+func (c *InstanceServiceClient) Move(ctx context.Context, in *compute.MoveInstanceRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return compute.NewInstanceServiceClient(conn).Move(ctx, in, opts...)
+}
+
 // RemoveOneToOneNat implements compute.InstanceServiceClient
 func (c *InstanceServiceClient) RemoveOneToOneNat(ctx context.Context, in *compute.RemoveInstanceOneToOneNatRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
