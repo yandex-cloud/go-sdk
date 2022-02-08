@@ -37,3 +37,8 @@ func (k *Kafka) User() *UserServiceClient {
 func (k *Kafka) ResourcePreset() *ResourcePresetServiceClient {
 	return &ResourcePresetServiceClient{getConn: k.getConn}
 }
+
+// Connector gets ConnectorService client
+func (k *Kafka) Connector() *ConnectorServiceClient {
+	return &ConnectorServiceClient{getConn: k.getConn}
+}
