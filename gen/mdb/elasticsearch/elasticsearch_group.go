@@ -42,3 +42,8 @@ func (e *ElasticSearch) Auth() *AuthServiceClient {
 func (e *ElasticSearch) Backup() *BackupServiceClient {
 	return &BackupServiceClient{getConn: e.getConn}
 }
+
+// Extension gets ExtensionService client
+func (e *ElasticSearch) Extension() *ExtensionServiceClient {
+	return &ExtensionServiceClient{getConn: e.getConn}
+}

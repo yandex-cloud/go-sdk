@@ -14,6 +14,7 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/endpoint"
 	iampb "github.com/yandex-cloud/go-genproto/yandex/cloud/iam/v1"
@@ -125,7 +126,7 @@ func Build(ctx context.Context, conf Config, customOpts ...grpc.DialOption) (*SD
 		dialOpts = append(dialOpts, grpc.WithBlock(), grpc.WithTimeout(conf.DialContextTimeout)) // nolint
 	}
 	if conf.Plaintext {
-		dialOpts = append(dialOpts, grpc.WithInsecure())
+		dialOpts = append(dialOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	} else {
 		tlsConfig := conf.TLSConfig
 		if tlsConfig == nil {

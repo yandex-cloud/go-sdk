@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
@@ -94,7 +95,7 @@ func initTestService(t *testing.T, handler ZoneServerHandler, interceptor grpc.D
 		testutil.Message("Test server failed to start."),
 	)
 
-	so.c, err = grpc.Dial(so.l.Addr().String(), grpc.WithInsecure(), interceptor)
+	so.c, err = grpc.Dial(so.l.Addr().String(), grpc.WithTransportCredentials(insecure.NewCredentials()), interceptor)
 	require.NoError(t, err)
 	res = compute.NewZoneServiceClient(so.c)
 	return
@@ -103,7 +104,7 @@ func initTestService(t *testing.T, handler ZoneServerHandler, interceptor grpc.D
 func IsGrpcEndpointReady(t *testing.T, addr string) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 	defer cancel()
-	conn, err := grpc.DialContext(ctx, addr, grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.DialContext(ctx, addr, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
 		return false
 	}

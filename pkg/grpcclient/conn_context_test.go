@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/yandex-cloud/go-sdk/pkg/testutil"
 )
@@ -31,7 +32,7 @@ func startServer(ctx context.Context, t *testing.T, l net.Listener) {
 
 func TestDialContextTimeout(t *testing.T) {
 	connCtx := NewLazyConnContext(DialOptions(
-		grpc.WithInsecure(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithTimeout(time.Millisecond*1), // nolint
 		grpc.WithBlock(),
 	))
@@ -59,7 +60,7 @@ func TestNewLazyClientConnContext(t *testing.T) {
 	}
 	defer cancel()
 
-	connCtx := NewLazyConnContext(DialOptions(grpc.WithInsecure()))
+	connCtx := NewLazyConnContext(DialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 
 	wg := sync.WaitGroup{}
 	const numClients = 50
