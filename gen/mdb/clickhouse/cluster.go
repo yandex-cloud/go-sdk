@@ -1030,6 +1030,15 @@ func (c *ClusterServiceClient) Update(ctx context.Context, in *clickhouse.Update
 	return clickhouse.NewClusterServiceClient(conn).Update(ctx, in, opts...)
 }
 
+// UpdateHosts implements clickhouse.ClusterServiceClient
+func (c *ClusterServiceClient) UpdateHosts(ctx context.Context, in *clickhouse.UpdateClusterHostsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return clickhouse.NewClusterServiceClient(conn).UpdateHosts(ctx, in, opts...)
+}
+
 // UpdateShard implements clickhouse.ClusterServiceClient
 func (c *ClusterServiceClient) UpdateShard(ctx context.Context, in *clickhouse.UpdateClusterShardRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
