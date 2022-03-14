@@ -877,3 +877,12 @@ func (c *ClusterServiceClient) Update(ctx context.Context, in *redis.UpdateClust
 	}
 	return redis.NewClusterServiceClient(conn).Update(ctx, in, opts...)
 }
+
+// UpdateHosts implements redis.ClusterServiceClient
+func (c *ClusterServiceClient) UpdateHosts(ctx context.Context, in *redis.UpdateClusterHostsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return redis.NewClusterServiceClient(conn).UpdateHosts(ctx, in, opts...)
+}
