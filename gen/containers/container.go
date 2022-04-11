@@ -530,6 +530,15 @@ func (it *ContainerRevisionsIterator) Error() error {
 	return it.err
 }
 
+// Rollback implements containers.ContainerServiceClient
+func (c *ContainerServiceClient) Rollback(ctx context.Context, in *containers.RollbackContainerRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return containers.NewContainerServiceClient(conn).Rollback(ctx, in, opts...)
+}
+
 // SetAccessBindings implements containers.ContainerServiceClient
 func (c *ContainerServiceClient) SetAccessBindings(ctx context.Context, in *access.SetAccessBindingsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
