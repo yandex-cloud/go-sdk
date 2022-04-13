@@ -38,6 +38,15 @@ func (c *DatabaseServiceClient) Delete(ctx context.Context, in *sqlserver.Delete
 	return sqlserver.NewDatabaseServiceClient(conn).Delete(ctx, in, opts...)
 }
 
+// ExportBackup implements sqlserver.DatabaseServiceClient
+func (c *DatabaseServiceClient) ExportBackup(ctx context.Context, in *sqlserver.ExportDatabaseBackupRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return sqlserver.NewDatabaseServiceClient(conn).ExportBackup(ctx, in, opts...)
+}
+
 // Get implements sqlserver.DatabaseServiceClient
 func (c *DatabaseServiceClient) Get(ctx context.Context, in *sqlserver.GetDatabaseRequest, opts ...grpc.CallOption) (*sqlserver.Database, error) {
 	conn, err := c.getConn(ctx)
@@ -45,6 +54,15 @@ func (c *DatabaseServiceClient) Get(ctx context.Context, in *sqlserver.GetDataba
 		return nil, err
 	}
 	return sqlserver.NewDatabaseServiceClient(conn).Get(ctx, in, opts...)
+}
+
+// ImportBackup implements sqlserver.DatabaseServiceClient
+func (c *DatabaseServiceClient) ImportBackup(ctx context.Context, in *sqlserver.ImportDatabaseBackupRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return sqlserver.NewDatabaseServiceClient(conn).ImportBackup(ctx, in, opts...)
 }
 
 // List implements sqlserver.DatabaseServiceClient
