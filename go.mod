@@ -6,7 +6,6 @@ require (
 	github.com/c2h5oh/datasize v0.0.0-20200112174442-28bbd4740fee
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang-jwt/jwt/v4 v4.1.0
-	github.com/golang/protobuf v1.5.2
 	github.com/google/uuid v1.1.2
 	github.com/hashicorp/go-multierror v1.0.0
 	github.com/mitchellh/go-testing-interface v1.0.0
