@@ -30,6 +30,7 @@ import (
 	"github.com/yandex-cloud/go-sdk/gen/organizationmanager"
 	organizationmanagersaml "github.com/yandex-cloud/go-sdk/gen/organizationmanager/saml"
 	"github.com/yandex-cloud/go-sdk/gen/resourcemanager"
+	"github.com/yandex-cloud/go-sdk/gen/storage-api"
 	"github.com/yandex-cloud/go-sdk/gen/vpc"
 	"github.com/yandex-cloud/go-sdk/gen/ydb"
 	sdk_operation "github.com/yandex-cloud/go-sdk/operation"
@@ -49,6 +50,7 @@ const (
 	OrganizationManagementServiceID Endpoint = "organization-manager"
 	ResourceManagementServiceID     Endpoint = "resource-manager"
 	StorageServiceID                Endpoint = "storage"
+	StorageAPIServiceID             Endpoint = "storage-api"
 	SerialSSHServiceID              Endpoint = "serialssh"
 	// revive:disable:var-naming
 	ApiEndpointServiceID Endpoint = "endpoint"
@@ -353,3 +355,8 @@ func (sdk *SDK) CreateIAMTokenForServiceAccount(ctx context.Context, serviceAcco
 }
 
 var now = time.Now
+
+// StorageAPI returns storage object for operating with Object Storage service.
+func (sdk *SDK) StorageAPI() *storage.StorageAPI {
+	return storage.NewStorageAPI(sdk.getConn(StorageAPIServiceID))
+}
