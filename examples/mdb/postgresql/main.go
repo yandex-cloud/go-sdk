@@ -91,7 +91,7 @@ func findNetwork(ctx context.Context, sdk *ycsdk.SDK, folderID string) *string {
 		break
 	}
 	if networkID == "" {
-		log.Fatal(fmt.Sprintf("no networks in folder: %s", folderID))
+		log.Fatalf("no networks in folder: %s", folderID)
 	}
 	return &networkID
 }
@@ -113,7 +113,7 @@ func findSubnet(ctx context.Context, sdk *ycsdk.SDK, folderID string, networkID 
 		break
 	}
 	if subnetID == "" {
-		log.Fatal(fmt.Sprintf("no subnets in zone: %s", zone))
+		log.Fatalf("no subnets in zone: %s", zone)
 	}
 	return &subnetID
 }

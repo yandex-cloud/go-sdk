@@ -689,3 +689,12 @@ func (c *ClusterServiceClient) Update(ctx context.Context, in *sqlserver.UpdateC
 	}
 	return sqlserver.NewClusterServiceClient(conn).Update(ctx, in, opts...)
 }
+
+// UpdateHosts implements sqlserver.ClusterServiceClient
+func (c *ClusterServiceClient) UpdateHosts(ctx context.Context, in *sqlserver.UpdateClusterHostsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return sqlserver.NewClusterServiceClient(conn).UpdateHosts(ctx, in, opts...)
+}

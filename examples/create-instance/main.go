@@ -137,7 +137,7 @@ func findSubnet(ctx context.Context, sdk *ycsdk.SDK, folderID string, zone strin
 		break
 	}
 	if subnetID == "" {
-		log.Fatal(fmt.Sprintf("no subnets in zone: %s", zone))
+		log.Fatalf("no subnets in zone: %s", zone)
 	}
 	return subnetID
 }
