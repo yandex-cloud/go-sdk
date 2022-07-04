@@ -22,3 +22,8 @@ func NewGreenplum(g func(ctx context.Context) (*grpc.ClientConn, error)) *Greenp
 func (g *Greenplum) Cluster() *ClusterServiceClient {
 	return &ClusterServiceClient{getConn: g.getConn}
 }
+
+// ResourcePreset gets ResourcePresetService client
+func (g *Greenplum) ResourcePreset() *ResourcePresetServiceClient {
+	return &ResourcePresetServiceClient{getConn: g.getConn}
+}
