@@ -222,7 +222,7 @@ func (sdk *SDK) Kubernetes() *k8s.Kubernetes {
 	return k8s.NewKubernetes(sdk.getConn(KubernetesServiceID))
 }
 
-//DNS returns DNS object that is used to operate on Yandex DNS
+// DNS returns DNS object that is used to operate on Yandex DNS
 func (sdk *SDK) DNS() *dns.DNS {
 	return dns.NewDNS(sdk.getConn(DNSServiceID))
 }
@@ -263,13 +263,31 @@ func (sdk *SDK) getConn(serviceID Endpoint) func(ctx context.Context) (*grpc.Cli
 		}
 		endpoint, endpointExist := sdk.Endpoint(serviceID)
 		if !endpointExist {
-			return nil, fmt.Errorf("server doesn't know service \"%v\". Known services: %v",
-				serviceID,
-				sdk.KnownServices())
+			return nil, &ServiceIsNotAvailableError{
+				ServiceID:           serviceID,
+				APIEndpoint:         sdk.conf.Endpoint,
+				availableServiceIDs: sdk.KnownServices(),
+			}
 		}
 		return sdk.cc.GetConn(ctx, endpoint.Address)
 	}
 }
+
+type ServiceIsNotAvailableError struct {
+	ServiceID           Endpoint
+	APIEndpoint         string
+	availableServiceIDs []string
+}
+
+func (s *ServiceIsNotAvailableError) Error() string {
+	return fmt.Sprintf("Service \"%v\" is not available at Cloud API endpoint \"%v\". Available services: %v",
+		s.ServiceID,
+		s.APIEndpoint,
+		s.availableServiceIDs,
+	)
+}
+
+var _ error = &ServiceIsNotAvailableError{}
 
 func (sdk *SDK) initDone() (b bool) {
 	sdk.endpoints.mu.Lock()
