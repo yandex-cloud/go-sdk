@@ -289,6 +289,15 @@ func (it *DatabaseAccessBindingsIterator) Error() error {
 	return it.err
 }
 
+// Move implements ydb.DatabaseServiceClient
+func (c *DatabaseServiceClient) Move(ctx context.Context, in *ydb.MoveDatabaseRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return ydb.NewDatabaseServiceClient(conn).Move(ctx, in, opts...)
+}
+
 // Restore implements ydb.DatabaseServiceClient
 func (c *DatabaseServiceClient) Restore(ctx context.Context, in *ydb.RestoreBackupRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
