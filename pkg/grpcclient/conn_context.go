@@ -14,7 +14,7 @@ import (
 	"github.com/yandex-cloud/go-sdk/pkg/singleflight"
 )
 
-var ErrConnContextClosed = errors.New("grpcutil: client connection context closed")
+var ErrConnContextClosed = errors.New("grpcclient: client connection context closed")
 
 type DialError struct {
 	Err error
