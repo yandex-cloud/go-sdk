@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/lockbox/v1"
-	"github.com/yandex-cloud/go-sdk"
+	ycsdk "github.com/yandex-cloud/go-sdk"
 )
 
 func main() {

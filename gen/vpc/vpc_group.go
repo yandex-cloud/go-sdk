@@ -42,3 +42,8 @@ func (v *VPC) SecurityGroup() *SecurityGroupServiceClient {
 func (v *VPC) Address() *AddressServiceClient {
 	return &AddressServiceClient{getConn: v.getConn}
 }
+
+// Gateway gets GatewayService client
+func (v *VPC) Gateway() *GatewayServiceClient {
+	return &GatewayServiceClient{getConn: v.getConn}
+}
