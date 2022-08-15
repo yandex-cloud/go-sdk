@@ -4,6 +4,7 @@
 package sdkerrors
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -26,4 +27,8 @@ func TestWithMessage_StatusErr(t *testing.T) {
 	st, ok = status.FromError(WithMessage(statusWithMessage, "extra msg"))
 	assert.True(t, ok)
 	assert.Equal(t, expectedStatus, st)
+}
+
+func TestWithMessage_ErrorsIs(t *testing.T) {
+	assert.True(t, errors.Is(WithMessage(context.DeadlineExceeded, "wait operation"), context.DeadlineExceeded))
 }

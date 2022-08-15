@@ -38,6 +38,15 @@ func (c *ClusterServiceClient) Delete(ctx context.Context, in *greenplum.DeleteC
 	return greenplum.NewClusterServiceClient(conn).Delete(ctx, in, opts...)
 }
 
+// Expand implements greenplum.ClusterServiceClient
+func (c *ClusterServiceClient) Expand(ctx context.Context, in *greenplum.ExpandRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return greenplum.NewClusterServiceClient(conn).Expand(ctx, in, opts...)
+}
+
 // Get implements greenplum.ClusterServiceClient
 func (c *ClusterServiceClient) Get(ctx context.Context, in *greenplum.GetClusterRequest, opts ...grpc.CallOption) (*greenplum.Cluster, error) {
 	conn, err := c.getConn(ctx)
