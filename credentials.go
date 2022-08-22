@@ -29,7 +29,7 @@ import (
 )
 
 // Credentials is an abstraction of API authorization credentials.
-// See https://cloud.yandex.ru/docs/iam/concepts/authorization/authorization for details.
+// See https://cloud.yandex.ru/docs/iam/concepts/authorization/ for details.
 // Note that functions that return Credentials may return different Credentials implementation
 // in next SDK version, and this is not considered breaking change.
 type Credentials interface {
