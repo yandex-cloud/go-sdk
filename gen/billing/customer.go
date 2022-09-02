@@ -29,6 +29,15 @@ func (c *CustomerServiceClient) Activate(ctx context.Context, in *billing.Activa
 	return billing.NewCustomerServiceClient(conn).Activate(ctx, in, opts...)
 }
 
+// CreateResellerServed implements billing.CustomerServiceClient
+func (c *CustomerServiceClient) CreateResellerServed(ctx context.Context, in *billing.CreateResellerServedCustomerRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return billing.NewCustomerServiceClient(conn).CreateResellerServed(ctx, in, opts...)
+}
+
 // Invite implements billing.CustomerServiceClient
 func (c *CustomerServiceClient) Invite(ctx context.Context, in *billing.InviteCustomerRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)

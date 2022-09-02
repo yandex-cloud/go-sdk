@@ -27,3 +27,8 @@ func (o *OrganizationManager) Organization() *OrganizationServiceClient {
 func (o *OrganizationManager) User() *UserServiceClient {
 	return &UserServiceClient{getConn: o.getConn}
 }
+
+// Group gets GroupService client
+func (o *OrganizationManager) Group() *GroupServiceClient {
+	return &GroupServiceClient{getConn: o.getConn}
+}
