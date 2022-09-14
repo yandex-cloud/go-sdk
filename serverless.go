@@ -19,7 +19,7 @@ const (
 	APIGatewayServiceID           Endpoint = "serverless-apigateway"
 	MDBProxyServiceID             Endpoint = "mdbproxy"
 	ServerlessContainersServiceID Endpoint = "serverless-containers"
-	APIGatewayWebsocketServiceID  Endpoint = "apigateway-websocket"
+	APIGatewayWebsocketServiceID  Endpoint = "apigateway-connections"
 )
 
 func (s *Serverless) Functions() *functions.Function {
