@@ -5,7 +5,7 @@ package iamkey
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io/ioutil" //nolint:staticcheck
 	"os"
 	"path/filepath"
 	"testing"

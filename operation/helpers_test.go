@@ -19,6 +19,7 @@ func marshalAny(t *testing.T, msg proto.Message) *anypb.Any {
 //go:generate mockery -name=mockClient -out-name=MockClient -testonly
 
 // TODO(skipor): get rid of, when mockery will understand type aliases
+//
 //nolint:deadcode,megacheck
 type mockClient interface {
 	Client

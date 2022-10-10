@@ -6,7 +6,7 @@ package iamkey
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io/ioutil" //nolint:staticcheck
 
 	yaml2json "github.com/ghodss/yaml"
 	"google.golang.org/protobuf/encoding/protojson"
