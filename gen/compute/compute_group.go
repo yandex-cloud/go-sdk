@@ -77,3 +77,8 @@ func (c *Compute) Filesystem() *FilesystemServiceClient {
 func (c *Compute) SnapshotSchedule() *SnapshotScheduleServiceClient {
 	return &SnapshotScheduleServiceClient{getConn: c.getConn}
 }
+
+// GpuCluster gets GpuClusterService client
+func (c *Compute) GpuCluster() *GpuClusterServiceClient {
+	return &GpuClusterServiceClient{getConn: c.getConn}
+}

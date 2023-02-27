@@ -29,6 +29,15 @@ func (c *RegistryServiceClient) AddCertificate(ctx context.Context, in *devices.
 	return devices.NewRegistryServiceClient(conn).AddCertificate(ctx, in, opts...)
 }
 
+// AddDataStreamExport implements devices.RegistryServiceClient
+func (c *RegistryServiceClient) AddDataStreamExport(ctx context.Context, in *devices.AddDataStreamExportRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return devices.NewRegistryServiceClient(conn).AddDataStreamExport(ctx, in, opts...)
+}
+
 // AddPassword implements devices.RegistryServiceClient
 func (c *RegistryServiceClient) AddPassword(ctx context.Context, in *devices.AddRegistryPasswordRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -63,6 +72,15 @@ func (c *RegistryServiceClient) DeleteCertificate(ctx context.Context, in *devic
 		return nil, err
 	}
 	return devices.NewRegistryServiceClient(conn).DeleteCertificate(ctx, in, opts...)
+}
+
+// DeleteDataStreamExport implements devices.RegistryServiceClient
+func (c *RegistryServiceClient) DeleteDataStreamExport(ctx context.Context, in *devices.DeleteDataStreamExportRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return devices.NewRegistryServiceClient(conn).DeleteDataStreamExport(ctx, in, opts...)
 }
 
 // DeletePassword implements devices.RegistryServiceClient
@@ -314,6 +332,115 @@ func (it *RegistryCertificatesIterator) Value() *devices.RegistryCertificate {
 }
 
 func (it *RegistryCertificatesIterator) Error() error {
+	return it.err
+}
+
+// ListDataStreamExports implements devices.RegistryServiceClient
+func (c *RegistryServiceClient) ListDataStreamExports(ctx context.Context, in *devices.ListDataStreamExportsRequest, opts ...grpc.CallOption) (*devices.ListDataStreamExportsResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return devices.NewRegistryServiceClient(conn).ListDataStreamExports(ctx, in, opts...)
+}
+
+type RegistryDataStreamExportsIterator struct {
+	ctx  context.Context
+	opts []grpc.CallOption
+
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
+
+	client  *RegistryServiceClient
+	request *devices.ListDataStreamExportsRequest
+
+	items []*devices.DataStreamExport
+}
+
+func (c *RegistryServiceClient) RegistryDataStreamExportsIterator(ctx context.Context, req *devices.ListDataStreamExportsRequest, opts ...grpc.CallOption) *RegistryDataStreamExportsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
+	return &RegistryDataStreamExportsIterator{
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
+	}
+}
+
+func (it *RegistryDataStreamExportsIterator) Next() bool {
+	if it.err != nil {
+		return false
+	}
+	if len(it.items) > 1 {
+		it.items[0] = nil
+		it.items = it.items[1:]
+		return true
+	}
+	it.items = nil // consume last item, if any
+
+	if it.started {
+		return false
+	}
+	it.started = true
+
+	response, err := it.client.ListDataStreamExports(it.ctx, it.request, it.opts...)
+	it.err = err
+	if err != nil {
+		return false
+	}
+
+	it.items = response.DataStreamExports
+	return len(it.items) > 0
+}
+
+func (it *RegistryDataStreamExportsIterator) Take(size int64) ([]*devices.DataStreamExport, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*devices.DataStreamExport
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *RegistryDataStreamExportsIterator) TakeAll() ([]*devices.DataStreamExport, error) {
+	return it.Take(0)
+}
+
+func (it *RegistryDataStreamExportsIterator) Value() *devices.DataStreamExport {
+	if len(it.items) == 0 {
+		panic("calling Value on empty iterator")
+	}
+	return it.items[0]
+}
+
+func (it *RegistryDataStreamExportsIterator) Error() error {
 	return it.err
 }
 
