@@ -26,6 +26,7 @@ import (
 	"github.com/yandex-cloud/go-sdk/gen/dns"
 	"github.com/yandex-cloud/go-sdk/gen/iam"
 	k8s "github.com/yandex-cloud/go-sdk/gen/kubernetes"
+	"github.com/yandex-cloud/go-sdk/gen/monitoring"
 	gen_operation "github.com/yandex-cloud/go-sdk/gen/operation"
 	"github.com/yandex-cloud/go-sdk/gen/organizationmanager"
 	organizationmanagersaml "github.com/yandex-cloud/go-sdk/gen/organizationmanager/saml"
@@ -51,6 +52,7 @@ const (
 	ResourceManagementServiceID     Endpoint = "resource-manager"
 	StorageServiceID                Endpoint = "storage"
 	StorageAPIServiceID             Endpoint = "storage-api"
+	MonitoringServiceID             Endpoint = "monitoring"
 	SerialSSHServiceID              Endpoint = "serialssh"
 	// revive:disable:var-naming
 	ApiEndpointServiceID Endpoint = "endpoint"
@@ -377,4 +379,9 @@ var now = time.Now
 // StorageAPI returns storage object for operating with Object Storage service.
 func (sdk *SDK) StorageAPI() *storage.StorageAPI {
 	return storage.NewStorageAPI(sdk.getConn(StorageAPIServiceID))
+}
+
+// Monitoring returns object for operating with Monitoring service.
+func (sdk *SDK) Monitoring() *monitoring.Monitoring {
+	return monitoring.NewMonitoring(sdk.getConn(MonitoringServiceID))
 }
