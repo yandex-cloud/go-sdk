@@ -32,3 +32,8 @@ func (o *OrganizationManager) User() *UserServiceClient {
 func (o *OrganizationManager) Group() *GroupServiceClient {
 	return &GroupServiceClient{getConn: o.getConn}
 }
+
+// GroupMapping gets GroupMappingService client
+func (o *OrganizationManager) GroupMapping() *GroupMappingServiceClient {
+	return &GroupMappingServiceClient{getConn: o.getConn}
+}
