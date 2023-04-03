@@ -76,13 +76,13 @@ func (c *grpcCaller) Call(attempt int, opts *options) (callContextIsDone bool, e
 	callCtx := c.ctx
 	var cancel context.CancelFunc
 
+	if opts.perCallTimeout > 0 {
+		callCtx, cancel = context.WithTimeout(callCtx, opts.perCallTimeout)
+		defer cancel()
+	}
+
 	if attempt > 0 {
 		callCtx = opts.addRetryAttemptToHeader(callCtx, attempt)
-
-		if opts.perCallTimeout > 0 {
-			callCtx, cancel = context.WithTimeout(callCtx, opts.perCallTimeout)
-			defer cancel()
-		}
 	}
 
 	err = c.invoker(callCtx, c.method, c.req, c.reply, c.conn, c.callOpts...)
