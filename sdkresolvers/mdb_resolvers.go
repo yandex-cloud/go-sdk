@@ -11,6 +11,7 @@ import (
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/kafka/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/mongodb/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/mysql/v1"
+	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/opensearch/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/postgresql/v1"
 	redis "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/redis/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/sqlserver/v1"
@@ -226,6 +227,30 @@ func (r *elasticSearchClusterResolver) Run(ctx context.Context, sdk *ycsdk.SDK, 
 	}
 
 	resp, err := sdk.MDB().ElasticSearch().Cluster().List(ctx, &elasticsearch.ListClustersRequest{
+		FolderId: r.FolderID(),
+		Filter:   CreateResolverFilter("name", r.Name),
+		PageSize: DefaultResolverPageSize,
+	})
+	return r.findName(resp.GetClusters(), err)
+}
+
+func OpenSearchClusterResolver(name string, opts ...ResolveOption) ycsdk.Resolver {
+	return &openSearchClusterResolver{
+		BaseNameResolver: NewBaseNameResolver(name, "cluster", opts...),
+	}
+}
+
+type openSearchClusterResolver struct {
+	BaseNameResolver
+}
+
+func (r *openSearchClusterResolver) Run(ctx context.Context, sdk *ycsdk.SDK, opts ...grpc.CallOption) error {
+	err := r.ensureFolderID()
+	if err != nil {
+		return err
+	}
+
+	resp, err := sdk.MDB().OpenSearch().Cluster().List(ctx, &opensearch.ListClustersRequest{
 		FolderId: r.FolderID(),
 		Filter:   CreateResolverFilter("name", r.Name),
 		PageSize: DefaultResolverPageSize,

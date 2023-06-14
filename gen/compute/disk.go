@@ -404,6 +404,15 @@ func (c *DiskServiceClient) Move(ctx context.Context, in *compute.MoveDiskReques
 	return compute.NewDiskServiceClient(conn).Move(ctx, in, opts...)
 }
 
+// Relocate implements compute.DiskServiceClient
+func (c *DiskServiceClient) Relocate(ctx context.Context, in *compute.RelocateDiskRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return compute.NewDiskServiceClient(conn).Relocate(ctx, in, opts...)
+}
+
 // Update implements compute.DiskServiceClient
 func (c *DiskServiceClient) Update(ctx context.Context, in *compute.UpdateDiskRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)

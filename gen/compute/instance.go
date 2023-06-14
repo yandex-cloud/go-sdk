@@ -342,6 +342,15 @@ func (c *InstanceServiceClient) Move(ctx context.Context, in *compute.MoveInstan
 	return compute.NewInstanceServiceClient(conn).Move(ctx, in, opts...)
 }
 
+// Relocate implements compute.InstanceServiceClient
+func (c *InstanceServiceClient) Relocate(ctx context.Context, in *compute.RelocateInstanceRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return compute.NewInstanceServiceClient(conn).Relocate(ctx, in, opts...)
+}
+
 // RemoveOneToOneNat implements compute.InstanceServiceClient
 func (c *InstanceServiceClient) RemoveOneToOneNat(ctx context.Context, in *compute.RemoveInstanceOneToOneNatRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
