@@ -548,6 +548,15 @@ func (c *DnsZoneServiceClient) UpdateAccessBindings(ctx context.Context, in *acc
 	return dns.NewDnsZoneServiceClient(conn).UpdateAccessBindings(ctx, in, opts...)
 }
 
+// UpdatePrivateNetworks implements dns.DnsZoneServiceClient
+func (c *DnsZoneServiceClient) UpdatePrivateNetworks(ctx context.Context, in *dns.UpdateDnsZonePrivateNetworksRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return dns.NewDnsZoneServiceClient(conn).UpdatePrivateNetworks(ctx, in, opts...)
+}
+
 // UpdateRecordSets implements dns.DnsZoneServiceClient
 func (c *DnsZoneServiceClient) UpdateRecordSets(ctx context.Context, in *dns.UpdateRecordSetsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
