@@ -664,6 +664,24 @@ func (c *InstanceGroupServiceClient) ResumeProcesses(ctx context.Context, in *in
 	return instancegroup.NewInstanceGroupServiceClient(conn).ResumeProcesses(ctx, in, opts...)
 }
 
+// RollingRecreate implements instancegroup.InstanceGroupServiceClient
+func (c *InstanceGroupServiceClient) RollingRecreate(ctx context.Context, in *instancegroup.RollingRecreateRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return instancegroup.NewInstanceGroupServiceClient(conn).RollingRecreate(ctx, in, opts...)
+}
+
+// RollingRestart implements instancegroup.InstanceGroupServiceClient
+func (c *InstanceGroupServiceClient) RollingRestart(ctx context.Context, in *instancegroup.RollingRestartRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return instancegroup.NewInstanceGroupServiceClient(conn).RollingRestart(ctx, in, opts...)
+}
+
 // SetAccessBindings implements instancegroup.InstanceGroupServiceClient
 func (c *InstanceGroupServiceClient) SetAccessBindings(ctx context.Context, in *access.SetAccessBindingsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
