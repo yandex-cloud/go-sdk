@@ -48,6 +48,15 @@ func (c *FunctionServiceClient) Delete(ctx context.Context, in *functions.Delete
 	return functions.NewFunctionServiceClient(conn).Delete(ctx, in, opts...)
 }
 
+// DeleteVersion implements functions.FunctionServiceClient
+func (c *FunctionServiceClient) DeleteVersion(ctx context.Context, in *functions.DeleteFunctionVersionRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return functions.NewFunctionServiceClient(conn).DeleteVersion(ctx, in, opts...)
+}
+
 // Get implements functions.FunctionServiceClient
 func (c *FunctionServiceClient) Get(ctx context.Context, in *functions.GetFunctionRequest, opts ...grpc.CallOption) (*functions.Function, error) {
 	conn, err := c.getConn(ctx)

@@ -22,3 +22,8 @@ func NewLogging(g func(ctx context.Context) (*grpc.ClientConn, error)) *Logging 
 func (l *Logging) LogGroup() *LogGroupServiceClient {
 	return &LogGroupServiceClient{getConn: l.getConn}
 }
+
+// Sink gets SinkService client
+func (l *Logging) Sink() *SinkServiceClient {
+	return &SinkServiceClient{getConn: l.getConn}
+}
