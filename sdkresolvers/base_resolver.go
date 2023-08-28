@@ -26,6 +26,7 @@ type resolveOptions struct {
 	organizationID string
 	clusterID      string
 	federationID   string
+	communityID    string
 }
 
 type ResolveOption func(*resolveOptions)
@@ -150,6 +151,10 @@ func (r *BaseResolver) OrganizationID() string {
 	return r.opts.organizationID
 }
 
+func (r *BaseResolver) CommunityID() string {
+	return r.opts.communityID
+}
+
 func (r *BaseResolver) ClusterID() string {
 	return r.opts.clusterID
 }
@@ -206,6 +211,16 @@ func (r *BaseNameResolver) ensureCloudID() error {
 func (r *BaseNameResolver) ensureOrganizationID() error {
 	if r.OrganizationID() == "" {
 		err := &ErrNotFound{error: fmt.Sprintf("can't resolve %v without organization id specified", r.resolvingObjectType)}
+		return r.SetErr(err)
+	}
+
+	return nil
+}
+
+func (r *BaseNameResolver) ensureCommunityID() error {
+	if r.CommunityID() == "" {
+		err := &ErrNotFound{error: fmt.Sprintf("can't resolve %v without community id specified", r.resolvingObjectType)}
+
 		return r.SetErr(err)
 	}
 
