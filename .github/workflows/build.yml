@@ -2,10 +2,6 @@ name: Build
 
 on: [push]
 
-defaults:
-  run:
-    working-directory: /go/src/github.com/yandex-cloud/go-sdk
-
 jobs:
   build:
     name: build

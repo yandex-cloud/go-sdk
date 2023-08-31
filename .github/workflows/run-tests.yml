@@ -6,10 +6,6 @@ on:
       - master
   pull_request:
 
-defaults:
-  run:
-    working-directory: /go/src/github.com/yandex-cloud/go-sdk
-
 jobs:
   tests:
     name: test
