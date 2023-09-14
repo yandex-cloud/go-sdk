@@ -72,7 +72,7 @@ func main() {
 }
 
 func checkLicense(ctx context.Context, sdk *ycsdk.SDK, licenseInstanceID string, resourceID string) error {
-	op, err := sdk.WrapOperation(sdk.Marketplace().LicenseManager().Lock().Ensure(ctx, &licensemanager.CreateLockRequest{
+	op, err := sdk.WrapOperation(sdk.Marketplace().LicenseManager().Lock().Ensure(ctx, &licensemanager.EnsureLockRequest{
 		InstanceId: licenseInstanceID,
 		ResourceId: resourceID, // Use compute instance id as resource ID
 	}))

@@ -39,7 +39,7 @@ func (c *LockServiceClient) Delete(ctx context.Context, in *licensemanager.Delet
 }
 
 // Ensure implements licensemanager.LockServiceClient
-func (c *LockServiceClient) Ensure(ctx context.Context, in *licensemanager.CreateLockRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+func (c *LockServiceClient) Ensure(ctx context.Context, in *licensemanager.EnsureLockRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
 	if err != nil {
 		return nil, err
