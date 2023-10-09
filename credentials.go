@@ -10,13 +10,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil" //nolint:staticcheck
+	"io"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"time"
 
-	jwt "github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v4"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/status"
@@ -213,7 +213,7 @@ func (c *instanceServiceAccountCredentials) iamToken(ctx context.Context) (*iamp
 			"Is this compute instance running using Service Account? That is, Instance.service_account_id should not be empty.",
 			resp.Status)
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
 		if err != nil {

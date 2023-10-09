@@ -413,6 +413,15 @@ func (c *SubnetServiceClient) Move(ctx context.Context, in *vpc.MoveSubnetReques
 	return vpc.NewSubnetServiceClient(conn).Move(ctx, in, opts...)
 }
 
+// Relocate implements vpc.SubnetServiceClient
+func (c *SubnetServiceClient) Relocate(ctx context.Context, in *vpc.RelocateSubnetRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return vpc.NewSubnetServiceClient(conn).Relocate(ctx, in, opts...)
+}
+
 // RemoveCidrBlocks implements vpc.SubnetServiceClient
 func (c *SubnetServiceClient) RemoveCidrBlocks(ctx context.Context, in *vpc.RemoveSubnetCidrBlocksRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)

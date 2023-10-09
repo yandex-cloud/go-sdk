@@ -27,3 +27,8 @@ func (l *Logging) LogGroup() *LogGroupServiceClient {
 func (l *Logging) Sink() *SinkServiceClient {
 	return &SinkServiceClient{getConn: l.getConn}
 }
+
+// Export gets ExportService client
+func (l *Logging) Export() *ExportServiceClient {
+	return &ExportServiceClient{getConn: l.getConn}
+}

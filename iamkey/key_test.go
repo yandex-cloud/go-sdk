@@ -5,7 +5,6 @@ package iamkey
 
 import (
 	"encoding/json"
-	"io/ioutil" //nolint:staticcheck
 	"os"
 	"path/filepath"
 	"testing"
@@ -13,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/encoding/prototext"
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 )
 
 func TestKey_JSONEncoding(t *testing.T) {
@@ -37,7 +36,7 @@ func TestKey_YAMLEncoding(t *testing.T) {
 }
 
 func TestKey_WriteFileReadFile(t *testing.T) {
-	dir, err := ioutil.TempDir("", "yc-sdk")
+	dir, err := os.MkdirTemp("", "yc-sdk")
 	require.NoError(t, err)
 	defer os.RemoveAll(dir)
 
@@ -51,7 +50,7 @@ func TestKey_WriteFileReadFile(t *testing.T) {
 }
 
 func testKey(t *testing.T) *Key {
-	data, err := ioutil.ReadFile("../test_data/service_account_key.pb")
+	data, err := os.ReadFile("../test_data/service_account_key.pb")
 	require.NoError(t, err)
 	key := &Key{}
 	err = prototext.Unmarshal(data, key)
