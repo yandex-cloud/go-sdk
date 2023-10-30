@@ -654,3 +654,12 @@ func (c *HostGroupServiceClient) UpdateAccessBindings(ctx context.Context, in *a
 	}
 	return compute.NewHostGroupServiceClient(conn).UpdateAccessBindings(ctx, in, opts...)
 }
+
+// UpdateHost implements compute.HostGroupServiceClient
+func (c *HostGroupServiceClient) UpdateHost(ctx context.Context, in *compute.UpdateHostGroupHostRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return compute.NewHostGroupServiceClient(conn).UpdateHost(ctx, in, opts...)
+}
