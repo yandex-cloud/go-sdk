@@ -22,3 +22,18 @@ func NewLoadtesting(g func(ctx context.Context) (*grpc.ClientConn, error)) *Load
 func (l *Loadtesting) Agent() *AgentServiceClient {
 	return &AgentServiceClient{getConn: l.getConn}
 }
+
+// Config gets ConfigService client
+func (l *Loadtesting) Config() *ConfigServiceClient {
+	return &ConfigServiceClient{getConn: l.getConn}
+}
+
+// Report gets ReportService client
+func (l *Loadtesting) Report() *ReportServiceClient {
+	return &ReportServiceClient{getConn: l.getConn}
+}
+
+// Test gets TestService client
+func (l *Loadtesting) Test() *TestServiceClient {
+	return &TestServiceClient{getConn: l.getConn}
+}
