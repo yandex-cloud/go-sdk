@@ -20,15 +20,6 @@ type TestServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
 }
 
-// Create implements agent.TestServiceClient
-func (c *TestServiceClient) Create(ctx context.Context, in *agent.CreateTestRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
-	conn, err := c.getConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return agent.NewTestServiceClient(conn).Create(ctx, in, opts...)
-}
-
 // Get implements agent.TestServiceClient
 func (c *TestServiceClient) Get(ctx context.Context, in *agent.GetTestRequest, opts ...grpc.CallOption) (*agent.Test, error) {
 	conn, err := c.getConn(ctx)
