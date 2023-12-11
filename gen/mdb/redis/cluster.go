@@ -83,6 +83,15 @@ func (c *ClusterServiceClient) DeleteShard(ctx context.Context, in *redis.Delete
 	return redis.NewClusterServiceClient(conn).DeleteShard(ctx, in, opts...)
 }
 
+// EnableSharding implements redis.ClusterServiceClient
+func (c *ClusterServiceClient) EnableSharding(ctx context.Context, in *redis.EnableShardingClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return redis.NewClusterServiceClient(conn).EnableSharding(ctx, in, opts...)
+}
+
 // Get implements redis.ClusterServiceClient
 func (c *ClusterServiceClient) Get(ctx context.Context, in *redis.GetClusterRequest, opts ...grpc.CallOption) (*redis.Cluster, error) {
 	conn, err := c.getConn(ctx)

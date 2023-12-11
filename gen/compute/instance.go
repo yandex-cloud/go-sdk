@@ -495,6 +495,15 @@ func (c *InstanceServiceClient) SetAccessBindings(ctx context.Context, in *acces
 	return compute.NewInstanceServiceClient(conn).SetAccessBindings(ctx, in, opts...)
 }
 
+// SimulateMaintenanceEvent implements compute.InstanceServiceClient
+func (c *InstanceServiceClient) SimulateMaintenanceEvent(ctx context.Context, in *compute.SimulateInstanceMaintenanceEventRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return compute.NewInstanceServiceClient(conn).SimulateMaintenanceEvent(ctx, in, opts...)
+}
+
 // Start implements compute.InstanceServiceClient
 func (c *InstanceServiceClient) Start(ctx context.Context, in *compute.StartInstanceRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
