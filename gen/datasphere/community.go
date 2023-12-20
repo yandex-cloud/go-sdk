@@ -21,6 +21,15 @@ type CommunityServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
 }
 
+// AddResource implements datasphere.CommunityServiceClient
+func (c *CommunityServiceClient) AddResource(ctx context.Context, in *datasphere.AddCommunityResourceRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return datasphere.NewCommunityServiceClient(conn).AddResource(ctx, in, opts...)
+}
+
 // Create implements datasphere.CommunityServiceClient
 func (c *CommunityServiceClient) Create(ctx context.Context, in *datasphere.CreateCommunityRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -278,6 +287,15 @@ func (it *CommunityAccessBindingsIterator) Value() *access.AccessBinding {
 
 func (it *CommunityAccessBindingsIterator) Error() error {
 	return it.err
+}
+
+// RemoveResource implements datasphere.CommunityServiceClient
+func (c *CommunityServiceClient) RemoveResource(ctx context.Context, in *datasphere.RemoveCommunityResourceRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return datasphere.NewCommunityServiceClient(conn).RemoveResource(ctx, in, opts...)
 }
 
 // SetAccessBindings implements datasphere.CommunityServiceClient

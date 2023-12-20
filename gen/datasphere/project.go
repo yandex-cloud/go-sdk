@@ -21,6 +21,15 @@ type ProjectServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
 }
 
+// AddResource implements datasphere.ProjectServiceClient
+func (c *ProjectServiceClient) AddResource(ctx context.Context, in *datasphere.AddResourceToProjectRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return datasphere.NewProjectServiceClient(conn).AddResource(ctx, in, opts...)
+}
+
 // Create implements datasphere.ProjectServiceClient
 func (c *ProjectServiceClient) Create(ctx context.Context, in *datasphere.CreateProjectRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -323,6 +332,15 @@ func (c *ProjectServiceClient) Open(ctx context.Context, in *datasphere.OpenProj
 		return nil, err
 	}
 	return datasphere.NewProjectServiceClient(conn).Open(ctx, in, opts...)
+}
+
+// RemoveResource implements datasphere.ProjectServiceClient
+func (c *ProjectServiceClient) RemoveResource(ctx context.Context, in *datasphere.RemoveResourceFromProjectRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return datasphere.NewProjectServiceClient(conn).RemoveResource(ctx, in, opts...)
 }
 
 // SetAccessBindings implements datasphere.ProjectServiceClient

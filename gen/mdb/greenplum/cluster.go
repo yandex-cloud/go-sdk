@@ -20,6 +20,15 @@ type ClusterServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
 }
 
+// Backup implements greenplum.ClusterServiceClient
+func (c *ClusterServiceClient) Backup(ctx context.Context, in *greenplum.BackupClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return greenplum.NewClusterServiceClient(conn).Backup(ctx, in, opts...)
+}
+
 // Create implements greenplum.ClusterServiceClient
 func (c *ClusterServiceClient) Create(ctx context.Context, in *greenplum.CreateClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
