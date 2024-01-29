@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 
 	greenplum "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/greenplum/v1"
+	"github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 )
 
 //revive:disable
@@ -17,6 +18,15 @@ import (
 // lazy GRPC connection initialization.
 type BackupServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
+}
+
+// Delete implements greenplum.BackupServiceClient
+func (c *BackupServiceClient) Delete(ctx context.Context, in *greenplum.DeleteBackupRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return greenplum.NewBackupServiceClient(conn).Delete(ctx, in, opts...)
 }
 
 // Get implements greenplum.BackupServiceClient
