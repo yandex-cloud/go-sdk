@@ -48,6 +48,15 @@ func (c *FederationServiceClient) Delete(ctx context.Context, in *saml.DeleteFed
 	return saml.NewFederationServiceClient(conn).Delete(ctx, in, opts...)
 }
 
+// DeleteUserAccounts implements saml.FederationServiceClient
+func (c *FederationServiceClient) DeleteUserAccounts(ctx context.Context, in *saml.DeleteFederatedUserAccountsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return saml.NewFederationServiceClient(conn).DeleteUserAccounts(ctx, in, opts...)
+}
+
 // Get implements saml.FederationServiceClient
 func (c *FederationServiceClient) Get(ctx context.Context, in *saml.GetFederationRequest, opts ...grpc.CallOption) (*saml.Federation, error) {
 	conn, err := c.getConn(ctx)

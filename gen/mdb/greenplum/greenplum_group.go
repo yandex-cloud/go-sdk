@@ -37,3 +37,8 @@ func (g *Greenplum) PXFDatasource() *PXFDatasourceServiceClient {
 func (g *Greenplum) Backup() *BackupServiceClient {
 	return &BackupServiceClient{getConn: g.getConn}
 }
+
+// HBARule gets HBARuleService client
+func (g *Greenplum) HBARule() *HBARuleServiceClient {
+	return &HBARuleServiceClient{getConn: g.getConn}
+}

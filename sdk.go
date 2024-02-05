@@ -203,6 +203,11 @@ func (sdk *SDK) OrganizationManager() *organizationmanager.OrganizationManager {
 	return organizationmanager.NewOrganizationManager(sdk.getConn(OrganizationManagementServiceID))
 }
 
+func (sdk *SDK) OSLoginServiceClient() *organizationmanager.OsLoginServiceClient {
+	manager := sdk.OrganizationManager()
+	return manager.OsLogin()
+}
+
 func (sdk *SDK) GroupMappingServiceClient() *organizationmanager.GroupMappingServiceClient {
 	manager := sdk.OrganizationManager()
 	return manager.GroupMapping()
