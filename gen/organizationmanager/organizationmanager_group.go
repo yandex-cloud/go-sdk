@@ -42,3 +42,8 @@ func (o *OrganizationManager) GroupMapping() *GroupMappingServiceClient {
 func (o *OrganizationManager) OsLogin() *OsLoginServiceClient {
 	return &OsLoginServiceClient{getConn: o.getConn}
 }
+
+// UserSshKey gets UserSshKeyService client
+func (o *OrganizationManager) UserSshKey() *UserSshKeyServiceClient {
+	return &UserSshKeyServiceClient{getConn: o.getConn}
+}

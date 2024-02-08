@@ -208,6 +208,11 @@ func (sdk *SDK) OSLoginServiceClient() *organizationmanager.OsLoginServiceClient
 	return manager.OsLogin()
 }
 
+func (sdk *SDK) UserSSHKeyServiceClient() *organizationmanager.UserSshKeyServiceClient {
+	manager := sdk.OrganizationManager()
+	return manager.UserSshKey()
+}
+
 func (sdk *SDK) GroupMappingServiceClient() *organizationmanager.GroupMappingServiceClient {
 	manager := sdk.OrganizationManager()
 	return manager.GroupMapping()
