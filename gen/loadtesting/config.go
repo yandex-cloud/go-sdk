@@ -30,6 +30,15 @@ func (c *ConfigServiceClient) Create(ctx context.Context, in *api.CreateConfigRe
 	return api.NewConfigServiceClient(conn).Create(ctx, in, opts...)
 }
 
+// Delete implements api.ConfigServiceClient
+func (c *ConfigServiceClient) Delete(ctx context.Context, in *api.DeleteConfigRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return api.NewConfigServiceClient(conn).Delete(ctx, in, opts...)
+}
+
 // Get implements api.ConfigServiceClient
 func (c *ConfigServiceClient) Get(ctx context.Context, in *api.GetConfigRequest, opts ...grpc.CallOption) (*config.Config, error) {
 	conn, err := c.getConn(ctx)

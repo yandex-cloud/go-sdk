@@ -163,3 +163,12 @@ func (it *AgentIterator) Value() *agent.Agent {
 func (it *AgentIterator) Error() error {
 	return it.err
 }
+
+// Update implements api.AgentServiceClient
+func (c *AgentServiceClient) Update(ctx context.Context, in *api.UpdateAgentRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return api.NewAgentServiceClient(conn).Update(ctx, in, opts...)
+}

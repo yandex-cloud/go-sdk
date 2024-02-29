@@ -22,6 +22,7 @@ import (
 	_ "github.com/yandex-cloud/go-genproto/yandex/cloud/quota" // Used in Operation.error.details
 	"github.com/yandex-cloud/go-sdk/dial"
 	apiendpoint "github.com/yandex-cloud/go-sdk/gen/apiendpoint"
+	"github.com/yandex-cloud/go-sdk/gen/audittrails"
 	"github.com/yandex-cloud/go-sdk/gen/backup"
 	"github.com/yandex-cloud/go-sdk/gen/compute"
 	"github.com/yandex-cloud/go-sdk/gen/dns"
@@ -58,11 +59,12 @@ const (
 	// revive:disable:var-naming
 	ApiEndpointServiceID Endpoint = "endpoint"
 	// revive:enable:var-naming
-	VpcServiceID        Endpoint = "vpc"
-	KubernetesServiceID Endpoint = "managed-kubernetes"
-	DNSServiceID        Endpoint = "dns"
-	YDBServiceID        Endpoint = "ydb"
-	BackupServiceID     Endpoint = "backup"
+	VpcServiceID         Endpoint = "vpc"
+	KubernetesServiceID  Endpoint = "managed-kubernetes"
+	DNSServiceID         Endpoint = "dns"
+	YDBServiceID         Endpoint = "ydb"
+	BackupServiceID      Endpoint = "backup"
+	AuditTrailsServiceID Endpoint = "audit-trails"
 )
 
 // Config is a config that is used to create SDK instance.
@@ -406,4 +408,9 @@ func (sdk *SDK) Monitoring() *monitoring.Monitoring {
 // Backup returns backup for operating with Backup service.
 func (sdk *SDK) Backup() *backup.Backup {
 	return backup.NewBackup(sdk.getConn(BackupServiceID))
+}
+
+// AuditTrails returns object for operating with Audit Trails service.
+func (sdk *SDK) AuditTrails() *audittrails.AuditTrails {
+	return audittrails.NewAuditTrails(sdk.getConn(AuditTrailsServiceID))
 }
