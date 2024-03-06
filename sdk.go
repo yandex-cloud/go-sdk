@@ -64,7 +64,7 @@ const (
 	DNSServiceID         Endpoint = "dns"
 	YDBServiceID         Endpoint = "ydb"
 	BackupServiceID      Endpoint = "backup"
-	AuditTrailsServiceID Endpoint = "audit-trails"
+	AuditTrailsServiceID Endpoint = "audittrails"
 )
 
 // Config is a config that is used to create SDK instance.
