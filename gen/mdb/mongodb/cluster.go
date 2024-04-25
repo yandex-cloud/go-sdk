@@ -895,3 +895,12 @@ func (c *ClusterServiceClient) Update(ctx context.Context, in *mongodb.UpdateClu
 	}
 	return mongodb.NewClusterServiceClient(conn).Update(ctx, in, opts...)
 }
+
+// UpdateHosts implements mongodb.ClusterServiceClient
+func (c *ClusterServiceClient) UpdateHosts(ctx context.Context, in *mongodb.UpdateClusterHostsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return mongodb.NewClusterServiceClient(conn).UpdateHosts(ctx, in, opts...)
+}
