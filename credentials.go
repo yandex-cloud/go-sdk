@@ -14,6 +14,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httputil"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -91,9 +92,19 @@ func ServiceAccountKey(key *iamkey.Key) (Credentials, error) {
 // That is, for SDK build with InstanceServiceAccount credentials and used on Compute Instance
 // created with yandex.cloud.compute.v1.CreateInstanceRequest.service_account_id, API calls
 // will be authenticated with this ServiceAccount ID.
+// You can override the default address of Metadata Service by setting env variable.
 // TODO(skipor): doc link
 func InstanceServiceAccount() NonExchangeableCredentials {
-	return newInstanceServiceAccountCredentials(InstanceMetadataAddr)
+	return newInstanceServiceAccountCredentials(getMetadataServiceAddr())
+}
+
+// getMetadataServiceAddr returns the address of Metadata Service, gets the value from InstanceMetadataOverrideEnvVar
+// env variable if it is set, otherwise uses the default address from InstanceMetadataAddr.
+func getMetadataServiceAddr() string {
+	if nonDefaultAddr := os.Getenv(InstanceMetadataOverrideEnvVar); nonDefaultAddr != "" {
+		return nonDefaultAddr
+	}
+	return InstanceMetadataAddr
 }
 
 func newServiceAccountJWTBuilder(key *iamkey.Key) (*serviceAccountJWTBuilder, error) {

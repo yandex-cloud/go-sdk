@@ -92,6 +92,24 @@ func (c *RegistryServiceClient) DeletePassword(ctx context.Context, in *devices.
 	return devices.NewRegistryServiceClient(conn).DeletePassword(ctx, in, opts...)
 }
 
+// Disable implements devices.RegistryServiceClient
+func (c *RegistryServiceClient) Disable(ctx context.Context, in *devices.DisableRegistryRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return devices.NewRegistryServiceClient(conn).Disable(ctx, in, opts...)
+}
+
+// Enable implements devices.RegistryServiceClient
+func (c *RegistryServiceClient) Enable(ctx context.Context, in *devices.EnableRegistryRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return devices.NewRegistryServiceClient(conn).Enable(ctx, in, opts...)
+}
+
 // Get implements devices.RegistryServiceClient
 func (c *RegistryServiceClient) Get(ctx context.Context, in *devices.GetRegistryRequest, opts ...grpc.CallOption) (*devices.Registry, error) {
 	conn, err := c.getConn(ctx)

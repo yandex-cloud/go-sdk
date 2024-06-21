@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -114,6 +115,27 @@ func TestInstanceServiceAccount(t *testing.T) {
 		_, err := creds.IAMToken(context.Background())
 		require.Error(t, err)
 		t.Log(err)
+	})
+}
+
+func TestMetadataServiceOverride(t *testing.T) {
+	t.Run("should return the default value", func(t *testing.T) {
+		// GIVEN
+		expected := InstanceMetadataAddr
+		// WHEN
+		actual := getMetadataServiceAddr()
+		// THEN
+		require.Equal(t, expected, actual)
+	})
+	t.Run("should be equal to value from env variable", func(t *testing.T) {
+		// GIVEN
+		expected := "69.69.69.69"
+		require.NoError(t, os.Setenv(InstanceMetadataOverrideEnvVar, expected))
+		// WHEN
+		actual := getMetadataServiceAddr()
+		// THEN
+		require.Equal(t, expected, actual)
+		require.NoError(t, os.Unsetenv(InstanceMetadataOverrideEnvVar))
 	})
 }
 
