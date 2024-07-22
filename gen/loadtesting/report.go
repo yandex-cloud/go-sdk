@@ -19,6 +19,15 @@ type ReportServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
 }
 
+// CalculateKpiValues implements api.ReportServiceClient
+func (c *ReportServiceClient) CalculateKpiValues(ctx context.Context, in *api.CalculateReportKpiValuesRequest, opts ...grpc.CallOption) (*api.CalculateReportKpiValuesResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return api.NewReportServiceClient(conn).CalculateKpiValues(ctx, in, opts...)
+}
+
 // GetTable implements api.ReportServiceClient
 func (c *ReportServiceClient) GetTable(ctx context.Context, in *api.GetTableReportRequest, opts ...grpc.CallOption) (*api.GetTableReportResponse, error) {
 	conn, err := c.getConn(ctx)

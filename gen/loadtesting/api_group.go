@@ -28,6 +28,11 @@ func (l *Loadtesting) Config() *ConfigServiceClient {
 	return &ConfigServiceClient{getConn: l.getConn}
 }
 
+// RegressionDashboard gets RegressionDashboardService client
+func (l *Loadtesting) RegressionDashboard() *RegressionDashboardServiceClient {
+	return &RegressionDashboardServiceClient{getConn: l.getConn}
+}
+
 // Report gets ReportService client
 func (l *Loadtesting) Report() *ReportServiceClient {
 	return &ReportServiceClient{getConn: l.getConn}
