@@ -172,6 +172,15 @@ func (c *ServiceControlServiceClient) Pause(ctx context.Context, in *iam.PauseSe
 	return iam.NewServiceControlServiceClient(conn).Pause(ctx, in, opts...)
 }
 
+// ResolveAgent implements iam.ServiceControlServiceClient
+func (c *ServiceControlServiceClient) ResolveAgent(ctx context.Context, in *iam.ResolveServiceAgentRequest, opts ...grpc.CallOption) (*iam.ServiceAgent, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return iam.NewServiceControlServiceClient(conn).ResolveAgent(ctx, in, opts...)
+}
+
 // Resume implements iam.ServiceControlServiceClient
 func (c *ServiceControlServiceClient) Resume(ctx context.Context, in *iam.ResumeServiceRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)

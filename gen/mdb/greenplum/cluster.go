@@ -761,6 +761,15 @@ func (it *ClusterSegmentHostsIterator) Error() error {
 	return it.err
 }
 
+// Move implements greenplum.ClusterServiceClient
+func (c *ClusterServiceClient) Move(ctx context.Context, in *greenplum.MoveClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return greenplum.NewClusterServiceClient(conn).Move(ctx, in, opts...)
+}
+
 // Restore implements greenplum.ClusterServiceClient
 func (c *ClusterServiceClient) Restore(ctx context.Context, in *greenplum.RestoreClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
