@@ -27,3 +27,12 @@ func (c *AgentServiceClient) ClaimStatus(ctx context.Context, in *agent.ClaimAge
 	}
 	return agent.NewAgentServiceClient(conn).ClaimStatus(ctx, in, opts...)
 }
+
+// ReportEventLogs implements agent.AgentServiceClient
+func (c *AgentServiceClient) ReportEventLogs(ctx context.Context, in *agent.ReportEventLogsRequest, opts ...grpc.CallOption) (*agent.ReportEventLogsResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return agent.NewAgentServiceClient(conn).ReportEventLogs(ctx, in, opts...)
+}
