@@ -27,6 +27,8 @@ import (
 	"github.com/yandex-cloud/go-sdk/gen/compute"
 	"github.com/yandex-cloud/go-sdk/gen/dns"
 	"github.com/yandex-cloud/go-sdk/gen/iam"
+	"github.com/yandex-cloud/go-sdk/gen/iam/workload"
+	"github.com/yandex-cloud/go-sdk/gen/iam/workload/oidc"
 	k8s "github.com/yandex-cloud/go-sdk/gen/kubernetes"
 	"github.com/yandex-cloud/go-sdk/gen/monitoring"
 	gen_operation "github.com/yandex-cloud/go-sdk/gen/operation"
@@ -170,6 +172,14 @@ func (sdk *SDK) WrapOperation(op *operation.Operation, err error) (*sdk_operatio
 // IAM returns IAM object that is used to operate on Yandex Cloud Identity and Access Manager
 func (sdk *SDK) IAM() *iam.IAM {
 	return iam.NewIAM(sdk.getConn(IAMServiceID))
+}
+
+func (sdk *SDK) Workload() *workload.Workload {
+	return workload.NewWorkload(sdk.getConn(IAMServiceID))
+}
+
+func (sdk *SDK) WorkloadOidc() *oidc.WorkloadOidc {
+	return oidc.NewWorkloadOidc(sdk.getConn(IAMServiceID))
 }
 
 // Compute returns Compute object that is used to operate on Yandex Compute Cloud
