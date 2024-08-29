@@ -37,6 +37,7 @@ import (
 	"github.com/yandex-cloud/go-sdk/gen/resourcemanager"
 	"github.com/yandex-cloud/go-sdk/gen/storage-api"
 	"github.com/yandex-cloud/go-sdk/gen/vpc"
+	"github.com/yandex-cloud/go-sdk/gen/vpc/privatelink"
 	"github.com/yandex-cloud/go-sdk/gen/ydb"
 	sdk_operation "github.com/yandex-cloud/go-sdk/operation"
 	"github.com/yandex-cloud/go-sdk/pkg/grpcclient"
@@ -190,6 +191,11 @@ func (sdk *SDK) Compute() *compute.Compute {
 // VPC returns VPC object that is used to operate on Yandex Virtual Private Cloud
 func (sdk *SDK) VPC() *vpc.VPC {
 	return vpc.NewVPC(sdk.getConn(VpcServiceID))
+}
+
+// VPCPrivateLink returns PrivateLink object that is used to operate on Yandex Virtual Private Cloud Private Endpoints
+func (sdk *SDK) VPCPrivateLink() *privatelink.PrivateLink {
+	return privatelink.NewPrivateLink(sdk.getConn(VpcServiceID))
 }
 
 // MDB returns MDB object that is used to operate on Yandex Managed Databases

@@ -36,3 +36,12 @@ func (c *IamTokenServiceClient) CreateForServiceAccount(ctx context.Context, in 
 	}
 	return iam.NewIamTokenServiceClient(conn).CreateForServiceAccount(ctx, in, opts...)
 }
+
+// Revoke implements iam.IamTokenServiceClient
+func (c *IamTokenServiceClient) Revoke(ctx context.Context, in *iam.RevokeIamTokenRequest, opts ...grpc.CallOption) (*iam.RevokeIamTokenResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return iam.NewIamTokenServiceClient(conn).Revoke(ctx, in, opts...)
+}
