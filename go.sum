@@ -264,6 +264,8 @@ github.com/yandex-cloud/go-genproto v0.0.0-20240819112322-98a264d392f6 h1:w57l27
 github.com/yandex-cloud/go-genproto v0.0.0-20240819112322-98a264d392f6/go.mod h1:HEUYX/p8966tMUHHT+TsS0hF/Ca/NYwqprC5WXSDMfE=
 github.com/yandex-cloud/go-genproto v0.0.0-20240829130658-0568052c5a6a h1:GCVnt5H4CB4np3ReSNH0GpBg5HDaLz1rZKnjhQjQGL4=
 github.com/yandex-cloud/go-genproto v0.0.0-20240829130658-0568052c5a6a/go.mod h1:HEUYX/p8966tMUHHT+TsS0hF/Ca/NYwqprC5WXSDMfE=
+github.com/yandex-cloud/go-genproto v0.0.0-20240903084352-17cc86ae897b h1:GWeoo4cXvvvFLjucwVBgg4qOabn9eRx0QVpjDLlRsWM=
+github.com/yandex-cloud/go-genproto v0.0.0-20240903084352-17cc86ae897b/go.mod h1:HEUYX/p8966tMUHHT+TsS0hF/Ca/NYwqprC5WXSDMfE=
 go.opentelemetry.io/proto/otlp v0.7.0/go.mod h1:PqfVotwruBrMGOCsRd/89rSnXhoiJIqeYNgFYFoEGnI=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
