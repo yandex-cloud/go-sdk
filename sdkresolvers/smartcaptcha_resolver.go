@@ -27,7 +27,7 @@ func (r *captchaResolver) Run(ctx context.Context, sdk *ycsdk.SDK, opts ...grpc.
 
 	resp, err := sdk.SmartCaptcha().Captcha().List(ctx, &smartcaptcha.ListCaptchasRequest{
 		FolderId: r.FolderID(),
-		// TODO: better to use Filter("name"), but now it's not supported now
+		// TODO: better to use Filter("name"), but it's not supported now
 	}, opts...)
 	return r.findName(resp.GetResources(), err)
 }
