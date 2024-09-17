@@ -4,9 +4,11 @@ import (
 	"github.com/yandex-cloud/go-sdk/gen/apigateway"
 	"github.com/yandex-cloud/go-sdk/gen/apigateway/websocket"
 	"github.com/yandex-cloud/go-sdk/gen/containers"
+	"github.com/yandex-cloud/go-sdk/gen/eventrouter"
 	"github.com/yandex-cloud/go-sdk/gen/functions"
 	"github.com/yandex-cloud/go-sdk/gen/mdbproxy"
 	"github.com/yandex-cloud/go-sdk/gen/triggers"
+	"github.com/yandex-cloud/go-sdk/gen/workflows"
 )
 
 type Serverless struct {
@@ -20,6 +22,8 @@ const (
 	MDBProxyServiceID             Endpoint = "mdbproxy"
 	ServerlessContainersServiceID Endpoint = "serverless-containers"
 	APIGatewayWebsocketServiceID  Endpoint = "apigateway-connections"
+	EventrouterServiceID          Endpoint = "serverless-eventrouter"
+	WorkflowServiceID             Endpoint = "serverless-workflows"
 )
 
 func (s *Serverless) Functions() *functions.Function {
@@ -44,4 +48,12 @@ func (s *Serverless) Containers() *containers.Container {
 
 func (s *Serverless) APIGatewayWebsocket() *websocket.Websocket {
 	return websocket.NewWebsocket(s.sdk.getConn(APIGatewayWebsocketServiceID))
+}
+
+func (s *Serverless) Eventrouter() *eventrouter.Eventrouter {
+	return eventrouter.NewEventrouter(s.sdk.getConn(EventrouterServiceID))
+}
+
+func (s *Serverless) Workflow() *workflows.Workflow {
+	return workflows.NewWorkflow(s.sdk.getConn(WorkflowServiceID))
 }
