@@ -2,6 +2,7 @@ package retry
 
 import (
 	"context"
+	"google.golang.org/protobuf/proto"
 	"net"
 	"strconv"
 	"testing"
@@ -149,7 +150,7 @@ func TestFiveRetries(t *testing.T) {
 
 	ser.countGetFailures = 5
 	res, err = c.Get(context.Background(), &compute.GetZoneRequest{ZoneId: "id"}, WithMax(5))
-	require.Equal(t, &defaultZone, res)
+	require.True(t, proto.Equal(&defaultZone, res), "Expected zone and actual zone should be equal")
 	require.NoError(t, err)
 }
 
@@ -192,7 +193,7 @@ func TestRetriableCodes(t *testing.T) {
 
 	res, err = c.Get(context.Background(), &compute.GetZoneRequest{ZoneId: "id"}, WithMax(len(trc.codes)))
 	require.NoError(t, err)
-	require.Equal(t, &defaultZone, res)
+	require.True(t, proto.Equal(&defaultZone, res), "Expected zone and actual zone should be equal")
 }
 
 type timeoutChecker interface {
