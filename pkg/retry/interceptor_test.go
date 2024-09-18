@@ -2,7 +2,6 @@ package retry
 
 import (
 	"context"
-	"google.golang.org/protobuf/proto"
 	"net"
 	"strconv"
 	"testing"
@@ -15,6 +14,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/compute/v1"
 	"github.com/yandex-cloud/go-sdk/pkg/testutil"

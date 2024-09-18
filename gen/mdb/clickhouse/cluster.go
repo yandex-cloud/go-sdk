@@ -39,6 +39,15 @@ func (c *ClusterServiceClient) AddShard(ctx context.Context, in *clickhouse.AddC
 	return clickhouse.NewClusterServiceClient(conn).AddShard(ctx, in, opts...)
 }
 
+// AddShards implements clickhouse.ClusterServiceClient
+func (c *ClusterServiceClient) AddShards(ctx context.Context, in *clickhouse.AddClusterShardsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return clickhouse.NewClusterServiceClient(conn).AddShards(ctx, in, opts...)
+}
+
 // AddZookeeper implements clickhouse.ClusterServiceClient
 func (c *ClusterServiceClient) AddZookeeper(ctx context.Context, in *clickhouse.AddClusterZookeeperRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -127,6 +136,15 @@ func (c *ClusterServiceClient) DeleteShardGroup(ctx context.Context, in *clickho
 		return nil, err
 	}
 	return clickhouse.NewClusterServiceClient(conn).DeleteShardGroup(ctx, in, opts...)
+}
+
+// DeleteShards implements clickhouse.ClusterServiceClient
+func (c *ClusterServiceClient) DeleteShards(ctx context.Context, in *clickhouse.DeleteClusterShardsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return clickhouse.NewClusterServiceClient(conn).DeleteShards(ctx, in, opts...)
 }
 
 // Get implements clickhouse.ClusterServiceClient
