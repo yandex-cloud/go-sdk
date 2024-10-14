@@ -362,6 +362,15 @@ func (c *ProjectServiceClient) RemoveResource(ctx context.Context, in *dataspher
 	return datasphere.NewProjectServiceClient(conn).RemoveResource(ctx, in, opts...)
 }
 
+// ResizeDisk implements datasphere.ProjectServiceClient
+func (c *ProjectServiceClient) ResizeDisk(ctx context.Context, in *datasphere.ResizeProjectDiskRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return datasphere.NewProjectServiceClient(conn).ResizeDisk(ctx, in, opts...)
+}
+
 // SetAccessBindings implements datasphere.ProjectServiceClient
 func (c *ProjectServiceClient) SetAccessBindings(ctx context.Context, in *access.SetAccessBindingsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
