@@ -67,15 +67,6 @@ func (c *ProjectServiceClient) Get(ctx context.Context, in *datasphere.GetProjec
 	return datasphere.NewProjectServiceClient(conn).Get(ctx, in, opts...)
 }
 
-// GetCellOutputs implements datasphere.ProjectServiceClient
-func (c *ProjectServiceClient) GetCellOutputs(ctx context.Context, in *datasphere.CellOutputsRequest, opts ...grpc.CallOption) (*datasphere.CellOutputsResponse, error) {
-	conn, err := c.getConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return datasphere.NewProjectServiceClient(conn).GetCellOutputs(ctx, in, opts...)
-}
-
 // GetRestrictions implements datasphere.ProjectServiceClient
 func (c *ProjectServiceClient) GetRestrictions(ctx context.Context, in *datasphere.GetProjectRestrictionsRequest, opts ...grpc.CallOption) (*datasphere.RestrictionsResponse, error) {
 	conn, err := c.getConn(ctx)
@@ -92,15 +83,6 @@ func (c *ProjectServiceClient) GetRestrictionsMeta(ctx context.Context, in *empt
 		return nil, err
 	}
 	return datasphere.NewProjectServiceClient(conn).GetRestrictionsMeta(ctx, in, opts...)
-}
-
-// GetStateVariables implements datasphere.ProjectServiceClient
-func (c *ProjectServiceClient) GetStateVariables(ctx context.Context, in *datasphere.GetStateVariablesRequest, opts ...grpc.CallOption) (*datasphere.GetStateVariablesResponse, error) {
-	conn, err := c.getConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return datasphere.NewProjectServiceClient(conn).GetStateVariables(ctx, in, opts...)
 }
 
 // GetUnitBalance implements datasphere.ProjectServiceClient
