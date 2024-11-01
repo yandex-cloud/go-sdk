@@ -23,6 +23,7 @@ const (
 	ServerlessContainersServiceID Endpoint = "serverless-containers"
 	APIGatewayWebsocketServiceID  Endpoint = "apigateway-connections"
 	EventrouterServiceID          Endpoint = "serverless-eventrouter"
+	EventrouterEventsServiceID    Endpoint = "serverlesseventrouter-events"
 	WorkflowServiceID             Endpoint = "serverless-workflows"
 )
 
@@ -52,6 +53,10 @@ func (s *Serverless) APIGatewayWebsocket() *websocket.Websocket {
 
 func (s *Serverless) Eventrouter() *eventrouter.Eventrouter {
 	return eventrouter.NewEventrouter(s.sdk.getConn(EventrouterServiceID))
+}
+
+func (s *Serverless) EventrouterEvents() *eventrouter.Eventrouter {
+	return eventrouter.NewEventrouter(s.sdk.getConn(EventrouterEventsServiceID))
 }
 
 func (s *Serverless) Workflow() *workflows.Workflow {

@@ -65,6 +65,15 @@ func (c *ClusterServiceClient) Delete(ctx context.Context, in *opensearch.Delete
 	return opensearch.NewClusterServiceClient(conn).Delete(ctx, in, opts...)
 }
 
+// DeleteBackup implements opensearch.ClusterServiceClient
+func (c *ClusterServiceClient) DeleteBackup(ctx context.Context, in *opensearch.DeleteBackupRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return opensearch.NewClusterServiceClient(conn).DeleteBackup(ctx, in, opts...)
+}
+
 // DeleteDashboardsNodeGroup implements opensearch.ClusterServiceClient
 func (c *ClusterServiceClient) DeleteDashboardsNodeGroup(ctx context.Context, in *opensearch.DeleteDashboardsNodeGroupRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)

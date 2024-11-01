@@ -15,7 +15,7 @@ type workflowsResolver struct {
 
 func WorkflowsResolver(name string, opts ...ResolveOption) ycsdk.Resolver {
 	return &workflowsResolver{
-		BaseNameResolver: NewBaseNameResolver(name, "api-gateway", opts...),
+		BaseNameResolver: NewBaseNameResolver(name, "workflow", opts...),
 	}
 }
 
