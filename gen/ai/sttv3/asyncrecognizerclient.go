@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	stt "github.com/yandex-cloud/go-genproto/yandex/cloud/ai/stt/v3"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
@@ -18,6 +19,15 @@ import (
 // lazy GRPC connection initialization.
 type AsyncRecognizerClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
+}
+
+// DeleteRecognition implements stt.AsyncRecognizerClient
+func (c *AsyncRecognizerClient) DeleteRecognition(ctx context.Context, in *stt.DeleteRecognitionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return stt.NewAsyncRecognizerClient(conn).DeleteRecognition(ctx, in, opts...)
 }
 
 // GetRecognition implements stt.AsyncRecognizerClient

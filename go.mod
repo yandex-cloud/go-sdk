@@ -10,7 +10,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/mitchellh/go-testing-interface v1.14.1
 	github.com/stretchr/testify v1.9.0
-	github.com/yandex-cloud/go-genproto v0.0.0-20241101135610-76a0cfc1a773
+	github.com/yandex-cloud/go-genproto v0.0.0-20241113173716-0b2f694b4bab
 	golang.org/x/net v0.28.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1
 	google.golang.org/grpc v1.66.2

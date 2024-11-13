@@ -170,3 +170,12 @@ func (c *ExecutionServiceClient) Stop(ctx context.Context, in *workflows.StopExe
 	}
 	return workflows.NewExecutionServiceClient(conn).Stop(ctx, in, opts...)
 }
+
+// Terminate implements workflows.ExecutionServiceClient
+func (c *ExecutionServiceClient) Terminate(ctx context.Context, in *workflows.TerminateExecutionRequest, opts ...grpc.CallOption) (*workflows.TerminateExecutionResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return workflows.NewExecutionServiceClient(conn).Terminate(ctx, in, opts...)
+}
