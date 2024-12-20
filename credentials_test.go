@@ -16,7 +16,7 @@ import (
 	"testing"
 	"time"
 
-	jwt "github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -123,7 +123,7 @@ func TestMetadataServiceOverride(t *testing.T) {
 		// GIVEN
 		expected := InstanceMetadataAddr
 		// WHEN
-		actual := getMetadataServiceAddr()
+		actual := GetMetadataServiceAddr()
 		// THEN
 		require.Equal(t, expected, actual)
 	})
@@ -132,7 +132,7 @@ func TestMetadataServiceOverride(t *testing.T) {
 		expected := "69.69.69.69"
 		require.NoError(t, os.Setenv(InstanceMetadataOverrideEnvVar, expected))
 		// WHEN
-		actual := getMetadataServiceAddr()
+		actual := GetMetadataServiceAddr()
 		// THEN
 		require.Equal(t, expected, actual)
 		require.NoError(t, os.Unsetenv(InstanceMetadataOverrideEnvVar))

@@ -95,12 +95,12 @@ func ServiceAccountKey(key *iamkey.Key) (Credentials, error) {
 // You can override the default address of Metadata Service by setting env variable.
 // TODO(skipor): doc link
 func InstanceServiceAccount() NonExchangeableCredentials {
-	return newInstanceServiceAccountCredentials(getMetadataServiceAddr())
+	return newInstanceServiceAccountCredentials(GetMetadataServiceAddr())
 }
 
-// getMetadataServiceAddr returns the address of Metadata Service, gets the value from InstanceMetadataOverrideEnvVar
+// GetMetadataServiceAddr returns the address of Metadata Service, gets the value from InstanceMetadataOverrideEnvVar
 // env variable if it is set, otherwise uses the default address from InstanceMetadataAddr.
-func getMetadataServiceAddr() string {
+func GetMetadataServiceAddr() string {
 	if nonDefaultAddr := os.Getenv(InstanceMetadataOverrideEnvVar); nonDefaultAddr != "" {
 		return nonDefaultAddr
 	}

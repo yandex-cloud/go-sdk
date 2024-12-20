@@ -27,3 +27,12 @@ func (c *PayloadServiceClient) Get(ctx context.Context, in *lockbox.GetPayloadRe
 	}
 	return lockbox.NewPayloadServiceClient(conn).Get(ctx, in, opts...)
 }
+
+// GetEx implements lockbox.PayloadServiceClient
+func (c *PayloadServiceClient) GetEx(ctx context.Context, in *lockbox.GetExRequest, opts ...grpc.CallOption) (*lockbox.GetExResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return lockbox.NewPayloadServiceClient(conn).GetEx(ctx, in, opts...)
+}
