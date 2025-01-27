@@ -22,3 +22,8 @@ func NewMetering(g func(ctx context.Context) (*grpc.ClientConn, error)) *Meterin
 func (m *Metering) ImageProductUsage() *ImageProductUsageServiceClient {
 	return &ImageProductUsageServiceClient{getConn: m.getConn}
 }
+
+// ProductUsage gets ProductUsageService client
+func (m *Metering) ProductUsage() *ProductUsageServiceClient {
+	return &ProductUsageServiceClient{getConn: m.getConn}
+}
