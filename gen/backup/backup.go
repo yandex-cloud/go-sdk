@@ -29,6 +29,15 @@ func (c *BackupServiceClient) Delete(ctx context.Context, in *backup.DeleteBacku
 	return backup.NewBackupServiceClient(conn).Delete(ctx, in, opts...)
 }
 
+// DeleteArchive implements backup.BackupServiceClient
+func (c *BackupServiceClient) DeleteArchive(ctx context.Context, in *backup.DeleteArchiveRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return backup.NewBackupServiceClient(conn).DeleteArchive(ctx, in, opts...)
+}
+
 // Get implements backup.BackupServiceClient
 func (c *BackupServiceClient) Get(ctx context.Context, in *backup.GetBackupRequest, opts ...grpc.CallOption) (*backup.Backup, error) {
 	conn, err := c.getConn(ctx)

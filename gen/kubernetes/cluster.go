@@ -511,6 +511,15 @@ func (it *ClusterOperationsIterator) Error() error {
 	return it.err
 }
 
+// RescheduleMaintenance implements k8s.ClusterServiceClient
+func (c *ClusterServiceClient) RescheduleMaintenance(ctx context.Context, in *k8s.RescheduleMaintenanceRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return k8s.NewClusterServiceClient(conn).RescheduleMaintenance(ctx, in, opts...)
+}
+
 // Start implements k8s.ClusterServiceClient
 func (c *ClusterServiceClient) Start(ctx context.Context, in *k8s.StartClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)

@@ -1,0 +1,6 @@
+issues:
+  exclude:
+    - "grpc.Dial is deprecated: use NewClient instead.  Will be supported throughout 1.x."
+    - "grpc.DialContext is deprecated: use NewClient instead.  Will be supported throughout 1.x."
+    - "grpc.WithBlock is deprecated: this DialOption is not supported by NewClient. Will be supported throughout 1.x."
+
