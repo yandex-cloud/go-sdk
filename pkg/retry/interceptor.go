@@ -15,6 +15,8 @@ import (
 // Interceptor returns retry interceptor, that can be parametrized by specific call options.
 // Without any option, it uses default options, that basically retries nothing.
 // Default retry quantity is 0, backoff function is nil, retry codes are DefaultRetriableCodes, AttemptHeader is false, and perCallTimeout is 0.
+//
+// Deprecated: RetryDialOption function to provide standard gRPC retries.
 func Interceptor(callOpts ...grpc.CallOption) grpc.UnaryClientInterceptor {
 	i := unaryInterceptor{opts: *defaultOptions.applyOptions(callOpts)}
 	return i.InterceptUnary

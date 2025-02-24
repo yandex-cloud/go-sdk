@@ -9,47 +9,65 @@ import (
 
 // WithDefaultInterceptor returns interceptor that DOESN'T retry anything.
 // Its possible to change its behaviour with call options.
+//
+// Deprecated: use retry/v1 package instead of this options
 func WithDefaultInterceptor() grpc.DialOption {
 	return grpc.WithUnaryInterceptor(Interceptor())
 }
 
 // WithMax option sets quantity of retry attempts.
 // It handles negative maxRetryCount as INFINITE retries.
+//
+// Deprecated: use retry/v1 package instead of this options
 func WithMax(maxRetryCount int) grpc.CallOption {
 	return newOption(setRetryQuantity(maxRetryCount))
 }
 
 // WithCodes overrides the whole retriable codes list.
+//
+// Deprecated: use retry/v1 package instead of this options
 func WithCodes(codes ...codes.Code) grpc.CallOption {
 	return newOption(setRetriableCodes(codes...))
 }
 
 // WithAttemptHeader adds retry attempt number to context outgoing metadata, with key "x-retry-attempt".
+//
+// Deprecated: use retry/v1 package instead of this options
 func WithAttemptHeader(enable bool) grpc.CallOption {
 	return newOption(setAttemptHeader(enable))
 }
 
 // WithPerCallTimeout adds timeout for retry calls.
+//
+// Deprecated: use retry/v1 package instead of this options
 func WithPerCallTimeout(to time.Duration) grpc.CallOption {
 	return newOption(setPerCallTimeout(to))
 }
 
 // WithBackoff sets up interceptor with custom defined backoff function
+//
+// Deprecated: use retry/v1 package instead of this options
 func WithBackoff(f BackoffFunc) grpc.CallOption {
 	return newOption(setBackoff(f))
 }
 
 // DefaultBackoff uses exponential backoff with jitter, with base = 50ms, and maximum timeout = 1 minute.
+//
+// Deprecated: use retry/v1 package instead of this options
 func DefaultBackoff() BackoffFunc {
 	return DefaultExponentialJitterBackoff()
 }
 
 // WithDefaultExponentialJitterBackoff same as WithDefaultBackoff
+//
+// Deprecated: use retry/v1 package instead of this options
 func DefaultExponentialJitterBackoff() BackoffFunc {
 	return BackoffExponentialWithJitter(defaultExponentialBackoffBase, defaultExponentialBackoffCap)
 }
 
 // DefaultLinearJitterBackoff uses linear backoff with base = 50ms, and jitter = +-10%
+//
+// Deprecated: use retry/v1 package instead of this options
 func DefaultLinearJitterBackoff() BackoffFunc {
 	return BackoffLinearWithJitter(defaultLinearBackoffTimeout, defaultLinearBackoffJitter)
 }
