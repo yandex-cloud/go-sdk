@@ -10,20 +10,22 @@ import (
 //revive:enable:var-naming
 
 type RetryConfig struct {
-	mc map[nameConfig]*methodConfig
+	mc              map[nameConfig]*methodConfig
+	retryThrottling *retryThrottling
+	waitForReady    bool
 }
 
 type RetryOption func(c *RetryConfig)
 
 type grpcRetryPolicy struct {
-	MethodConfig []*methodConfig `json:"methodConfig"`
+	MethodConfig    []*methodConfig `json:"methodConfig"`
+	RetryThrottling retryThrottling `json:"retryThrottling"`
+	WaitForReady    bool            `json:"waitForReady"`
 }
 
 type methodConfig struct {
-	NameConfig      []nameConfig    `json:"name"`
-	RetryPolicy     retryPolicy     `json:"retryPolicy"`
-	RetryThrottling retryThrottling `json:"retryThrottling"`
-	WaitForReady    bool            `json:"waitForReady"`
+	NameConfig  []nameConfig `json:"name"`
+	RetryPolicy retryPolicy  `json:"retryPolicy"`
 }
 
 type nameConfig struct {

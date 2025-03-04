@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 
 	cloudrouter "github.com/yandex-cloud/go-genproto/yandex/cloud/cloudrouter/v1"
+	"github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 )
 
 //revive:disable
@@ -17,6 +18,33 @@ import (
 // lazy GRPC connection initialization.
 type RoutingInstanceServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
+}
+
+// AddPrivateConnection implements cloudrouter.RoutingInstanceServiceClient
+func (c *RoutingInstanceServiceClient) AddPrivateConnection(ctx context.Context, in *cloudrouter.AddPrivateConnectionRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudrouter.NewRoutingInstanceServiceClient(conn).AddPrivateConnection(ctx, in, opts...)
+}
+
+// Create implements cloudrouter.RoutingInstanceServiceClient
+func (c *RoutingInstanceServiceClient) Create(ctx context.Context, in *cloudrouter.CreateRoutingInstanceRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudrouter.NewRoutingInstanceServiceClient(conn).Create(ctx, in, opts...)
+}
+
+// Delete implements cloudrouter.RoutingInstanceServiceClient
+func (c *RoutingInstanceServiceClient) Delete(ctx context.Context, in *cloudrouter.DeleteRoutingInstanceRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudrouter.NewRoutingInstanceServiceClient(conn).Delete(ctx, in, opts...)
 }
 
 // Get implements cloudrouter.RoutingInstanceServiceClient
@@ -160,4 +188,156 @@ func (it *RoutingInstanceIterator) Value() *cloudrouter.RoutingInstance {
 
 func (it *RoutingInstanceIterator) Error() error {
 	return it.err
+}
+
+// ListOperations implements cloudrouter.RoutingInstanceServiceClient
+func (c *RoutingInstanceServiceClient) ListOperations(ctx context.Context, in *cloudrouter.ListRoutingInstanceOperationsRequest, opts ...grpc.CallOption) (*cloudrouter.ListRoutingInstanceOperationsResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudrouter.NewRoutingInstanceServiceClient(conn).ListOperations(ctx, in, opts...)
+}
+
+type RoutingInstanceOperationsIterator struct {
+	ctx  context.Context
+	opts []grpc.CallOption
+
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
+
+	client  *RoutingInstanceServiceClient
+	request *cloudrouter.ListRoutingInstanceOperationsRequest
+
+	items []*operation.Operation
+}
+
+func (c *RoutingInstanceServiceClient) RoutingInstanceOperationsIterator(ctx context.Context, req *cloudrouter.ListRoutingInstanceOperationsRequest, opts ...grpc.CallOption) *RoutingInstanceOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
+	return &RoutingInstanceOperationsIterator{
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
+	}
+}
+
+func (it *RoutingInstanceOperationsIterator) Next() bool {
+	if it.err != nil {
+		return false
+	}
+	if len(it.items) > 1 {
+		it.items[0] = nil
+		it.items = it.items[1:]
+		return true
+	}
+	it.items = nil // consume last item, if any
+
+	if it.started && it.request.PageToken == "" {
+		return false
+	}
+	it.started = true
+
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
+	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
+	it.err = err
+	if err != nil {
+		return false
+	}
+
+	it.items = response.Operations
+	it.request.PageToken = response.NextPageToken
+	return len(it.items) > 0
+}
+
+func (it *RoutingInstanceOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *RoutingInstanceOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
+}
+
+func (it *RoutingInstanceOperationsIterator) Value() *operation.Operation {
+	if len(it.items) == 0 {
+		panic("calling Value on empty iterator")
+	}
+	return it.items[0]
+}
+
+func (it *RoutingInstanceOperationsIterator) Error() error {
+	return it.err
+}
+
+// RemovePrefixes implements cloudrouter.RoutingInstanceServiceClient
+func (c *RoutingInstanceServiceClient) RemovePrefixes(ctx context.Context, in *cloudrouter.RemovePrefixesRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudrouter.NewRoutingInstanceServiceClient(conn).RemovePrefixes(ctx, in, opts...)
+}
+
+// RemovePrivateConnection implements cloudrouter.RoutingInstanceServiceClient
+func (c *RoutingInstanceServiceClient) RemovePrivateConnection(ctx context.Context, in *cloudrouter.RemovePrivateConnectionRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudrouter.NewRoutingInstanceServiceClient(conn).RemovePrivateConnection(ctx, in, opts...)
+}
+
+// Update implements cloudrouter.RoutingInstanceServiceClient
+func (c *RoutingInstanceServiceClient) Update(ctx context.Context, in *cloudrouter.UpdateRoutingInstanceRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudrouter.NewRoutingInstanceServiceClient(conn).Update(ctx, in, opts...)
+}
+
+// UpsertPrefixes implements cloudrouter.RoutingInstanceServiceClient
+func (c *RoutingInstanceServiceClient) UpsertPrefixes(ctx context.Context, in *cloudrouter.UpsertPrefixesRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudrouter.NewRoutingInstanceServiceClient(conn).UpsertPrefixes(ctx, in, opts...)
 }

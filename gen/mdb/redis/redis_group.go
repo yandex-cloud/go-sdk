@@ -32,3 +32,8 @@ func (r *Redis) ResourcePreset() *ResourcePresetServiceClient {
 func (r *Redis) Backup() *BackupServiceClient {
 	return &BackupServiceClient{getConn: r.getConn}
 }
+
+// User gets UserService client
+func (r *Redis) User() *UserServiceClient {
+	return &UserServiceClient{getConn: r.getConn}
+}

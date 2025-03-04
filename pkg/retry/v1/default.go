@@ -12,6 +12,11 @@ func defaultRetryConfig() *RetryConfig {
 			// default value for all services and methods
 			defaultNameConfig(): defaultMethodConfig(),
 		},
+		retryThrottling: &retryThrottling{
+			MaxTokens:  100,
+			TokenRatio: 0.1,
+		},
+		waitForReady: true,
 	}
 }
 
@@ -25,10 +30,5 @@ func defaultMethodConfig() *methodConfig {
 			BackoffMultiplier:    2,
 			RetryableStatusCodes: []string{"UNAVAILABLE"},
 		},
-		RetryThrottling: retryThrottling{
-			MaxTokens:  100,
-			TokenRatio: 0.1,
-		},
-		WaitForReady: true,
 	}
 }
