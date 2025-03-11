@@ -16,7 +16,6 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 
-	grpc_insight "bb.yandex-team.ru/cloud/cloud-go/api/pkg/grpc/middleware/insight"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/compute/v1"
 	"github.com/yandex-cloud/go-sdk/pkg/testutil"
 )
@@ -97,12 +96,7 @@ func initTestService(t *testing.T, handler ZoneServerHandler, interceptor grpc.D
 		testutil.Message("Test server failed to start."),
 	)
 
-	so.c, err = grpc_insight.CreateGRPCClient(so.l.Addr().String(),
-		grpc_insight.WithDialOptions(
-			grpc.WithTransportCredentials(insecure.NewCredentials()),
-			interceptor,
-		),
-	)
+	so.c, err = grpc.Dial(so.l.Addr().String(), grpc.WithTransportCredentials(insecure.NewCredentials()), interceptor)
 	require.NoError(t, err)
 	res = compute.NewZoneServiceClient(so.c)
 	return

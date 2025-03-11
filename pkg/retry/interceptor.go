@@ -16,7 +16,7 @@ import (
 // Without any option, it uses default options, that basically retries nothing.
 // Default retry quantity is 0, backoff function is nil, retry codes are DefaultRetriableCodes, AttemptHeader is false, and perCallTimeout is 0.
 //
-// Deprecated: RetryDialOption function to provide standard gRPC retries.
+// Deprecated: RetryDialOption function to provide standard gRPC retries. For idempotency keys use idempotency.Interceptor
 func Interceptor(callOpts ...grpc.CallOption) grpc.UnaryClientInterceptor {
 	i := unaryInterceptor{opts: *defaultOptions.applyOptions(callOpts)}
 	return i.InterceptUnary

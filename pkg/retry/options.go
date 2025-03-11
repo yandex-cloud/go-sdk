@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-// WithDefaultInterceptor returns interceptor that DOESN'T retry anything.
+// WithDefaultInterceptor returns interceptor that DOESN'T retrу anything.
 // Its possible to change its behaviour with call options.
 //
 // Deprecated: use retry/v1 package instead of this options
