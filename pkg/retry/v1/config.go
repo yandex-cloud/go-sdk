@@ -1,7 +1,7 @@
 package retry
 
 import (
-	"strings"
+	"strconv"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -68,8 +68,8 @@ func NewNameConfig(service, method string) nameConfig {
 }
 
 func WithDefaultRetryConfig() RetryOption {
-	return func(c *RetryConfig) {
-		c = defaultRetryConfig()
+	return func(c *RetryConfig) { // nolint:staticcheck,ineffassign
+		c = defaultRetryConfig() // nolint:ineffassign,staticcheck
 	}
 }
 
@@ -96,7 +96,7 @@ func WithRetryableStatusCodes(nm nameConfig, codes ...codes.Code) RetryOption {
 
 		names := make([]string, len(codes))
 		for i, code := range codes {
-			names[i] = strings.ToUpper(code.String())
+			names[i] = canonicalString(code)
 		}
 
 		if _, ok := c.mc[nm]; !ok {
@@ -105,5 +105,46 @@ func WithRetryableStatusCodes(nm nameConfig, codes ...codes.Code) RetryOption {
 		}
 
 		c.mc[nm].RetryPolicy.RetryableStatusCodes = names
+	}
+}
+
+func canonicalString(c codes.Code) string {
+	switch c {
+	case codes.OK:
+		return "OK"
+	case codes.Canceled:
+		return "CANCELLED"
+	case codes.Unknown:
+		return "UNKNOWN"
+	case codes.InvalidArgument:
+		return "INVALID_ARGUMENT"
+	case codes.DeadlineExceeded:
+		return "DEADLINE_EXCEEDED"
+	case codes.NotFound:
+		return "NOT_FOUND"
+	case codes.AlreadyExists:
+		return "ALREADY_EXISTS"
+	case codes.PermissionDenied:
+		return "PERMISSION_DENIED"
+	case codes.ResourceExhausted:
+		return "RESOURCE_EXHAUSTED"
+	case codes.FailedPrecondition:
+		return "FAILED_PRECONDITION"
+	case codes.Aborted:
+		return "ABORTED"
+	case codes.OutOfRange:
+		return "OUT_OF_RANGE"
+	case codes.Unimplemented:
+		return "UNIMPLEMENTED"
+	case codes.Internal:
+		return "INTERNAL"
+	case codes.Unavailable:
+		return "UNAVAILABLE"
+	case codes.DataLoss:
+		return "DATA_LOSS"
+	case codes.Unauthenticated:
+		return "UNAUTHENTICATED"
+	default:
+		return "CODE(" + strconv.FormatInt(int64(c), 10) + ")"
 	}
 }
