@@ -12,7 +12,6 @@ import (
 type RetryConfig struct {
 	mc              map[nameConfig]*methodConfig
 	retryThrottling *retryThrottling
-	waitForReady    bool
 }
 
 type RetryOption func(c *RetryConfig)
@@ -20,12 +19,12 @@ type RetryOption func(c *RetryConfig)
 type grpcRetryPolicy struct {
 	MethodConfig    []*methodConfig `json:"methodConfig"`
 	RetryThrottling retryThrottling `json:"retryThrottling"`
-	WaitForReady    bool            `json:"waitForReady"`
 }
 
 type methodConfig struct {
-	NameConfig  []nameConfig `json:"name"`
-	RetryPolicy retryPolicy  `json:"retryPolicy"`
+	NameConfig   []nameConfig `json:"name"`
+	RetryPolicy  retryPolicy  `json:"retryPolicy"`
+	WaitForReady bool         `json:"waitForReady"`
 }
 
 type nameConfig struct {

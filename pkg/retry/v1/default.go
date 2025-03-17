@@ -16,7 +16,6 @@ func defaultRetryConfig() *RetryConfig {
 			MaxTokens:  100,
 			TokenRatio: 0.1,
 		},
-		waitForReady: true,
 	}
 }
 
@@ -30,5 +29,6 @@ func defaultMethodConfig() *methodConfig {
 			BackoffMultiplier:    2,
 			RetryableStatusCodes: []string{"UNAVAILABLE"},
 		},
+		WaitForReady: true,
 	}
 }

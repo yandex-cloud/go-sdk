@@ -33,7 +33,7 @@ func RetryDialOption(opts ...RetryOption) (grpc.DialOption, error) {
 		mc = append(mc, v)
 	}
 
-	c, err := json.Marshal(&grpcRetryPolicy{MethodConfig: mc, RetryThrottling: *config.retryThrottling, WaitForReady: config.waitForReady})
+	c, err := json.Marshal(&grpcRetryPolicy{MethodConfig: mc, RetryThrottling: *config.retryThrottling})
 	if err != nil {
 		return nil, err
 	}
