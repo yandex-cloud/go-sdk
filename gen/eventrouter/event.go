@@ -28,3 +28,12 @@ func (c *EventServiceClient) Put(ctx context.Context, in *eventrouter.PutEventRe
 	}
 	return eventrouter.NewEventServiceClient(conn).Put(ctx, in, opts...)
 }
+
+// Send implements eventrouter.EventServiceClient
+func (c *EventServiceClient) Send(ctx context.Context, in *eventrouter.SendEventsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return eventrouter.NewEventServiceClient(conn).Send(ctx, in, opts...)
+}

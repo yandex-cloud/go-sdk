@@ -82,3 +82,8 @@ func (c *Compute) SnapshotSchedule() *SnapshotScheduleServiceClient {
 func (c *Compute) GpuCluster() *GpuClusterServiceClient {
 	return &GpuClusterServiceClient{getConn: c.getConn}
 }
+
+// ReservedInstancePool gets ReservedInstancePoolService client
+func (c *Compute) ReservedInstancePool() *ReservedInstancePoolServiceClient {
+	return &ReservedInstancePoolServiceClient{getConn: c.getConn}
+}

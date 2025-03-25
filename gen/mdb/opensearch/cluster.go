@@ -708,6 +708,15 @@ func (c *ClusterServiceClient) RescheduleMaintenance(ctx context.Context, in *op
 	return opensearch.NewClusterServiceClient(conn).RescheduleMaintenance(ctx, in, opts...)
 }
 
+// RestartOpenSearch implements opensearch.ClusterServiceClient
+func (c *ClusterServiceClient) RestartOpenSearch(ctx context.Context, in *opensearch.RestartOpenSearchRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return opensearch.NewClusterServiceClient(conn).RestartOpenSearch(ctx, in, opts...)
+}
+
 // Restore implements opensearch.ClusterServiceClient
 func (c *ClusterServiceClient) Restore(ctx context.Context, in *opensearch.RestoreClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -742,6 +751,15 @@ func (c *ClusterServiceClient) StreamLogs(ctx context.Context, in *opensearch.St
 		return nil, err
 	}
 	return opensearch.NewClusterServiceClient(conn).StreamLogs(ctx, in, opts...)
+}
+
+// SwitchMaster implements opensearch.ClusterServiceClient
+func (c *ClusterServiceClient) SwitchMaster(ctx context.Context, in *opensearch.SwitchMasterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return opensearch.NewClusterServiceClient(conn).SwitchMaster(ctx, in, opts...)
 }
 
 // Update implements opensearch.ClusterServiceClient

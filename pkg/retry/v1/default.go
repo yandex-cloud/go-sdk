@@ -12,10 +12,8 @@ func defaultRetryConfig() *RetryConfig {
 			// default value for all services and methods
 			defaultNameConfig(): defaultMethodConfig(),
 		},
-		retryThrottling: &retryThrottling{
-			MaxTokens:  100,
-			TokenRatio: 0.1,
-		},
+		// Temporary is stricter, so it's the default value
+		retryThrottling: defaultRetryThrottling(ThrottlingModeTemporary),
 	}
 }
 
@@ -30,5 +28,19 @@ func defaultMethodConfig() *methodConfig {
 			RetryableStatusCodes: []string{"UNAVAILABLE"},
 		},
 		WaitForReady: true,
+	}
+}
+
+func defaultRetryThrottling(mode ThrottlingMode) *retryThrottling {
+	if mode == ThrottlingModePersistent {
+		return &retryThrottling{
+			MaxTokens:  100,
+			TokenRatio: 0.1,
+		}
+	}
+
+	return &retryThrottling{
+		MaxTokens:  6,
+		TokenRatio: 0.1,
 	}
 }

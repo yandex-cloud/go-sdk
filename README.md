@@ -29,43 +29,14 @@ if err != nil {
 
 ### Retries
 
-If you want to add retries to SDK, provide configuration using `retry/v1` package:
+SDK provide built-in retry policy, that supports [exponential backoff and jitter](https://aws.amazon.com/ru/blogs/architecture/exponential-backoff-and-jitter/), and also [retry budget](https://github.com/grpc/proposal/blob/master/A6-client-retries.md#throttling-retry-attempts-and-hedged-rpcs). 
+It's necessary to avoid retry amplification.
 
 ```go
 import (
 	...
-
-	ycsdk "bb.yandex-team.ru/cloud/cloud-go/sdk"
-	"bb.yandex-team.ru/cloud/cloud-go/sdk/pkg/retry/v1"
-)
-
-...
-
-retriesDialOption, err := retry.RetryDialOption(
-	retry.WithRetries(retry.DefaultNameConfig(), 2),
-	retry.WithRetryableStatusCodes(retry.DefaultNameConfig(), codes.AlreadyExists, codes.Unavailable),
-)
-if err != nil {
-	log.Fatal(err)
-}
-
-_, err = ycsdk.Build(
-	ctx,
-	ycsdk.Config{
-		Credentials: ycsdk.OAuthToken(*token),
-	},
-	retriesDialOption,
-)
-```
-
-It's **strongly recommended** to use provided default configuration to avoid retry amplification:
-
-```go
-import (
-	...
-
-	ycsdk "bb.yandex-team.ru/cloud/cloud-go/sdk"
-	"bb.yandex-team.ru/cloud/cloud-go/sdk/pkg/retry/v1"
+	ycsdk "github.com/yandex-cloud/go-sdk"
+	"github.com/yandex-cloud/go-sdk/pkg/retry/v1"
 )
 
 ...
@@ -83,6 +54,13 @@ _, err = ycsdk.Build(
 	retriesDialOption,
 )
 ```
+
+SDK provide different modes for retry throttling policy:
+
+* `persistent` is suitable when you use SDK in any long-lived application, when SDK instance will live long enough for manage budget;
+* `temporary` is suitable when you use SDK in any short-lived application, e.g. scripts or CI/CD.
+
+By default, SDK will use temporary mode, but you can change it through functional option.
 
 
 ### More examples

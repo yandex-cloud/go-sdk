@@ -74,7 +74,7 @@ type BackupIterator struct {
 func (c *BackupServiceClient) BackupIterator(ctx context.Context, req *backup.ListBackupsRequest, opts ...grpc.CallOption) *BackupIterator {
 	var pageSize int64
 	const defaultPageSize = 1000
-
+	pageSize = req.PageSize
 	if pageSize == 0 {
 		pageSize = defaultPageSize
 	}
@@ -98,10 +98,16 @@ func (it *BackupIterator) Next() bool {
 	}
 	it.items = nil // consume last item, if any
 
-	if it.started {
+	if it.started && it.request.PageToken == "" {
 		return false
 	}
 	it.started = true
+
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
 
 	response, err := it.client.List(it.ctx, it.request, it.opts...)
 	it.err = err
@@ -110,6 +116,7 @@ func (it *BackupIterator) Next() bool {
 	}
 
 	it.items = response.Backups
+	it.request.PageToken = response.NextPageToken
 	return len(it.items) > 0
 }
 

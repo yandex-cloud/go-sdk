@@ -51,6 +51,30 @@ type GRPCKeepAliveConfig struct {
 	PermitWithoutStream bool          `yaml:"permit_without_stream"`
 }
 
+// ThrottlingMode provides the mode SDK will retry request.
+type ThrottlingMode string
+
+const (
+	// ThrottlingModePersistent model provides retry attempts and budget for persistent environments.
+	// This mode is suitable when you use SDK in your server application, or any long-lived applications.
+	ThrottlingModePersistent ThrottlingMode = "persistent"
+
+	// ThrottlingModeTemporary model provides retry attempts and budget for temporary environments.
+	// This mode is suitable when you use SDK in some CI scripts, or any short-lived applications.
+	ThrottlingModeTemporary ThrottlingMode = "temporary"
+)
+
+func parseThrottlingMode(v string) ThrottlingMode {
+	switch v {
+	case "persistent":
+		return ThrottlingModePersistent
+	case "temporary":
+		return ThrottlingModeTemporary
+	default:
+		return ThrottlingModeTemporary
+	}
+}
+
 func DefaultRetryConfig() *RetryConfig {
 	return &RetryConfig{}
 }
@@ -104,6 +128,18 @@ func WithRetryableStatusCodes(nm nameConfig, codes ...codes.Code) RetryOption {
 		}
 
 		c.mc[nm].RetryPolicy.RetryableStatusCodes = names
+	}
+}
+
+func WithThrottlingMode(mode ThrottlingMode) RetryOption {
+	return func(c *RetryConfig) {
+		if c == nil {
+			c = defaultRetryConfig()
+		}
+
+		tm := parseThrottlingMode(string(mode))
+
+		c.retryThrottling = defaultRetryThrottling(tm)
 	}
 }
 
