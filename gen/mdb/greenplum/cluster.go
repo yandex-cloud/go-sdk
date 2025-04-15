@@ -770,6 +770,15 @@ func (c *ClusterServiceClient) Move(ctx context.Context, in *greenplum.MoveClust
 	return greenplum.NewClusterServiceClient(conn).Move(ctx, in, opts...)
 }
 
+// RescheduleMaintenance implements greenplum.ClusterServiceClient
+func (c *ClusterServiceClient) RescheduleMaintenance(ctx context.Context, in *greenplum.RescheduleMaintenanceRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return greenplum.NewClusterServiceClient(conn).RescheduleMaintenance(ctx, in, opts...)
+}
+
 // Restore implements greenplum.ClusterServiceClient
 func (c *ClusterServiceClient) Restore(ctx context.Context, in *greenplum.RestoreClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)

@@ -42,3 +42,13 @@ func (g *Greenplum) Backup() *BackupServiceClient {
 func (g *Greenplum) HBARule() *HBARuleServiceClient {
 	return &HBARuleServiceClient{getConn: g.getConn}
 }
+
+// User gets UserService client
+func (g *Greenplum) User() *UserServiceClient {
+	return &UserServiceClient{getConn: g.getConn}
+}
+
+// ResourceGroup gets ResourceGroupService client
+func (g *Greenplum) ResourceGroup() *ResourceGroupServiceClient {
+	return &ResourceGroupServiceClient{getConn: g.getConn}
+}

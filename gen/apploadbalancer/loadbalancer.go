@@ -38,6 +38,15 @@ func (c *LoadBalancerServiceClient) AddSniMatch(ctx context.Context, in *appload
 	return apploadbalancer.NewLoadBalancerServiceClient(conn).AddSniMatch(ctx, in, opts...)
 }
 
+// CancelZonalShift implements apploadbalancer.LoadBalancerServiceClient
+func (c *LoadBalancerServiceClient) CancelZonalShift(ctx context.Context, in *apploadbalancer.CancelZonalShiftRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return apploadbalancer.NewLoadBalancerServiceClient(conn).CancelZonalShift(ctx, in, opts...)
+}
+
 // Create implements apploadbalancer.LoadBalancerServiceClient
 func (c *LoadBalancerServiceClient) Create(ctx context.Context, in *apploadbalancer.CreateLoadBalancerRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -331,6 +340,15 @@ func (c *LoadBalancerServiceClient) Start(ctx context.Context, in *apploadbalanc
 		return nil, err
 	}
 	return apploadbalancer.NewLoadBalancerServiceClient(conn).Start(ctx, in, opts...)
+}
+
+// StartZonalShift implements apploadbalancer.LoadBalancerServiceClient
+func (c *LoadBalancerServiceClient) StartZonalShift(ctx context.Context, in *apploadbalancer.StartZonalShiftRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return apploadbalancer.NewLoadBalancerServiceClient(conn).StartZonalShift(ctx, in, opts...)
 }
 
 // Stop implements apploadbalancer.LoadBalancerServiceClient
