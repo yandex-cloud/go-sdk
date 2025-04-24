@@ -126,11 +126,13 @@ func Build(ctx context.Context, conf Config, customOpts ...grpc.DialOption) (*SD
 		conf: conf,
 	}
 	tokenMiddleware := NewIAMTokenMiddleware(sdk, now)
+
 	var dialOpts []grpc.DialOption
 	dialOpts = append(dialOpts,
 		grpc.WithContextDialer(dial.NewProxyDialer(dial.NewDialer())),
 		grpc.WithChainUnaryInterceptor(tokenMiddleware.InterceptUnary),
 		grpc.WithChainStreamInterceptor(tokenMiddleware.InterceptStream),
+		grpc.WithUserAgent(dial.UserAgent()),
 	)
 
 	if conf.DialContextTimeout > 0 {

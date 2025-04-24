@@ -53,6 +53,16 @@ func (c *Clickhouse) FormatSchema() *FormatSchemaServiceClient {
 	return &FormatSchemaServiceClient{getConn: c.getConn}
 }
 
+// Extension gets ExtensionService client
+func (c *Clickhouse) Extension() *ExtensionServiceClient {
+	return &ExtensionServiceClient{getConn: c.getConn}
+}
+
+// ClusterExtension gets ClusterExtensionService client
+func (c *Clickhouse) ClusterExtension() *ClusterExtensionServiceClient {
+	return &ClusterExtensionServiceClient{getConn: c.getConn}
+}
+
 // Versions gets VersionsService client
 func (c *Clickhouse) Versions() *VersionsServiceClient {
 	return &VersionsServiceClient{getConn: c.getConn}

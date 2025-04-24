@@ -306,6 +306,15 @@ func (it *RoutingInstanceOperationsIterator) Error() error {
 	return it.err
 }
 
+// MovePrefix implements cloudrouter.RoutingInstanceServiceClient
+func (c *RoutingInstanceServiceClient) MovePrefix(ctx context.Context, in *cloudrouter.MovePrefixRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudrouter.NewRoutingInstanceServiceClient(conn).MovePrefix(ctx, in, opts...)
+}
+
 // RemovePrefixes implements cloudrouter.RoutingInstanceServiceClient
 func (c *RoutingInstanceServiceClient) RemovePrefixes(ctx context.Context, in *cloudrouter.RemovePrefixesRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -331,6 +340,15 @@ func (c *RoutingInstanceServiceClient) Update(ctx context.Context, in *cloudrout
 		return nil, err
 	}
 	return cloudrouter.NewRoutingInstanceServiceClient(conn).Update(ctx, in, opts...)
+}
+
+// UpdatePrefixMask implements cloudrouter.RoutingInstanceServiceClient
+func (c *RoutingInstanceServiceClient) UpdatePrefixMask(ctx context.Context, in *cloudrouter.UpdatePrefixMaskRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudrouter.NewRoutingInstanceServiceClient(conn).UpdatePrefixMask(ctx, in, opts...)
 }
 
 // UpsertPrefixes implements cloudrouter.RoutingInstanceServiceClient
