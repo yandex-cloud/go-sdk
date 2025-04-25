@@ -5,12 +5,12 @@ go 1.21
 require (
 	github.com/c2h5oh/datasize v0.0.0-20200825124411-48ed595a09d2
 	github.com/ghodss/yaml v1.0.0
-	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/mitchellh/go-testing-interface v1.14.1
 	github.com/stretchr/testify v1.9.0
-	github.com/yandex-cloud/go-genproto v0.0.0
+	github.com/yandex-cloud/go-genproto v0.1.0
 	golang.org/x/net v0.28.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1
 	google.golang.org/grpc v1.66.2
