@@ -1,0 +1,169 @@
+syntax = "proto3";
+
+package yandex.cloud.video.v1;
+
+import "google/api/annotations.proto";
+import "yandex/cloud/api/operation.proto";
+import "yandex/cloud/operation/operation.proto";
+import "yandex/cloud/validation.proto";
+import "yandex/cloud/video/v1/thumbnail.proto";
+
+option go_package = "github.com/yandex-cloud/go-genproto/yandex/cloud/video/v1;video";
+option java_package = "yandex.cloud.api.video.v1";
+
+// Thumbnail management service.
+service ThumbnailService {
+  // Get the specific thumbnail.
+  rpc Get(GetThumbnailRequest) returns (Thumbnail) {
+    option (google.api.http) = {
+      get: "/video/v1/thumbnails/{thumbnail_id}"
+    };
+  }
+
+  // List thumbnails for channel.
+  rpc List(ListThumbnailRequest) returns (ListThumbnailResponse) {
+    option (google.api.http) = {
+      get: "/video/v1/thumbnails"
+    };
+  }
+
+  // Create thumbnail.
+  rpc Create(CreateThumbnailRequest) returns (operation.Operation) {
+    option (google.api.http) = {
+      post: "/video/v1/thumbnails"
+      body: "*"
+    };
+    option (yandex.cloud.api.operation) = {
+      metadata: "CreateThumbnailMetadata"
+      response: "Thumbnail"
+    };
+  }
+
+  // Generate urls for downloading images.
+  rpc BatchGenerateDownloadURLs(BatchGenerateDownloadURLsRequest) returns (BatchGenerateDownloadURLsResponse) {
+    option (google.api.http) = {
+      post: "/video/v1/thumbnails:batchGenerateDownloadURLs"
+      body: "*"
+    };
+  }
+
+  // Generate url for uploading an image.
+  rpc GenerateUploadURL(GenerateThumbnailUploadURLRequest) returns (GenerateThumbnailUploadURLResponse) {
+    option (google.api.http) = {
+      post: "/video/v1/thumbnails/{thumbnail_id}:generateUploadURL"
+      body: "*"
+    };
+  }
+
+  // Delete thumbnail.
+  rpc Delete(DeleteThumbnailRequest) returns (operation.Operation) {
+    option (google.api.http) = {
+      delete: "/video/v1/thumbnails/{thumbnail_id}"
+    };
+    option (yandex.cloud.api.operation) = {
+      metadata: "DeleteThumbnailMetadata"
+      response: "google.protobuf.Empty"
+    };
+  }
+}
+
+message GetThumbnailRequest {
+  // ID of the thumbnail.
+  string thumbnail_id = 1 [(required) = true, (length) = "<=50"];
+}
+
+message ListThumbnailRequest {
+  // Reserved for future use.
+  reserved 2 to 99;
+
+  // ID of the channel.
+  string channel_id = 1 [(length) = "<=50"];
+
+  // The maximum number of the results per page to return.
+  // Default value: 100.
+  int64 page_size = 100 [(value) = "<=100"];
+  // Page token for getting the next page of the result.
+  string page_token = 101 [(length) = "<=15000"];
+}
+
+message ListThumbnailResponse {
+  // Reserved for future use.
+  reserved 2 to 99;
+
+  // List of thumbnails.
+  repeated Thumbnail thumbnails = 1;
+
+  // Token for getting the next page.
+  string next_page_token = 100;
+}
+
+message CreateThumbnailRequest {
+  // ID of the channel.
+  string channel_id = 1 [(length) = "<=200"];
+}
+
+message CreateThumbnailMetadata {
+  // ID of the thumbnail.
+  string thumbnail_id = 1;
+}
+
+message BatchGenerateDownloadURLsRequest {
+  // ID of the channel.
+  string channel_id = 1 [(required) = true, (length) = "<=200"];
+  // List of thumbnails IDs.
+  repeated string thumbnail_ids = 2 [(size) = "1-100", (length) = "<=50"];
+}
+
+message BatchGenerateDownloadURLsResponse {
+  // List of download urls.
+  repeated ThumbnailDownloadURL download_urls = 1;
+}
+
+message ThumbnailDownloadURL {
+  // ID of the thumbnail.
+  string thumbnail_id = 1;
+  // Original download url.
+  string original_url = 2;
+  // List of download urls, one per each available image size.
+  repeated ScaledURL scaled_urls = 3;
+
+  message ScaledURL {
+    // Download url.
+    string url = 1;
+    // Maximum width of the rectangle to inscribe the thumbnail into.
+    int64 max_width = 2;
+    // Maximum height of the rectangle to inscribe the thumbnail into.
+    int64 max_height = 3;
+    // Image format.
+    ImageFormat image_format = 4;
+  }
+
+  enum ImageFormat {
+    // Image format unspecified.
+    IMAGE_FORMAT_UNSPECIFIED = 0;
+    // JPEG image format.
+    JPEG = 1;
+    // WebP image format.
+    WEBP = 2;
+  }
+}
+
+message GenerateThumbnailUploadURLRequest {
+  // ID of the thumbnail.
+  string thumbnail_id = 1 [(required) = true, (length) = "<=50"];
+}
+
+message GenerateThumbnailUploadURLResponse {
+  // Upload url.
+  string upload_url = 1;
+}
+
+message DeleteThumbnailRequest {
+  // ID of the thumbnail.
+  string thumbnail_id = 1 [(required) = true, (length) = "<=50"];
+}
+
+message DeleteThumbnailMetadata {
+  // ID of the thumbnail.
+  string thumbnail_id = 1;
+}
