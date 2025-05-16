@@ -27,3 +27,12 @@ func (c *CertificateContentServiceClient) Get(ctx context.Context, in *certifica
 	}
 	return certificatemanager.NewCertificateContentServiceClient(conn).Get(ctx, in, opts...)
 }
+
+// GetEx implements certificatemanager.CertificateContentServiceClient
+func (c *CertificateContentServiceClient) GetEx(ctx context.Context, in *certificatemanager.GetExCertificateContentRequest, opts ...grpc.CallOption) (*certificatemanager.GetExCertificateContentResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return certificatemanager.NewCertificateContentServiceClient(conn).GetEx(ctx, in, opts...)
+}
