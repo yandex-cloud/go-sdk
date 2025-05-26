@@ -18,6 +18,11 @@ func NewTrino(g func(ctx context.Context) (*grpc.ClientConn, error)) *Trino {
 	return &Trino{g}
 }
 
+// Catalog gets CatalogService client
+func (t *Trino) Catalog() *CatalogServiceClient {
+	return &CatalogServiceClient{getConn: t.getConn}
+}
+
 // Cluster gets ClusterService client
 func (t *Trino) Cluster() *ClusterServiceClient {
 	return &ClusterServiceClient{getConn: t.getConn}

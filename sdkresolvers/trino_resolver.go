@@ -32,3 +32,27 @@ func (r *trinoClusterResolver) Run(ctx context.Context, sdk *ycsdk.SDK, opts ...
 	})
 	return r.findName(resp.GetClusters(), err)
 }
+
+func TrinoCatalogResolver(name string, opts ...ResolveOption) ycsdk.Resolver {
+	return &trinoCatalogResolver{
+		BaseNameResolver: NewBaseNameResolver(name, "catalog", opts...),
+	}
+}
+
+type trinoCatalogResolver struct {
+	BaseNameResolver
+}
+
+func (r *trinoCatalogResolver) Run(ctx context.Context, sdk *ycsdk.SDK, opts ...grpc.CallOption) error {
+	if r.ClusterID() == "" {
+		return NewErrNotFound("can't resolve trino catalog without cluster id")
+	}
+
+	resp, err := sdk.Trino().Catalog().List(ctx, &trino.ListCatalogsRequest{
+		ClusterId: r.ClusterID(),
+		PageSize:  DefaultResolverPageSize,
+		Filter:    CreateResolverFilter("name", r.Name),
+	})
+
+	return r.findName(resp.GetCatalogs(), err)
+}
