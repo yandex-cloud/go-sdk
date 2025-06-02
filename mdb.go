@@ -13,6 +13,7 @@ import (
 	"github.com/yandex-cloud/go-sdk/gen/mdb/opensearch"
 	"github.com/yandex-cloud/go-sdk/gen/mdb/postgresql"
 	"github.com/yandex-cloud/go-sdk/gen/mdb/redis"
+	"github.com/yandex-cloud/go-sdk/gen/mdb/spqr"
 	"github.com/yandex-cloud/go-sdk/gen/mdb/sqlserver"
 )
 
@@ -27,6 +28,7 @@ const (
 	MDBGreenplumServiceID  Endpoint = "managed-greenplum"
 	MDBElasticSearchID     Endpoint = "managed-elasticsearch"
 	MDBOpenSearchID        Endpoint = "managed-opensearch"
+	MDBSPQRID              Endpoint = "managed-spqr"
 )
 
 type MDB struct {
@@ -71,4 +73,8 @@ func (m *MDB) ElasticSearch() *elasticsearch.ElasticSearch {
 
 func (m *MDB) OpenSearch() *opensearch.OpenSearch {
 	return opensearch.NewOpenSearch(m.sdk.getConn(MDBOpenSearchID))
+}
+
+func (m *MDB) SPQR() *spqr.SPQR {
+	return spqr.NewSPQR(m.sdk.getConn(MDBSPQRID))
 }

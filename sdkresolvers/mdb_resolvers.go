@@ -14,6 +14,7 @@ import (
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/opensearch/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/postgresql/v1"
 	redis "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/redis/v1"
+	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/spqr/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/sqlserver/v1"
 	ycsdk "github.com/yandex-cloud/go-sdk"
 )
@@ -251,6 +252,30 @@ func (r *openSearchClusterResolver) Run(ctx context.Context, sdk *ycsdk.SDK, opt
 	}
 
 	resp, err := sdk.MDB().OpenSearch().Cluster().List(ctx, &opensearch.ListClustersRequest{
+		FolderId: r.FolderID(),
+		Filter:   CreateResolverFilter("name", r.Name),
+		PageSize: DefaultResolverPageSize,
+	})
+	return r.findName(resp.GetClusters(), err)
+}
+
+func SPQRClusterResolver(name string, opts ...ResolveOption) ycsdk.Resolver {
+	return &spqrClusterResolver{
+		BaseNameResolver: NewBaseNameResolver(name, "cluster", opts...),
+	}
+}
+
+type spqrClusterResolver struct {
+	BaseNameResolver
+}
+
+func (r *spqrClusterResolver) Run(ctx context.Context, sdk *ycsdk.SDK, opts ...grpc.CallOption) error {
+	err := r.ensureFolderID()
+	if err != nil {
+		return err
+	}
+
+	resp, err := sdk.MDB().SPQR().Cluster().List(ctx, &spqr.ListClustersRequest{
 		FolderId: r.FolderID(),
 		Filter:   CreateResolverFilter("name", r.Name),
 		PageSize: DefaultResolverPageSize,
