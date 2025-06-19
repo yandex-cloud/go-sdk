@@ -300,6 +300,15 @@ func (it *BucketAccessBindingsIterator) Error() error {
 	return it.err
 }
 
+// SetAccessBindings implements storage.BucketServiceClient
+func (c *BucketServiceClient) SetAccessBindings(ctx context.Context, in *access.SetAccessBindingsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return storage.NewBucketServiceClient(conn).SetAccessBindings(ctx, in, opts...)
+}
+
 // SetHTTPSConfig implements storage.BucketServiceClient
 func (c *BucketServiceClient) SetHTTPSConfig(ctx context.Context, in *storage.SetBucketHTTPSConfigRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
