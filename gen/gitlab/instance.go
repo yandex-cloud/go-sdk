@@ -180,3 +180,12 @@ func (c *InstanceServiceClient) Stop(ctx context.Context, in *gitlab.StopInstanc
 	}
 	return gitlab.NewInstanceServiceClient(conn).Stop(ctx, in, opts...)
 }
+
+// Update implements gitlab.InstanceServiceClient
+func (c *InstanceServiceClient) Update(ctx context.Context, in *gitlab.UpdateInstanceRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return gitlab.NewInstanceServiceClient(conn).Update(ctx, in, opts...)
+}

@@ -38,6 +38,15 @@ func (c *NetworkLoadBalancerServiceClient) AttachTargetGroup(ctx context.Context
 	return loadbalancer.NewNetworkLoadBalancerServiceClient(conn).AttachTargetGroup(ctx, in, opts...)
 }
 
+// CancelZonalShift implements loadbalancer.NetworkLoadBalancerServiceClient
+func (c *NetworkLoadBalancerServiceClient) CancelZonalShift(ctx context.Context, in *loadbalancer.CancelZonalShiftRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return loadbalancer.NewNetworkLoadBalancerServiceClient(conn).CancelZonalShift(ctx, in, opts...)
+}
+
 // Create implements loadbalancer.NetworkLoadBalancerServiceClient
 func (c *NetworkLoadBalancerServiceClient) Create(ctx context.Context, in *loadbalancer.CreateNetworkLoadBalancerRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -331,6 +340,15 @@ func (c *NetworkLoadBalancerServiceClient) Start(ctx context.Context, in *loadba
 		return nil, err
 	}
 	return loadbalancer.NewNetworkLoadBalancerServiceClient(conn).Start(ctx, in, opts...)
+}
+
+// StartZonalShift implements loadbalancer.NetworkLoadBalancerServiceClient
+func (c *NetworkLoadBalancerServiceClient) StartZonalShift(ctx context.Context, in *loadbalancer.StartZonalShiftRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return loadbalancer.NewNetworkLoadBalancerServiceClient(conn).StartZonalShift(ctx, in, opts...)
 }
 
 // Stop implements loadbalancer.NetworkLoadBalancerServiceClient
