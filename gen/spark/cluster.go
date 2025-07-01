@@ -296,3 +296,12 @@ func (c *ClusterServiceClient) Stop(ctx context.Context, in *spark.StopClusterRe
 	}
 	return spark.NewClusterServiceClient(conn).Stop(ctx, in, opts...)
 }
+
+// Update implements spark.ClusterServiceClient
+func (c *ClusterServiceClient) Update(ctx context.Context, in *spark.UpdateClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return spark.NewClusterServiceClient(conn).Update(ctx, in, opts...)
+}
