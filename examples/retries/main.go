@@ -7,8 +7,10 @@ import (
 
 	"google.golang.org/grpc/codes"
 
-	ycsdk "github.com/yandex-cloud/go-sdk"
-	"github.com/yandex-cloud/go-sdk/pkg/retry/v1"
+	ycsdk "github.com/yandex-cloud/go-sdk/v2"
+	"github.com/yandex-cloud/go-sdk/v2/credentials"
+	"github.com/yandex-cloud/go-sdk/v2/pkg/options"
+	"github.com/yandex-cloud/go-sdk/v2/pkg/options/retry"
 )
 
 func main() {
@@ -17,21 +19,14 @@ func main() {
 
 	ctx := context.Background()
 
-	// retriesDialOption, err := retry.DefaultRetryDialOption()
-	retriesDialOption, err := retry.RetryDialOption(
-		retry.WithRetries(retry.DefaultNameConfig(), 2),
-		retry.WithRetryableStatusCodes(retry.DefaultNameConfig(), codes.AlreadyExists, codes.Unavailable),
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	_, err = ycsdk.Build(
+	_, err := ycsdk.Build(
 		ctx,
-		ycsdk.Config{
-			Credentials: ycsdk.OAuthToken(*token),
-		},
-		retriesDialOption,
+		options.WithCredentials(credentials.IAMToken(*token)),
+		options.WithRetryOptions(
+			retry.WithRetries(retry.DefaultNameConfig(), 2),
+			retry.WithRetryableStatusCodes(retry.DefaultNameConfig(), codes.AlreadyExists, codes.Unavailable),
+		),
+		options.WithDefaultRetryOptions(),
 	)
 	if err != nil {
 		log.Fatal(err)

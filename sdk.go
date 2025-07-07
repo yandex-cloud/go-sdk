@@ -1,434 +1,191 @@
-// Copyright (c) 2017 Yandex LLC. All rights reserved.
-// Author: Alexey Baranov <baranovich@yandex-team.ru>
-
 package ycsdk
 
 import (
 	"context"
 	"crypto/tls"
-	"errors"
 	"fmt"
-	"sort"
-	"sync"
-	"time"
+	"runtime/debug"
 
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
+	grpccreds "google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/reflect/protoreflect"
 
-	"github.com/yandex-cloud/go-genproto/yandex/cloud/endpoint"
-	iampb "github.com/yandex-cloud/go-genproto/yandex/cloud/iam/v1"
-	"github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
-	_ "github.com/yandex-cloud/go-genproto/yandex/cloud/quota" // Used in Operation.error.details
-	"github.com/yandex-cloud/go-sdk/dial"
-	apiendpoint "github.com/yandex-cloud/go-sdk/gen/apiendpoint"
-	"github.com/yandex-cloud/go-sdk/gen/audittrails"
-	"github.com/yandex-cloud/go-sdk/gen/backup"
-	"github.com/yandex-cloud/go-sdk/gen/compute"
-	"github.com/yandex-cloud/go-sdk/gen/dns"
-	"github.com/yandex-cloud/go-sdk/gen/iam"
-	"github.com/yandex-cloud/go-sdk/gen/iam/workload"
-	"github.com/yandex-cloud/go-sdk/gen/iam/workload/oidc"
-	k8s "github.com/yandex-cloud/go-sdk/gen/kubernetes"
-	"github.com/yandex-cloud/go-sdk/gen/monitoring"
-	gen_operation "github.com/yandex-cloud/go-sdk/gen/operation"
-	"github.com/yandex-cloud/go-sdk/gen/organizationmanager"
-	organizationmanagersaml "github.com/yandex-cloud/go-sdk/gen/organizationmanager/saml"
-	"github.com/yandex-cloud/go-sdk/gen/resourcemanager"
-	"github.com/yandex-cloud/go-sdk/gen/storage-api"
-	"github.com/yandex-cloud/go-sdk/gen/vpc"
-	"github.com/yandex-cloud/go-sdk/gen/vpc/privatelink"
-	"github.com/yandex-cloud/go-sdk/gen/ydb"
-	sdk_operation "github.com/yandex-cloud/go-sdk/operation"
-	"github.com/yandex-cloud/go-sdk/pkg/grpcclient"
-	"github.com/yandex-cloud/go-sdk/pkg/sdkerrors"
-	"github.com/yandex-cloud/go-sdk/pkg/singleflight"
+	endpointpb "github.com/yandex-cloud/go-genproto/yandex/cloud/endpoint"
+	"github.com/yandex-cloud/go-sdk/v2/credentials"
+	"github.com/yandex-cloud/go-sdk/v2/pkg/authentication"
+	"github.com/yandex-cloud/go-sdk/v2/pkg/endpoints"
+	"github.com/yandex-cloud/go-sdk/v2/pkg/log"
+	"github.com/yandex-cloud/go-sdk/v2/pkg/options"
+	"github.com/yandex-cloud/go-sdk/v2/pkg/options/retry"
+	"github.com/yandex-cloud/go-sdk/v2/pkg/transport"
+	transportgrpc "github.com/yandex-cloud/go-sdk/v2/pkg/transport/grpc"
+	transportauth "github.com/yandex-cloud/go-sdk/v2/pkg/transport/middleware/authentication"
+	endpointsdk "github.com/yandex-cloud/go-sdk/v2/services/endpoint"
+	endpointssdk "github.com/yandex-cloud/go-sdk/v2/services/endpoints"
+	iamsdk "github.com/yandex-cloud/go-sdk/v2/services/iam/v1"
 )
 
-type Endpoint string
+var _ transport.Connector = (*SDK)(nil)
 
-const (
-	DefaultPageSize int64 = 1000
-
-	ComputeServiceID                Endpoint = "compute"
-	IAMServiceID                    Endpoint = "iam"
-	OperationServiceID              Endpoint = "operation"
-	OrganizationManagementServiceID Endpoint = "organization-manager"
-	ResourceManagementServiceID     Endpoint = "resource-manager"
-	StorageServiceID                Endpoint = "storage"
-	StorageAPIServiceID             Endpoint = "storage-api"
-	MonitoringServiceID             Endpoint = "monitoring"
-	SerialSSHServiceID              Endpoint = "serialssh"
-	// revive:disable:var-naming
-	ApiEndpointServiceID Endpoint = "endpoint"
-	// revive:enable:var-naming
-	VpcServiceID         Endpoint = "vpc"
-	KubernetesServiceID  Endpoint = "managed-kubernetes"
-	DNSServiceID         Endpoint = "dns"
-	YDBServiceID         Endpoint = "ydb"
-	BackupServiceID      Endpoint = "backup"
-	AuditTrailsServiceID Endpoint = "audittrails"
-)
-
-// Config is a config that is used to create SDK instance.
-type Config struct {
-	// Credentials are used to authenticate the client. See Credentials for more info.
-	Credentials Credentials
-	// DialContextTimeout specifies timeout of dial on API endpoint that
-	// is used when building an SDK instance.
-	DialContextTimeout time.Duration
-	// TLSConfig is optional tls.Config that one can use in order to tune TLS options.
-	TLSConfig *tls.Config
-
-	// Endpoint is an API endpoint of Yandex.Cloud against which the SDK is used.
-	// Most users won't need to explicitly set it.
-	Endpoint  string
-	Plaintext bool
-}
-
-// SDK is a Yandex.Cloud SDK
+// SDK provides a client connection wrapper managing connection pooling and endpoint resolution for gRPC services.
 type SDK struct {
-	conf      Config
-	cc        grpcclient.ConnContext
-	endpoints struct {
-		initDone bool
-		mu       sync.Mutex
-		ep       map[Endpoint]*endpoint.ApiEndpoint
-	}
-
-	initErr  error
-	initCall singleflight.Call
-	muErr    sync.Mutex
+	connPool *transportgrpc.ConnPool
+	conn     transport.Connector
 }
 
-// Build creates an SDK instance
-func Build(ctx context.Context, conf Config, customOpts ...grpc.DialOption) (*SDK, error) {
-	if conf.Credentials == nil {
-		return nil, errors.New("credentials required")
+// Build initializes and configures an SDK instance with the provided options and context.
+// It applies default configurations and validates necessary parameters like credentials and endpoints.
+// Returns an SDK instance or an error if initialization fails.
+func Build(ctx context.Context, opts ...options.Option) (*SDK, error) {
+	buildOptions := options.DefaultOptions()
+	for _, opt := range opts {
+		opt(buildOptions)
+	}
+	if buildOptions.Credentials == nil {
+		return nil, fmt.Errorf("credentials must be provided")
 	}
 
-	const defaultEndpoint = "api.cloud.yandex.net:443"
-	if conf.Endpoint == "" {
-		conf.Endpoint = defaultEndpoint
-	}
-	const DefaultTimeout = 20 * time.Second
-	if conf.DialContextTimeout == 0 {
-		conf.DialContextTimeout = DefaultTimeout
+	logger := zap.NewNop()
+	if buildOptions.Logger != nil {
+		logger = buildOptions.Logger
 	}
 
-	switch creds := conf.Credentials.(type) {
-	case ExchangeableCredentials, NonExchangeableCredentials:
-	default:
-		return nil, fmt.Errorf("unsupported credentials type %T", creds)
+	if injector, ok := buildOptions.Credentials.(log.LogInjector); ok {
+		injector.InjectLogger(logger)
 	}
-	sdk := &SDK{
-		cc:   nil, // Later
-		conf: conf,
-	}
-	tokenMiddleware := NewIAMTokenMiddleware(sdk, now)
 
-	var dialOpts []grpc.DialOption
-	dialOpts = append(dialOpts,
-		grpc.WithContextDialer(dial.NewProxyDialer(dial.NewDialer())),
-		grpc.WithChainUnaryInterceptor(tokenMiddleware.InterceptUnary),
-		grpc.WithChainStreamInterceptor(tokenMiddleware.InterceptStream),
-		grpc.WithUserAgent(dial.UserAgent()),
-	)
-
-	if conf.DialContextTimeout > 0 {
-		dialOpts = append(dialOpts, grpc.WithBlock(), grpc.WithTimeout(conf.DialContextTimeout)) // nolint
+	var err error
+	if buildOptions.EndpointsResolver == nil {
+		buildOptions.EndpointsResolver, err = buildEndpointsResolver(ctx, buildOptions.DiscoveryEndpoint)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get endpointsResolver: %w", err)
+		}
 	}
-	if conf.Plaintext {
+
+	if buildOptions.Authenticator == nil {
+		buildOptions.Authenticator, err = defaultAuthenticator(ctx, logger, buildOptions.Credentials, buildOptions.EndpointsResolver)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create authenticator: %w", err)
+		}
+	}
+
+	if injector, ok := buildOptions.Authenticator.(log.LogInjector); ok {
+		injector.InjectLogger(
+			logger,
+		)
+	}
+
+	dialOpts := []grpc.DialOption{
+		grpc.WithUserAgent(userAgent()),
+	}
+
+	if _, ok := buildOptions.Credentials.(*credentials.NoCredentials); !ok {
+		tokenMiddleware := transportauth.NewIAMTokenMiddleware(buildOptions.Authenticator, transportauth.WithLogger(logger))
+		dialOpts = append(dialOpts,
+			grpc.WithUnaryInterceptor(tokenMiddleware.InterceptUnary),
+			grpc.WithStreamInterceptor(tokenMiddleware.InterceptStream),
+		)
+	}
+
+	if buildOptions.Plaintext {
 		dialOpts = append(dialOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	} else {
-		tlsConfig := conf.TLSConfig
+		tlsConfig := buildOptions.TlsConfig
 		if tlsConfig == nil {
 			tlsConfig = &tls.Config{}
 		}
-		creds := credentials.NewTLS(tlsConfig)
-		dialOpts = append(dialOpts, grpc.WithTransportCredentials(creds))
+		dialOpts = append(dialOpts, grpc.WithTransportCredentials(grpccreds.NewTLS(tlsConfig)))
 	}
-	// Append custom options after default, to allow to customize dialer and etc.
-	dialOpts = append(dialOpts, customOpts...)
-	sdk.cc = grpcclient.NewLazyConnContext(grpcclient.DialOptions(dialOpts...))
-	return sdk, nil
-}
 
-// Shutdown shutdowns SDK and closes all open connections.
-func (sdk *SDK) Shutdown(ctx context.Context) error {
-	return sdk.cc.Shutdown(ctx)
-}
-
-func (sdk *SDK) CheckEndpointConnection(ctx context.Context, endpoint Endpoint) error {
-	_, err := sdk.getConn(endpoint)(ctx)
-	return err
-}
-
-// WrapOperation wraps operation proto message to
-func (sdk *SDK) WrapOperation(op *operation.Operation, err error) (*sdk_operation.Operation, error) {
-	if err != nil {
-		return nil, err
-	}
-	return sdk_operation.New(sdk.Operation(), op), nil
-}
-
-// IAM returns IAM object that is used to operate on Yandex Cloud Identity and Access Manager
-func (sdk *SDK) IAM() *iam.IAM {
-	return iam.NewIAM(sdk.getConn(IAMServiceID))
-}
-
-func (sdk *SDK) Workload() *workload.Workload {
-	return workload.NewWorkload(sdk.getConn(IAMServiceID))
-}
-
-func (sdk *SDK) WorkloadOidc() *oidc.WorkloadOidc {
-	return oidc.NewWorkloadOidc(sdk.getConn(IAMServiceID))
-}
-
-// Compute returns Compute object that is used to operate on Yandex Compute Cloud
-func (sdk *SDK) Compute() *compute.Compute {
-	return compute.NewCompute(sdk.getConn(ComputeServiceID))
-}
-
-// VPC returns VPC object that is used to operate on Yandex Virtual Private Cloud
-func (sdk *SDK) VPC() *vpc.VPC {
-	return vpc.NewVPC(sdk.getConn(VpcServiceID))
-}
-
-// VPCPrivateLink returns PrivateLink object that is used to operate on Yandex Virtual Private Cloud Private Endpoints
-func (sdk *SDK) VPCPrivateLink() *privatelink.PrivateLink {
-	return privatelink.NewPrivateLink(sdk.getConn(VpcServiceID))
-}
-
-// MDB returns MDB object that is used to operate on Yandex Managed Databases
-func (sdk *SDK) MDB() *MDB {
-	return &MDB{sdk: sdk}
-}
-
-func (sdk *SDK) Serverless() *Serverless {
-	return &Serverless{sdk: sdk}
-}
-
-func (sdk *SDK) Marketplace() *Marketplace {
-	return &Marketplace{sdk: sdk}
-}
-
-// Operation gets OperationService client
-func (sdk *SDK) Operation() *gen_operation.OperationServiceClient {
-	group := gen_operation.NewOperation(sdk.getConn(OperationServiceID))
-	return group.Operation()
-}
-
-func (sdk *SDK) OrganizationManager() *organizationmanager.OrganizationManager {
-	return organizationmanager.NewOrganizationManager(sdk.getConn(OrganizationManagementServiceID))
-}
-
-func (sdk *SDK) OSLoginServiceClient() *organizationmanager.OsLoginServiceClient {
-	manager := sdk.OrganizationManager()
-	return manager.OsLogin()
-}
-
-func (sdk *SDK) UserSSHKeyServiceClient() *organizationmanager.UserSshKeyServiceClient {
-	manager := sdk.OrganizationManager()
-	return manager.UserSshKey()
-}
-
-func (sdk *SDK) GroupMappingServiceClient() *organizationmanager.GroupMappingServiceClient {
-	manager := sdk.OrganizationManager()
-	return manager.GroupMapping()
-}
-
-func (sdk *SDK) OrganizationManagerSAML() *organizationmanagersaml.OrganizationManagerSAML {
-	return organizationmanagersaml.NewOrganizationManagerSAML(sdk.getConn(OrganizationManagementServiceID))
-}
-
-// ResourceManager returns ResourceManager object that is used to operate on Folders and Clouds
-func (sdk *SDK) ResourceManager() *resourcemanager.ResourceManager {
-	return resourcemanager.NewResourceManager(sdk.getConn(ResourceManagementServiceID))
-}
-
-// revive:disable:var-naming
-
-// ApiEndpoint gets ApiEndpointService client
-func (sdk *SDK) ApiEndpoint() *apiendpoint.APIEndpoint {
-	return apiendpoint.NewAPIEndpoint(sdk.getConn(ApiEndpointServiceID))
-}
-
-// revive:enable:var-naming
-
-// Kubernetes returns Kubernetes object that is used to operate on Yandex Managed Kubernetes
-func (sdk *SDK) Kubernetes() *k8s.Kubernetes {
-	return k8s.NewKubernetes(sdk.getConn(KubernetesServiceID))
-}
-
-// DNS returns DNS object that is used to operate on Yandex DNS
-func (sdk *SDK) DNS() *dns.DNS {
-	return dns.NewDNS(sdk.getConn(DNSServiceID))
-}
-
-// AI returns AI object that is used to do AI stuff.
-func (sdk *SDK) AI() *AI {
-	return &AI{sdk: sdk}
-}
-
-// YDB returns object for Yandex Database operations.
-func (sdk *SDK) YDB() *ydb.YDB {
-	return ydb.NewYDB(sdk.getConn(YDBServiceID))
-}
-
-func (sdk *SDK) Resolve(ctx context.Context, r ...Resolver) error {
-	args := make([]func() error, len(r))
-	for k, v := range r {
-		resolver := v
-		args[k] = func() error {
-			return resolver.Run(ctx, sdk)
-		}
-	}
-	return sdkerrors.CombineGoroutines(args...)
-}
-
-func (sdk *SDK) getConn(serviceID Endpoint) func(ctx context.Context) (*grpc.ClientConn, error) {
-	return func(ctx context.Context) (*grpc.ClientConn, error) {
-		if !sdk.initDone() {
-			sdk.initCall.Do(func() interface{} {
-				sdk.muErr.Lock()
-				sdk.initErr = sdk.initConns(ctx)
-				sdk.muErr.Unlock()
-				return nil
-			})
-			if err := sdk.InitErr(); err != nil {
-				return nil, err
-			}
-		}
-		endpoint, endpointExist := sdk.Endpoint(serviceID)
-		if !endpointExist {
-			return nil, &ServiceIsNotAvailableError{
-				ServiceID:           serviceID,
-				APIEndpoint:         sdk.conf.Endpoint,
-				availableServiceIDs: sdk.KnownServices(),
-			}
-		}
-		return sdk.cc.GetConn(ctx, endpoint.Address)
-	}
-}
-
-type ServiceIsNotAvailableError struct {
-	ServiceID           Endpoint
-	APIEndpoint         string
-	availableServiceIDs []string
-}
-
-func (s *ServiceIsNotAvailableError) Error() string {
-	return fmt.Sprintf("Service \"%v\" is not available at Cloud API endpoint \"%v\". Available services: %v",
-		s.ServiceID,
-		s.APIEndpoint,
-		s.availableServiceIDs,
-	)
-}
-
-var _ error = &ServiceIsNotAvailableError{}
-
-func (sdk *SDK) initDone() (b bool) {
-	sdk.endpoints.mu.Lock()
-	b = sdk.endpoints.initDone
-	sdk.endpoints.mu.Unlock()
-	return
-}
-
-func (sdk *SDK) KnownServices() []string {
-	sdk.endpoints.mu.Lock()
-	result := make([]string, 0, len(sdk.endpoints.ep))
-	for k := range sdk.endpoints.ep {
-		result = append(result, string(k))
-	}
-	sdk.endpoints.mu.Unlock()
-	sort.Strings(result)
-	return result
-}
-
-func (sdk *SDK) Endpoint(endpointName Endpoint) (ep *endpoint.ApiEndpoint, exist bool) {
-	sdk.endpoints.mu.Lock()
-	ep, exist = sdk.endpoints.ep[endpointName]
-	sdk.endpoints.mu.Unlock()
-	return
-}
-
-func (sdk *SDK) InitErr() error {
-	sdk.muErr.Lock()
-	defer sdk.muErr.Unlock()
-	return sdk.initErr
-}
-
-func (sdk *SDK) initConns(ctx context.Context) error {
-	discoveryConn, err := sdk.cc.GetConn(ctx, sdk.conf.Endpoint)
-	if err != nil {
-		return err
-	}
-	ec := endpoint.NewApiEndpointServiceClient(discoveryConn)
-	const defaultEndpointPageSize = 100
-	listResponse, err := ec.List(ctx, &endpoint.ListApiEndpointsRequest{
-		PageSize: defaultEndpointPageSize,
-	})
-	if err != nil {
-		return err
-	}
-	sdk.endpoints.mu.Lock()
-	sdk.endpoints.ep = make(map[Endpoint]*endpoint.ApiEndpoint, len(listResponse.Endpoints))
-	for _, e := range listResponse.Endpoints {
-		sdk.endpoints.ep[Endpoint(e.Id)] = e
-	}
-	sdk.endpoints.initDone = true
-	sdk.endpoints.mu.Unlock()
-	return nil
-}
-
-func (sdk *SDK) CreateIAMToken(ctx context.Context) (*iampb.CreateIamTokenResponse, error) {
-	creds := sdk.conf.Credentials
-	switch creds := creds.(type) {
-	case ExchangeableCredentials:
-		req, err := creds.IAMTokenRequest()
+	if buildOptions.DefaultRetryOptions {
+		retryOpt, err := retry.DefaultRetryDialOption()
 		if err != nil {
-			return nil, sdkerrors.WithMessage(err, "IAM token request build failed")
+			return nil, fmt.Errorf("failed to apply default retry options: %w", err)
 		}
-		return sdk.IAM().IamToken().Create(ctx, req)
-	case NonExchangeableCredentials:
-		return creds.IAMToken(ctx)
-	default:
-		return nil, fmt.Errorf("credentials type %T is not supported yet", creds)
+		dialOpts = append(dialOpts, retryOpt)
 	}
-}
 
-func (sdk *SDK) CreateIAMTokenForServiceAccount(ctx context.Context, serviceAccountID string) (*iampb.CreateIamTokenResponse, error) {
-	token, err := sdk.IAM().IamToken().CreateForServiceAccount(ctx, &iampb.CreateIamTokenForServiceAccountRequest{
-		ServiceAccountId: serviceAccountID,
-	})
-	if err != nil {
-		return nil, err
+	if len(buildOptions.RetryOptions) > 0 {
+		retryOpt, err := retry.RetryDialOption(buildOptions.RetryOptions...)
+		if err != nil {
+			return nil, fmt.Errorf("failed to apply retry options: %w", err)
+		}
+		dialOpts = append(dialOpts, retryOpt)
 	}
-	return &iampb.CreateIamTokenResponse{
-		IamToken:  token.IamToken,
-		ExpiresAt: token.ExpiresAt,
+
+	dialOpts = append(dialOpts, buildOptions.CustomDialOpts...)
+
+	connectionPool := transportgrpc.NewConnPool(dialOpts)
+
+	return &SDK{
+		conn:     transport.NewConnector(buildOptions.EndpointsResolver, connectionPool),
+		connPool: connectionPool,
 	}, nil
 }
 
-var now = time.Now
-
-// StorageAPI returns storage object for operating with Object Storage service.
-func (sdk *SDK) StorageAPI() *storage.StorageAPI {
-	return storage.NewStorageAPI(sdk.getConn(StorageAPIServiceID))
+// GetConnection retrieves a gRPC client connection for the specified method with optional call options.
+func (sdk *SDK) GetConnection(ctx context.Context, method protoreflect.FullName, opts ...grpc.CallOption) (grpc.ClientConnInterface, error) {
+	return sdk.conn.GetConnection(ctx, method, opts...)
 }
 
-// Monitoring returns object for operating with Monitoring service.
-func (sdk *SDK) Monitoring() *monitoring.Monitoring {
-	return monitoring.NewMonitoring(sdk.getConn(MonitoringServiceID))
+// Shutdown gracefully terminates the SDK by closing all active gRPC connections in the connection pool.
+func (sdk *SDK) Shutdown(ctx context.Context) error {
+	return sdk.connPool.Shutdown(ctx)
 }
 
-// Backup returns backup for operating with Backup service.
-func (sdk *SDK) Backup() *backup.Backup {
-	return backup.NewBackup(sdk.getConn(BackupServiceID))
+// userAgent returns the User-Agent string that includes the SDK name and its version, read from the build info.
+func userAgent() string {
+	cloudUserAgent := "yandex-cloud/go-sdk-v2"
+
+	build, _ := debug.ReadBuildInfo()
+	version := "unknown"
+
+	if build.Main.Version != "" {
+		version = build.Main.Version
+	}
+
+	return fmt.Sprintf("%s/%s", cloudUserAgent, version)
 }
 
-// AuditTrails returns object for operating with Audit Trails service.
-func (sdk *SDK) AuditTrails() *audittrails.AuditTrails {
-	return audittrails.NewAuditTrails(sdk.getConn(AuditTrailsServiceID))
+// defaultAuthenticator initializes an Authenticator using provided credentials and an endpoint resolver in the given context.
+func defaultAuthenticator(ctx context.Context, logger *zap.Logger, creds credentials.Credentials, resolver endpoints.EndpointsResolver) (authentication.Authenticator, error) {
+	authEndpoint, err := resolver.Endpoint(ctx, iamsdk.IamTokenCreate)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get auth endpoint: %w", err)
+	}
+
+	authernticator, err := authentication.NewAuthenticatorFromEndpoint(logger, creds, authEndpoint)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create authenticator: %w", err)
+	}
+	return authernticator, nil
+}
+
+// BuildEndpointsResolver creates an EndpointsResolver using a discovery endpoint to dynamically map service prefixes.
+func buildEndpointsResolver(ctx context.Context, discoveryEndpoint string) (endpoints.EndpointsResolver, error) {
+	conn := transport.NewSingleConnector(discoveryEndpoint, grpc.WithTransportCredentials(grpccreds.NewTLS(&tls.Config{})))
+	client := endpointsdk.NewApiEndpointClient(conn)
+
+	resp, err := client.List(ctx, &endpointpb.ListApiEndpointsRequest{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to list endpoints: %w", err)
+	}
+
+	// Map endpoint IDs to addresses
+	endpointMap := make(map[string]string, len(resp.Endpoints))
+	for _, ep := range resp.Endpoints {
+		endpointMap[ep.Id] = ep.Address
+	}
+
+	// Build resolver from dynamic endpoints
+	p2e := make(endpoints.PrefixToEndpoint, len(endpointssdk.DynamicEndpoints))
+	for prefix, id := range endpointssdk.DynamicEndpoints {
+		if addr, ok := endpointMap[id]; ok {
+			p2e[prefix] = endpoints.NewEndpointParams(addr)
+		}
+	}
+
+	return endpoints.NewPrefixEndpointsResolver(p2e), nil
 }

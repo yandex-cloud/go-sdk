@@ -5,31 +5,37 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/c2h5oh/datasize"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
-	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/mongodb/v1"
-	"github.com/yandex-cloud/go-genproto/yandex/cloud/vpc/v1"
-	ycsdk "github.com/yandex-cloud/go-sdk"
+	mdb "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/mongodb/v1"
+	vpc "github.com/yandex-cloud/go-genproto/yandex/cloud/vpc/v1"
+	ycsdk "github.com/yandex-cloud/go-sdk/v2"
+	"github.com/yandex-cloud/go-sdk/v2/credentials"
+	"github.com/yandex-cloud/go-sdk/v2/pkg/options"
+	mdbsdk "github.com/yandex-cloud/go-sdk/v2/services/mdb/mongodb/v1"
+	vpcsdk "github.com/yandex-cloud/go-sdk/v2/services/vpc/v1"
 )
 
 func main() {
 	flags := parseCmd()
-
 	ctx := context.Background()
-	sdk, err := ycsdk.Build(ctx, ycsdk.Config{
-		Credentials: ycsdk.OAuthToken(*flags.token),
-	})
 
+	sdk, err := ycsdk.Build(ctx,
+		options.WithCredentials(credentials.IAMToken(*flags.token)),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	fillMissingFlags(ctx, sdk, flags)
 
-	cluster := createCluster(ctx, sdk, flags)
+	req := createClusterRequest(flags)
+	cluster := createCluster(ctx, sdk, req)
 	defer deleteCluster(ctx, sdk, cluster)
+
 	changeClusterDescription(ctx, sdk, cluster)
 	addClusterHost(ctx, sdk, cluster, flags)
 }
@@ -47,42 +53,41 @@ type cmdFlags struct {
 	userPassword *string
 }
 
-func parseCmd() (ret *cmdFlags) {
-	ret = &cmdFlags{}
-	ret.token = flag.String("token", "", "")
-	ret.folderID = flag.String("folder-id", "", "Your Yandex.Cloud folder id")
-	ret.zoneID = flag.String("zone", "ru-central1-b", "Compute Engine zone to deploy to.")
+func parseCmd() *cmdFlags {
+	ret := &cmdFlags{}
+	ret.token = flag.String("token", os.Getenv("YC_IAM_TOKEN"), "")
+	ret.folderID = flag.String("folder-id", os.Getenv("YC_FOLDER_ID"), "Your Yandex.Cloud folder id")
+	ret.zoneID = flag.String("zone", "ru-central1-b", "Compute Engine zone to deploy to")
 	ret.networkID = flag.String("network-id", "", "Your Yandex.Cloud network id")
 	ret.subnetID = flag.String("subnet-id", "", "Subnet of the instance")
-	ret.clusterName = flag.String("cluster-name", "mongodb666", "")
-	ret.clusterDesc = flag.String("cluster-desc", "", "")
-	ret.dbName = flag.String("db-name", "db1", "")
-	ret.userName = flag.String("user-name", "user1", "")
-	ret.userPassword = flag.String("user-password", "password123", "")
+	ret.clusterName = flag.String("cluster-name", "mongodb666", "Cluster name")
+	ret.clusterDesc = flag.String("cluster-desc", "", "Cluster description")
+	ret.dbName = flag.String("db-name", "db1", "Database name")
+	ret.userName = flag.String("user-name", "user1", "User name")
+	ret.userPassword = flag.String("user-password", "password123", "User password")
 
 	flag.Parse()
-	return
+	return ret
 }
 
 func fillMissingFlags(ctx context.Context, sdk *ycsdk.SDK, flags *cmdFlags) {
 	if *flags.networkID == "" {
 		flags.networkID = findNetwork(ctx, sdk, *flags.folderID)
 	}
-
 	if *flags.subnetID == "" {
 		flags.subnetID = findSubnet(ctx, sdk, *flags.folderID, *flags.networkID, *flags.zoneID)
 	}
 }
 
 func findNetwork(ctx context.Context, sdk *ycsdk.SDK, folderID string) *string {
-	resp, err := sdk.VPC().Network().List(ctx, &vpc.ListNetworksRequest{
+	resp, err := vpcsdk.NewNetworkClient(sdk).List(ctx, &vpc.ListNetworksRequest{
 		FolderId: folderID,
 		PageSize: 100,
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
-	networkID := ""
+	var networkID string
 	for _, network := range resp.Networks {
 		if network.FolderId != folderID {
 			continue
@@ -96,15 +101,15 @@ func findNetwork(ctx context.Context, sdk *ycsdk.SDK, folderID string) *string {
 	return &networkID
 }
 
-func findSubnet(ctx context.Context, sdk *ycsdk.SDK, folderID string, networkID string, zone string) *string {
-	resp, err := sdk.VPC().Subnet().List(ctx, &vpc.ListSubnetsRequest{
+func findSubnet(ctx context.Context, sdk *ycsdk.SDK, folderID, networkID, zone string) *string {
+	resp, err := vpcsdk.NewSubnetClient(sdk).List(ctx, &vpc.ListSubnetsRequest{
 		FolderId: folderID,
 		PageSize: 100,
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
-	subnetID := ""
+	var subnetID string
 	for _, subnet := range resp.Subnets {
 		if subnet.ZoneId != zone || subnet.NetworkId != networkID {
 			continue
@@ -118,120 +123,118 @@ func findSubnet(ctx context.Context, sdk *ycsdk.SDK, folderID string, networkID 
 	return &subnetID
 }
 
-func createCluster(ctx context.Context, sdk *ycsdk.SDK, flags *cmdFlags) *mongodb.Cluster {
-	req := createClusterRequest(flags)
-
-	op, err := sdk.WrapOperation(sdk.MDB().MongoDB().Cluster().Create(ctx, req))
-
+func createCluster(ctx context.Context, sdk *ycsdk.SDK, req *mdb.CreateClusterRequest) *mdb.Cluster {
+	op, err := mdbsdk.NewClusterClient(sdk).Create(ctx, req)
 	if err != nil {
 		log.Fatal(err)
 	}
-	meta, err := op.Metadata()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("Creating cluster %s\n",
-		meta.(*mongodb.CreateClusterMetadata).ClusterId)
+	fmt.Printf("Creating cluster %s\n", op.Metadata())
 
-	err = op.Wait(ctx)
+	cluster, err := op.Wait(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
-	resp, err := op.Response()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return resp.(*mongodb.Cluster)
+	return cluster
 }
 
-func addClusterHost(ctx context.Context, sdk *ycsdk.SDK, cluster *mongodb.Cluster, params *cmdFlags) {
+func addClusterHost(ctx context.Context, sdk *ycsdk.SDK, cluster *mdb.Cluster, params *cmdFlags) {
 	fmt.Printf("Adding host to cluster %s\n", cluster.Id)
-	hostSpec := mongodb.HostSpec{
+	hostSpec := mdb.HostSpec{
 		ZoneId:         *params.zoneID,
 		SubnetId:       *params.subnetID,
-		AssignPublicIp: false}
+		AssignPublicIp: false,
+	}
+	hostSpecs := []*mdb.HostSpec{&hostSpec}
+	req := mdb.AddClusterHostsRequest{
+		ClusterId: cluster.Id,
+		HostSpecs: hostSpecs,
+	}
 
-	hostSpecs := []*mongodb.HostSpec{&hostSpec}
-	req := mongodb.AddClusterHostsRequest{ClusterId: cluster.Id, HostSpecs: hostSpecs}
-	op, err := sdk.WrapOperation(sdk.MDB().MongoDB().Cluster().AddHosts(ctx, &req))
+	op, err := mdbsdk.NewClusterClient(sdk).AddHosts(ctx, &req)
 	if err != nil {
 		log.Panic(err)
 	}
-	err = op.Wait(ctx)
-	if err != nil {
+	if _, err := op.Wait(ctx); err != nil {
 		log.Panic(err)
 	}
 }
 
-func changeClusterDescription(ctx context.Context, sdk *ycsdk.SDK, cluster *mongodb.Cluster) {
+func changeClusterDescription(ctx context.Context, sdk *ycsdk.SDK, cluster *mdb.Cluster) {
 	fmt.Printf("Updating cluster %s\n", cluster.Id)
-	mask := &fieldmaskpb.FieldMask{
-		Paths: []string{
-			"description",
-		},
+	mask := &fieldmaskpb.FieldMask{Paths: []string{"description"}}
+	req := mdb.UpdateClusterRequest{
+		ClusterId:   cluster.Id,
+		UpdateMask:  mask,
+		Description: "New Description!!!",
 	}
-	req := mongodb.UpdateClusterRequest{ClusterId: cluster.Id, UpdateMask: mask, Description: "New Description!!!"}
-	op, err := sdk.WrapOperation(sdk.MDB().MongoDB().Cluster().Update(ctx, &req))
+
+	op, err := mdbsdk.NewClusterClient(sdk).Update(ctx, &req)
 	if err != nil {
 		log.Panic(err)
 	}
-	err = op.Wait(ctx)
-	if err != nil {
+	if _, err := op.Wait(ctx); err != nil {
 		log.Panic(err)
 	}
 }
 
-func deleteCluster(ctx context.Context, sdk *ycsdk.SDK, cluster *mongodb.Cluster) {
+func deleteCluster(ctx context.Context, sdk *ycsdk.SDK, cluster *mdb.Cluster) {
 	fmt.Printf("Deleting cluster %s\n", cluster.Id)
-	op, err := sdk.WrapOperation(sdk.MDB().MongoDB().Cluster().Delete(ctx, &mongodb.DeleteClusterRequest{ClusterId: cluster.Id}))
+	op, err := mdbsdk.NewClusterClient(sdk).Delete(ctx, &mdb.DeleteClusterRequest{
+		ClusterId: cluster.Id,
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = op.Wait(ctx)
-	if err != nil {
+	if _, err := op.Wait(ctx); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func createClusterRequest(params *cmdFlags) *mongodb.CreateClusterRequest {
-	dbSpec := mongodb.DatabaseSpec{Name: *params.dbName}
-	dbSpecs := []*mongodb.DatabaseSpec{&dbSpec}
+func createClusterRequest(params *cmdFlags) *mdb.CreateClusterRequest {
+	dbSpec := mdb.DatabaseSpec{Name: *params.dbName}
+	dbSpecs := []*mdb.DatabaseSpec{&dbSpec}
 
-	permission := mongodb.Permission{DatabaseName: *params.dbName}
-	permissions := []*mongodb.Permission{&permission}
-	userSpec := mongodb.UserSpec{Name: *params.userName, Password: *params.userPassword, Permissions: permissions}
-	userSpecs := []*mongodb.UserSpec{&userSpec}
+	perm := mdb.Permission{DatabaseName: *params.dbName}
+	perms := []*mdb.Permission{&perm}
 
-	hostSpec := mongodb.HostSpec{
+	userSpec := mdb.UserSpec{
+		Name:        *params.userName,
+		Password:    *params.userPassword,
+		Permissions: perms,
+	}
+	userSpecs := []*mdb.UserSpec{&userSpec}
+
+	hostSpec := mdb.HostSpec{
 		ZoneId:         *params.zoneID,
 		SubnetId:       *params.subnetID,
-		AssignPublicIp: false}
+		AssignPublicIp: false,
+	}
+	hostSpecs := []*mdb.HostSpec{&hostSpec}
 
-	hostSpecs := []*mongodb.HostSpec{&hostSpec}
+	res := &mdb.Resources{
+		ResourcePresetId: "s1.micro",
+		DiskSize:         int64(10 * datasize.GB.Bytes()),
+		DiskTypeId:       "network-ssd",
+	}
 
-	res := &mongodb.Resources{ResourcePresetId: "s1.nano", DiskSize: int64(10 * datasize.GB.Bytes()), DiskTypeId: "network-nvme"}
-	configSpec := &mongodb.ConfigSpec{
-		Version: "3.6",
-		MongodbSpec: &mongodb.ConfigSpec_MongodbSpec_3_6{
-			MongodbSpec_3_6: &mongodb.MongodbSpec3_6{
-				Mongod: &mongodb.MongodbSpec3_6_Mongod{
-					Resources: res,
-				},
+	configSpec := &mdb.ConfigSpec{
+		Version: "6.0",
+		MongodbSpec: &mdb.ConfigSpec_MongodbSpec_6_0{
+			MongodbSpec_6_0: &mdb.MongodbSpec6_0{
+				Mongod: &mdb.MongodbSpec6_0_Mongod{Resources: res},
 			},
 		},
 	}
 
-	req := mongodb.CreateClusterRequest{
+	return &mdb.CreateClusterRequest{
 		FolderId:      *params.folderID,
 		Name:          *params.clusterName,
 		Description:   *params.clusterDesc,
-		Environment:   mongodb.Cluster_PRODUCTION,
+		Environment:   mdb.Cluster_PRODUCTION,
 		ConfigSpec:    configSpec,
 		DatabaseSpecs: dbSpecs,
 		UserSpecs:     userSpecs,
 		HostSpecs:     hostSpecs,
 		NetworkId:     *params.networkID,
 	}
-	return &req
 }

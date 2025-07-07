@@ -5,31 +5,37 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/c2h5oh/datasize"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
-	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/postgresql/v1"
-	"github.com/yandex-cloud/go-genproto/yandex/cloud/vpc/v1"
-	ycsdk "github.com/yandex-cloud/go-sdk"
+	postgresql "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/postgresql/v1"
+	vpc "github.com/yandex-cloud/go-genproto/yandex/cloud/vpc/v1"
+	ycsdk "github.com/yandex-cloud/go-sdk/v2"
+	"github.com/yandex-cloud/go-sdk/v2/credentials"
+	"github.com/yandex-cloud/go-sdk/v2/pkg/options"
+	pgsdk "github.com/yandex-cloud/go-sdk/v2/services/mdb/postgresql/v1"
+	vpcsdk "github.com/yandex-cloud/go-sdk/v2/services/vpc/v1"
 )
 
 func main() {
 	flags := parseCmd()
 	ctx := context.Background()
 
-	sdk, err := ycsdk.Build(ctx, ycsdk.Config{
-		Credentials: ycsdk.OAuthToken(*flags.token),
-	})
-
+	sdk, err := ycsdk.Build(ctx,
+		options.WithCredentials(credentials.IAMToken(*flags.token)),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	fillMissingFlags(ctx, sdk, flags)
 
-	cluster := createCluster(ctx, sdk, flags)
+	req := createClusterRequest(flags)
+	cluster := createCluster(ctx, sdk, req)
 	defer deleteCluster(ctx, sdk, cluster)
+
 	changeClusterDescription(ctx, sdk, cluster)
 	addClusterHost(ctx, sdk, cluster, flags)
 }
@@ -47,48 +53,46 @@ type cmdFlags struct {
 	userPassword *string
 }
 
-func parseCmd() (ret *cmdFlags) {
-	ret = &cmdFlags{}
-	ret.token = flag.String("token", "", "")
-	ret.folderID = flag.String("folder-id", "", "Your Yandex.Cloud folder id")
-	ret.zoneID = flag.String("zone", "ru-central1-b", "Compute Engine zone to deploy to.")
-	ret.networkID = flag.String("network-id", "", "Your Yandex.Cloud network id")
-	ret.subnetID = flag.String("subnet-id", "", "Subnet of the instance")
-	ret.clusterName = flag.String("cluster-name", "mongodb666", "")
-	ret.clusterDesc = flag.String("cluster-desc", "", "")
-	ret.dbName = flag.String("db-name", "db1", "")
-	ret.userName = flag.String("user-name", "user1", "")
-	ret.userPassword = flag.String("user-password", "password123", "")
+func parseCmd() *cmdFlags {
+	ret := &cmdFlags{}
+	ret.token = flag.String("token", os.Getenv("YC_IAM_TOKEN"), "")
+	ret.folderID = flag.String("folder-id", os.Getenv("YC_FOLDER_ID"), "Yandex.Cloud folder ID")
+	ret.zoneID = flag.String("zone", "ru-central1-b", "Zone to deploy to")
+	ret.networkID = flag.String("network-id", "", "VPC network ID")
+	ret.subnetID = flag.String("subnet-id", "", "VPC subnet ID")
+	ret.clusterName = flag.String("cluster-name", "postgresql666", "Cluster name")
+	ret.clusterDesc = flag.String("cluster-desc", "", "Cluster description")
+	ret.dbName = flag.String("db-name", "db1", "Database name")
+	ret.userName = flag.String("user-name", "user1", "Username")
+	ret.userPassword = flag.String("user-password", "password123", "User password")
 
 	flag.Parse()
-	return
+	return ret
 }
 
 func fillMissingFlags(ctx context.Context, sdk *ycsdk.SDK, flags *cmdFlags) {
 	if *flags.networkID == "" {
 		flags.networkID = findNetwork(ctx, sdk, *flags.folderID)
 	}
-
 	if *flags.subnetID == "" {
 		flags.subnetID = findSubnet(ctx, sdk, *flags.folderID, *flags.networkID, *flags.zoneID)
 	}
 }
 
 func findNetwork(ctx context.Context, sdk *ycsdk.SDK, folderID string) *string {
-	resp, err := sdk.VPC().Network().List(ctx, &vpc.ListNetworksRequest{
+	resp, err := vpcsdk.NewNetworkClient(sdk).List(ctx, &vpc.ListNetworksRequest{
 		FolderId: folderID,
 		PageSize: 100,
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
-	networkID := ""
-	for _, network := range resp.Networks {
-		if network.FolderId != folderID {
-			continue
+	var networkID string
+	for _, net := range resp.Networks {
+		if net.FolderId == folderID {
+			networkID = net.Id
+			break
 		}
-		networkID = network.Id
-		break
 	}
 	if networkID == "" {
 		log.Fatalf("no networks in folder: %s", folderID)
@@ -96,133 +100,130 @@ func findNetwork(ctx context.Context, sdk *ycsdk.SDK, folderID string) *string {
 	return &networkID
 }
 
-func findSubnet(ctx context.Context, sdk *ycsdk.SDK, folderID string, networkID string, zone string) *string {
-	resp, err := sdk.VPC().Subnet().List(ctx, &vpc.ListSubnetsRequest{
+func findSubnet(ctx context.Context, sdk *ycsdk.SDK, folderID, networkID, zone string) *string {
+	resp, err := vpcsdk.NewSubnetClient(sdk).List(ctx, &vpc.ListSubnetsRequest{
 		FolderId: folderID,
 		PageSize: 100,
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
-	subnetID := ""
-	for _, subnet := range resp.Subnets {
-		if subnet.ZoneId != zone || subnet.NetworkId != networkID {
-			continue
+	var subnetID string
+	for _, sn := range resp.Subnets {
+		if sn.NetworkId == networkID && sn.ZoneId == zone {
+			subnetID = sn.Id
+			break
 		}
-		subnetID = subnet.Id
-		break
 	}
 	if subnetID == "" {
-		log.Fatalf("no subnets in zone: %s", zone)
+		log.Fatalf("no subnets in zone %s for network %s", zone, networkID)
 	}
 	return &subnetID
 }
 
-func createCluster(ctx context.Context, sdk *ycsdk.SDK, flags *cmdFlags) *postgresql.Cluster {
-	req := createClusterRequest(flags)
-
-	op, err := sdk.WrapOperation(sdk.MDB().PostgreSQL().Cluster().Create(ctx, req))
-
+func createCluster(ctx context.Context, sdk *ycsdk.SDK, req *postgresql.CreateClusterRequest) *postgresql.Cluster {
+	op, err := pgsdk.NewClusterClient(sdk).Create(ctx, req)
 	if err != nil {
 		log.Fatal(err)
 	}
-	meta, err := op.Metadata()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("Creating cluster %s\n",
-		meta.(*postgresql.CreateClusterMetadata).ClusterId)
+	fmt.Printf("Creating cluster %s\n", op.Metadata())
 
-	err = op.Wait(ctx)
+	cluster, err := op.Wait(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
-	resp, err := op.Response()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return resp.(*postgresql.Cluster)
+	return cluster
 }
 
-func addClusterHost(ctx context.Context, sdk *ycsdk.SDK, cluster *postgresql.Cluster, params *cmdFlags) {
+func addClusterHost(ctx context.Context, sdk *ycsdk.SDK, cluster *postgresql.Cluster, flags *cmdFlags) {
 	fmt.Printf("Adding host to cluster %s\n", cluster.Id)
-	hostSpec := postgresql.HostSpec{
-		ZoneId:         *params.zoneID,
-		SubnetId:       *params.subnetID,
-		AssignPublicIp: false}
-
-	hostSpecs := []*postgresql.HostSpec{&hostSpec}
-	req := postgresql.AddClusterHostsRequest{ClusterId: cluster.Id, HostSpecs: hostSpecs}
-	op, err := sdk.WrapOperation(sdk.MDB().PostgreSQL().Cluster().AddHosts(ctx, &req))
+	host := postgresql.HostSpec{
+		ZoneId:         *flags.zoneID,
+		SubnetId:       *flags.subnetID,
+		AssignPublicIp: false,
+	}
+	req := &postgresql.AddClusterHostsRequest{
+		ClusterId: cluster.Id,
+		HostSpecs: []*postgresql.HostSpec{&host},
+	}
+	op, err := pgsdk.NewClusterClient(sdk).AddHosts(ctx, req)
 	if err != nil {
 		log.Panic(err)
 	}
-	err = op.Wait(ctx)
-	if err != nil {
+	if _, err := op.Wait(ctx); err != nil {
 		log.Panic(err)
 	}
 }
 
 func changeClusterDescription(ctx context.Context, sdk *ycsdk.SDK, cluster *postgresql.Cluster) {
 	fmt.Printf("Updating cluster %s\n", cluster.Id)
-	mask := &fieldmaskpb.FieldMask{
-		Paths: []string{
-			"description",
-		},
+	mask := &fieldmaskpb.FieldMask{Paths: []string{"description"}}
+	req := &postgresql.UpdateClusterRequest{
+		ClusterId:   cluster.Id,
+		UpdateMask:  mask,
+		Description: "New Description!!!",
 	}
-	req := postgresql.UpdateClusterRequest{ClusterId: cluster.Id, UpdateMask: mask, Description: "New Description!!!"}
-	op, err := sdk.WrapOperation(sdk.MDB().PostgreSQL().Cluster().Update(ctx, &req))
+	op, err := pgsdk.NewClusterClient(sdk).Update(ctx, req)
 	if err != nil {
 		log.Panic(err)
 	}
-	err = op.Wait(ctx)
-	if err != nil {
+	if _, err := op.Wait(ctx); err != nil {
 		log.Panic(err)
 	}
 }
 
 func deleteCluster(ctx context.Context, sdk *ycsdk.SDK, cluster *postgresql.Cluster) {
 	fmt.Printf("Deleting cluster %s\n", cluster.Id)
-	op, err := sdk.WrapOperation(sdk.MDB().PostgreSQL().Cluster().Delete(ctx, &postgresql.DeleteClusterRequest{ClusterId: cluster.Id}))
+	op, err := pgsdk.NewClusterClient(sdk).Delete(ctx, &postgresql.DeleteClusterRequest{
+		ClusterId: cluster.Id,
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = op.Wait(ctx)
-	if err != nil {
+	if _, err := op.Wait(ctx); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func createClusterRequest(params *cmdFlags) *postgresql.CreateClusterRequest {
-	dbSpec := postgresql.DatabaseSpec{Name: *params.dbName, Owner: *params.userName}
-	dbSpecs := []*postgresql.DatabaseSpec{&dbSpec}
-
-	permission := postgresql.Permission{DatabaseName: *params.dbName}
-	permissions := []*postgresql.Permission{&permission}
-	userSpec := postgresql.UserSpec{Name: *params.userName, Password: *params.userPassword, Permissions: permissions}
-	userSpecs := []*postgresql.UserSpec{&userSpec}
-
-	hostSpec := postgresql.HostSpec{
-		ZoneId:         *params.zoneID,
-		SubnetId:       *params.subnetID,
-		AssignPublicIp: false}
-
-	hostSpecs := []*postgresql.HostSpec{&hostSpec}
-
-	res := &postgresql.Resources{ResourcePresetId: "s1.nano", DiskSize: int64(10 * datasize.GB.Bytes()), DiskTypeId: "network-nvme"}
-	configSpec := postgresql.ConfigSpec{Version: "10", Resources: res}
-
-	req := postgresql.CreateClusterRequest{
-		FolderId:      *params.folderID,
-		Name:          *params.clusterName,
-		Description:   *params.clusterDesc,
-		Environment:   postgresql.Cluster_PRODUCTION,
-		ConfigSpec:    &configSpec,
-		DatabaseSpecs: dbSpecs,
-		UserSpecs:     userSpecs,
-		HostSpecs:     hostSpecs,
-		NetworkId:     *params.networkID,
+func createClusterRequest(flags *cmdFlags) *postgresql.CreateClusterRequest {
+	dbSpec := &postgresql.DatabaseSpec{
+		Name:  *flags.dbName,
+		Owner: *flags.userName,
 	}
-	return &req
+
+	perm := &postgresql.Permission{DatabaseName: *flags.dbName}
+	user := &postgresql.UserSpec{
+		Name:        *flags.userName,
+		Password:    *flags.userPassword,
+		Permissions: []*postgresql.Permission{perm},
+	}
+
+	host := &postgresql.HostSpec{
+		ZoneId:         *flags.zoneID,
+		SubnetId:       *flags.subnetID,
+		AssignPublicIp: false,
+	}
+
+	res := &postgresql.Resources{
+		ResourcePresetId: "s1.micro",
+		DiskSize:         int64(10 * datasize.GB.Bytes()),
+		DiskTypeId:       "network-ssd",
+	}
+
+	config := &postgresql.ConfigSpec{
+		Version:   "13",
+		Resources: res,
+	}
+
+	return &postgresql.CreateClusterRequest{
+		FolderId:      *flags.folderID,
+		Name:          *flags.clusterName,
+		Description:   *flags.clusterDesc,
+		Environment:   postgresql.Cluster_PRODUCTION,
+		ConfigSpec:    config,
+		DatabaseSpecs: []*postgresql.DatabaseSpec{dbSpec},
+		UserSpecs:     []*postgresql.UserSpec{user},
+		HostSpecs:     []*postgresql.HostSpec{host},
+		NetworkId:     *flags.networkID,
+	}
 }

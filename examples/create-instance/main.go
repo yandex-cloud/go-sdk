@@ -1,6 +1,3 @@
-// Copyright (c) 2018 Yandex LLC. All rights reserved.
-// Author: Maxim Kolganov <manykey@yandex-team.ru>
-
 package main
 
 import (
@@ -8,136 +5,183 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
+	"time"
 
-	"github.com/yandex-cloud/go-genproto/yandex/cloud/compute/v1"
-	"github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
-	"github.com/yandex-cloud/go-genproto/yandex/cloud/vpc/v1"
-	ycsdk "github.com/yandex-cloud/go-sdk"
+	computeapi "github.com/yandex-cloud/go-genproto/yandex/cloud/compute/v1"
+	vpcapi "github.com/yandex-cloud/go-genproto/yandex/cloud/vpc/v1"
+	ycsdk "github.com/yandex-cloud/go-sdk/v2"
+	"github.com/yandex-cloud/go-sdk/v2/credentials"
+	"github.com/yandex-cloud/go-sdk/v2/pkg/options"
+	computesdk "github.com/yandex-cloud/go-sdk/v2/services/compute/v1"
+	vpcsdk "github.com/yandex-cloud/go-sdk/v2/services/vpc/v1"
+)
+
+const (
+	defaultZone       = "ru-central1-b"
+	defaultPlatformID = "standard-v1"
+	defaultFamily     = "debian-9"
+	imageFolderID     = "standard-images"
+	createTimeout     = 5 * time.Minute
+	deleteTimeout     = 2 * time.Minute
 )
 
 func main() {
-	token := flag.String("token", "", "")
-	folderID := flag.String("folder-id", "", "Your Yandex.Cloud folder id")
-	zone := flag.String("zone", "ru-central1-b", "Compute Engine zone to deploy to.")
-	name := flag.String("name", "demo-instance", "New instance name.")
-	subnetID := flag.String("subnet-id", "", "Subnet of the instance")
+	if err := run(); err != nil {
+		log.Fatalf("fatal: %v", err)
+	}
+}
+
+func run() error {
+	iamToken := flag.String("token", os.Getenv("YC_IAM_TOKEN"), "IAM token for Yandex.Cloud (env YC_IAM_TOKEN)")
+	folderID := flag.String("folder-id", os.Getenv("YC_FOLDER_ID"), "Yandex.Cloud Folder ID (env YC_FOLDER_ID)")
+	zone := flag.String("zone", defaultZone, "Compute Engine zone")
+	name := flag.String("name", "demo-instance", "Name of the instance to create")
+	subnetID := flag.String("subnet-id", "", "Subnet ID (опционально)")
 	flag.Parse()
+
+	if *iamToken == "" {
+		return fmt.Errorf("token is required (use -token or set YC_IAM_TOKEN)")
+	}
+	if *folderID == "" {
+		return fmt.Errorf("folder-id is required (use -folder-id or set FOLDER_ID)")
+	}
 
 	ctx := context.Background()
 
-	sdk, err := ycsdk.Build(ctx, ycsdk.Config{
-		Credentials: ycsdk.OAuthToken(*token),
+	sdk, err := ycsdk.Build(ctx,
+		options.WithCredentials(credentials.IAMToken(*iamToken)),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to build SDK: %w", err)
+	}
+
+	computeClient := computesdk.NewInstanceClient(sdk)
+	imageClient := computesdk.NewImageClient(sdk)
+	subnetClient := vpcsdk.NewSubnetClient(sdk)
+
+	if *subnetID == "" {
+		log.Printf("No subnet-id provided, looking up in folder %s, zone %s…", *folderID, *zone)
+		id, err := findSubnet(ctx, subnetClient, *folderID, *zone)
+		if err != nil {
+			return fmt.Errorf("find subnet: %w", err)
+		}
+		*subnetID = id
+		log.Printf("→ Selected subnet-id: %s", *subnetID)
+	}
+
+	log.Printf("Fetching latest image for family %q…", defaultFamily)
+	imageID, err := getLatestImage(ctx, imageClient, imageFolderID, defaultFamily)
+	if err != nil {
+		return fmt.Errorf("get latest image: %w", err)
+	}
+	log.Printf("→ Image ID: %s", imageID)
+
+	op, err := createInstance(ctx, computeClient, *folderID, *zone, *name, *subnetID, imageID)
+	if err != nil {
+		return fmt.Errorf("create instance: %w", err)
+	}
+
+	ctxCreate, cancelCreate := context.WithTimeout(ctx, createTimeout)
+	defer cancelCreate()
+
+	log.Printf("Waiting for creation of instance %q…", *name)
+	createdInst, err := op.Wait(ctxCreate)
+	if err != nil {
+		return fmt.Errorf("wait create op: %w", err)
+	}
+	log.Printf("Instance %q created, ID=%s", *name, createdInst.Id)
+
+	log.Printf("Deleting instance ID=%s…", createdInst.Id)
+	delOp, err := computeClient.Delete(ctx, &computeapi.DeleteInstanceRequest{
+		InstanceId: createdInst.Id,
 	})
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("delete instance: %w", err)
 	}
-	op, err := sdk.WrapOperation(createInstance(
-		ctx, sdk, *folderID, *zone, *name, *subnetID))
-	if err != nil {
-		log.Fatal(err)
+
+	ctxDel, cancelDel := context.WithTimeout(ctx, deleteTimeout)
+	defer cancelDel()
+
+	if _, err := delOp.Wait(ctxDel); err != nil {
+		return fmt.Errorf("wait delete op: %w", err)
 	}
-	meta, err := op.Metadata()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("Creating instance %s\n",
-		meta.(*compute.CreateInstanceMetadata).InstanceId)
-	err = op.Wait(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	resp, err := op.Response()
-	if err != nil {
-		log.Fatal(err)
-	}
-	instance := resp.(*compute.Instance)
-	fmt.Printf("Deleting instance %s\n", instance.Id)
-	op, err = sdk.WrapOperation(deleteInstance(ctx, sdk, instance.Id))
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = op.Wait(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.Printf("Instance ID=%s deleted", createdInst.Id)
+
+	return nil
 }
 
-func createInstance(ctx context.Context, sdk *ycsdk.SDK, folderID, zone, name, subnetID string) (*operation.Operation, error) {
-	if subnetID == "" {
-		subnetID = findSubnet(ctx, sdk, folderID, zone)
-	}
-	sourceImageID := sourceImage(ctx, sdk)
-	request := &compute.CreateInstanceRequest{
+func createInstance(
+	ctx context.Context,
+	client computesdk.InstanceClient,
+	folderID, zone, name, subnetID, imageID string,
+) (*computesdk.InstanceCreateOperation, error) {
+	req := &computeapi.CreateInstanceRequest{
 		FolderId:   folderID,
 		Name:       name,
 		ZoneId:     zone,
-		PlatformId: "standard-v1",
-		ResourcesSpec: &compute.ResourcesSpec{
-			Cores:  1,
-			Memory: 2 * 1024 * 1024 * 1024,
+		PlatformId: defaultPlatformID,
+		ResourcesSpec: &computeapi.ResourcesSpec{
+			Cores:  2,
+			Memory: 2 * 1024 * 1024 * 1024, // 2 GiB
 		},
-		BootDiskSpec: &compute.AttachedDiskSpec{
+		BootDiskSpec: &computeapi.AttachedDiskSpec{
 			AutoDelete: true,
-			Disk: &compute.AttachedDiskSpec_DiskSpec_{
-				DiskSpec: &compute.AttachedDiskSpec_DiskSpec{
+			Disk: &computeapi.AttachedDiskSpec_DiskSpec_{
+				DiskSpec: &computeapi.AttachedDiskSpec_DiskSpec{
 					TypeId: "network-hdd",
-					Size:   20 * 1024 * 1024 * 1024,
-					Source: &compute.AttachedDiskSpec_DiskSpec_ImageId{
-						ImageId: sourceImageID,
+					Size:   20 * 1024 * 1024 * 1024, // 20 GiB
+					Source: &computeapi.AttachedDiskSpec_DiskSpec_ImageId{
+						ImageId: imageID,
 					},
 				},
 			},
 		},
-		NetworkInterfaceSpecs: []*compute.NetworkInterfaceSpec{
+		NetworkInterfaceSpecs: []*computeapi.NetworkInterfaceSpec{
 			{
 				SubnetId: subnetID,
-				PrimaryV4AddressSpec: &compute.PrimaryAddressSpec{
-					OneToOneNatSpec: &compute.OneToOneNatSpec{
-						IpVersion: compute.IpVersion_IPV4,
+				PrimaryV4AddressSpec: &computeapi.PrimaryAddressSpec{
+					OneToOneNatSpec: &computeapi.OneToOneNatSpec{
+						IpVersion: computeapi.IpVersion_IPV4,
 					},
 				},
 			},
 		},
 	}
-	op, err := sdk.Compute().Instance().Create(ctx, request)
-	return op, err
+	return client.Create(ctx, req)
 }
 
-func sourceImage(ctx context.Context, sdk *ycsdk.SDK) string {
-	image, err := sdk.Compute().Image().GetLatestByFamily(ctx, &compute.GetImageLatestByFamilyRequest{
-		FolderId: "standard-images",
-		Family:   "debian-9",
+func getLatestImage(
+	ctx context.Context,
+	client computesdk.ImageClient,
+	folderID, family string,
+) (string, error) {
+	resp, err := client.GetLatestByFamily(ctx, &computeapi.GetImageLatestByFamilyRequest{
+		FolderId: folderID,
+		Family:   family,
 	})
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
-	return image.Id
+	return resp.Id, nil
 }
 
-func deleteInstance(ctx context.Context, sdk *ycsdk.SDK, id string) (*operation.Operation, error) {
-	return sdk.Compute().Instance().Delete(ctx, &compute.DeleteInstanceRequest{
-		InstanceId: id,
-	})
-}
-
-func findSubnet(ctx context.Context, sdk *ycsdk.SDK, folderID string, zone string) string {
-	resp, err := sdk.VPC().Subnet().List(ctx, &vpc.ListSubnetsRequest{
+func findSubnet(
+	ctx context.Context,
+	client vpcsdk.SubnetClient,
+	folderID, zone string,
+) (string, error) {
+	resp, err := client.List(ctx, &vpcapi.ListSubnetsRequest{
 		FolderId: folderID,
 		PageSize: 100,
 	})
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
-	subnetID := ""
-	for _, subnet := range resp.Subnets {
-		if subnet.ZoneId != zone {
-			continue
+	for _, s := range resp.Subnets {
+		if s.ZoneId == zone {
+			return s.Id, nil
 		}
-		subnetID = subnet.Id
-		break
 	}
-	if subnetID == "" {
-		log.Fatalf("no subnets in zone: %s", zone)
-	}
-	return subnetID
+	return "", fmt.Errorf("no subnet found in zone %s", zone)
 }

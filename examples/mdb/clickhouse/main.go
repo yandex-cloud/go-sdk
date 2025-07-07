@@ -5,22 +5,27 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/c2h5oh/datasize"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/clickhouse/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/vpc/v1"
-	ycsdk "github.com/yandex-cloud/go-sdk"
+	ycsdk "github.com/yandex-cloud/go-sdk/v2"
+	"github.com/yandex-cloud/go-sdk/v2/credentials"
+	"github.com/yandex-cloud/go-sdk/v2/pkg/options"
+	clickhousesdk "github.com/yandex-cloud/go-sdk/v2/services/mdb/clickhouse/v1"
+	vpcsdk "github.com/yandex-cloud/go-sdk/v2/services/vpc/v1"
 )
 
 func main() {
 	flags := parseCmd()
 	ctx := context.Background()
 
-	sdk, err := ycsdk.Build(ctx, ycsdk.Config{
-		Credentials: ycsdk.OAuthToken(*flags.token),
-	})
+	sdk, err := ycsdk.Build(ctx,
+		options.WithCredentials(credentials.IAMToken(*flags.token)),
+	)
 
 	if err != nil {
 		log.Fatal(err)
@@ -50,8 +55,8 @@ type cmdFlags struct {
 
 func parseCmd() (ret *cmdFlags) {
 	ret = &cmdFlags{}
-	ret.token = flag.String("token", "", "")
-	ret.folderID = flag.String("folder-id", "", "Your Yandex.Cloud folder id")
+	ret.token = flag.String("token", os.Getenv("YC_IAM_TOKEN"), "")
+	ret.folderID = flag.String("folder-id", os.Getenv("YC_FOLDER_ID"), "Your Yandex.Cloud folder id")
 	ret.zoneID = flag.String("zone", "ru-central1-b", "Compute Engine zone to deploy to.")
 	ret.networkID = flag.String("network-id", "", "Your Yandex.Cloud network id")
 	ret.subnetID = flag.String("subnet-id", "", "Subnet of the instance")
@@ -76,10 +81,11 @@ func fillMissingFlags(ctx context.Context, sdk *ycsdk.SDK, flags *cmdFlags) {
 }
 
 func findNetwork(ctx context.Context, sdk *ycsdk.SDK, folderID string) *string {
-	resp, err := sdk.VPC().Network().List(ctx, &vpc.ListNetworksRequest{
+	resp, err := vpcsdk.NewNetworkClient(sdk).List(ctx, &vpc.ListNetworksRequest{
 		FolderId: folderID,
 		PageSize: 100,
 	})
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -98,10 +104,11 @@ func findNetwork(ctx context.Context, sdk *ycsdk.SDK, folderID string) *string {
 }
 
 func findSubnet(ctx context.Context, sdk *ycsdk.SDK, folderID string, networkID string, zone string) *string {
-	resp, err := sdk.VPC().Subnet().List(ctx, &vpc.ListSubnetsRequest{
+	resp, err := vpcsdk.NewSubnetClient(sdk).List(ctx, &vpc.ListSubnetsRequest{
 		FolderId: folderID,
 		PageSize: 100,
 	})
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -120,28 +127,19 @@ func findSubnet(ctx context.Context, sdk *ycsdk.SDK, folderID string, networkID 
 }
 
 func createCluster(ctx context.Context, sdk *ycsdk.SDK, req *clickhouse.CreateClusterRequest) *clickhouse.Cluster {
-	op, err := sdk.WrapOperation(sdk.MDB().Clickhouse().Cluster().Create(ctx, req))
+	op, err := clickhousesdk.NewClusterClient(sdk).Create(ctx, req)
 
 	if err != nil {
 		log.Fatal(err)
 	}
-	meta, err := op.Metadata()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("Creating cluster %s\n",
-		meta.(*clickhouse.CreateClusterMetadata).ClusterId)
+	fmt.Printf("Creating cluster %s\n", op.Metadata())
 
-	err = op.Wait(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	resp, err := op.Response()
+	cluster, err := op.Wait(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return resp.(*clickhouse.Cluster)
+	return cluster
 }
 
 func addClusterHost(ctx context.Context, sdk *ycsdk.SDK, cluster *clickhouse.Cluster, params *cmdFlags) {
@@ -153,11 +151,12 @@ func addClusterHost(ctx context.Context, sdk *ycsdk.SDK, cluster *clickhouse.Clu
 
 	hostSpecs := []*clickhouse.HostSpec{&hostSpec}
 	req := clickhouse.AddClusterHostsRequest{ClusterId: cluster.Id, HostSpecs: hostSpecs}
-	op, err := sdk.WrapOperation(sdk.MDB().Clickhouse().Cluster().AddHosts(ctx, &req))
+
+	op, err := clickhousesdk.NewClusterClient(sdk).AddHosts(ctx, &req)
 	if err != nil {
 		log.Panic(err)
 	}
-	err = op.Wait(ctx)
+	_, err = op.Wait(ctx)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -171,11 +170,12 @@ func changeClusterDescription(ctx context.Context, sdk *ycsdk.SDK, cluster *clic
 		},
 	}
 	updateReq := clickhouse.UpdateClusterRequest{ClusterId: cluster.Id, UpdateMask: mask, Description: "New Description!!!"}
-	op, err := sdk.WrapOperation(sdk.MDB().Clickhouse().Cluster().Update(ctx, &updateReq))
+
+	op, err := clickhousesdk.NewClusterClient(sdk).Update(ctx, &updateReq)
 	if err != nil {
 		log.Panic(err)
 	}
-	err = op.Wait(ctx)
+	_, err = op.Wait(ctx)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -183,11 +183,12 @@ func changeClusterDescription(ctx context.Context, sdk *ycsdk.SDK, cluster *clic
 
 func deleteCluster(ctx context.Context, sdk *ycsdk.SDK, cluster *clickhouse.Cluster) {
 	fmt.Printf("Deleting cluster %s\n", cluster.Id)
-	op, err := sdk.WrapOperation(sdk.MDB().Clickhouse().Cluster().Delete(ctx, &clickhouse.DeleteClusterRequest{ClusterId: cluster.Id}))
+	op, err := clickhousesdk.NewClusterClient(sdk).Delete(ctx, &clickhouse.DeleteClusterRequest{ClusterId: cluster.Id})
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = op.Wait(ctx)
+	_, err = op.Wait(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -214,8 +215,8 @@ func createClusterRequest(params *cmdFlags) *clickhouse.CreateClusterRequest {
 
 	hostSpecs := []*clickhouse.HostSpec{&hostCKSpec, &hostCKSpec, &hostZooSpec, &hostZooSpec, &hostZooSpec}
 
-	zres := &clickhouse.Resources{ResourcePresetId: "s1.nano", DiskSize: int64(10 * datasize.GB.Bytes()), DiskTypeId: "network-nvme"}
-	cres := &clickhouse.Resources{ResourcePresetId: "s1.nano", DiskSize: int64(10 * datasize.GB.Bytes()), DiskTypeId: "network-nvme"}
+	zres := &clickhouse.Resources{ResourcePresetId: "s1.micro", DiskSize: int64(10 * datasize.GB.Bytes()), DiskTypeId: "network-ssd"}
+	cres := &clickhouse.Resources{ResourcePresetId: "s1.micro", DiskSize: int64(10 * datasize.GB.Bytes()), DiskTypeId: "network-ssd"}
 
 	configSpec := &clickhouse.ConfigSpec{
 		Clickhouse: &clickhouse.ConfigSpec_Clickhouse{Resources: cres},

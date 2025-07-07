@@ -1,6 +1,3 @@
-// Copyright (c) 2023 Yandex LLC. All rights reserved.
-// Author: Dmitry Novikov <novikoff@yandex-team.ru>
-
 package main
 
 import (
@@ -15,108 +12,128 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yandex-cloud/go-genproto/yandex/cloud/marketplace/licensemanager/v1"
-	ycsdk "github.com/yandex-cloud/go-sdk"
+	licensemanagerapi "github.com/yandex-cloud/go-genproto/yandex/cloud/marketplace/licensemanager/v1"
+	ycsdk "github.com/yandex-cloud/go-sdk/v2"
+	credentials "github.com/yandex-cloud/go-sdk/v2/credentials"
+	"github.com/yandex-cloud/go-sdk/v2/pkg/options"
+	licensemanagersdk "github.com/yandex-cloud/go-sdk/v2/services/marketplace/licensemanager/v1"
+)
+
+const (
+	checkPeriod = time.Minute
 )
 
 func main() {
-	var licenseInstanceID string
-	var period time.Duration
-	var apiEndpoint string
-	var insecureSkipVerify bool
+	var (
+		licenseInstanceID  string
+		period             time.Duration
+		apiEndpoint        string
+		insecureSkipVerify bool
+	)
 	flag.StringVar(&licenseInstanceID, "license-instance-id", "", "license instance id")
-	flag.DurationVar(&period, "period", time.Minute, "check period")
+	flag.DurationVar(&period, "period", checkPeriod, "check period")
 	flag.StringVar(&apiEndpoint, "endpoint", "", "api endpoint")
 	flag.BoolVar(&insecureSkipVerify, "insecure-skip-verify", false, "do not check certificate")
 	flag.Parse()
+
+	if licenseInstanceID == "" {
+		log.Fatal("parameter -license-instance-id is required")
+	}
+
 	log.Println("LicenseInstanceID:", licenseInstanceID)
+
 	computeInstanceID, err := getInstanceID()
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatal(err)
 	}
 	log.Println("ComputeInstanceID:", computeInstanceID)
 
-	cfg := ycsdk.Config{
-		Credentials: ycsdk.InstanceServiceAccount(),
-		Endpoint:    apiEndpoint,
-	}
-	if insecureSkipVerify {
-		cfg.TLSConfig = &tls.Config{
-			InsecureSkipVerify: true,
-		}
-	}
 	ctx := context.Background()
-	sdk, err := ycsdk.Build(ctx, cfg)
+	sdk, err := ycsdk.Build(ctx,
+		options.WithCredentials(credentials.InstanceServiceAccount()),
+		options.WithDiscoveryEndpoint(apiEndpoint),
+		options.WithTLSConfig(&tls.Config{InsecureSkipVerify: insecureSkipVerify}),
+	)
 	if err != nil {
-		log.Fatal("SDK init error: " + err.Error())
+		log.Fatal("SDK init error:", err)
 	}
-	inst, err := sdk.Marketplace().LicenseManager().Instance().Get(ctx, &licensemanager.GetInstanceRequest{InstanceId: licenseInstanceID})
+
+	inst, err := licensemanagersdk.
+		NewInstanceClient(sdk).
+		Get(ctx, &licensemanagerapi.GetInstanceRequest{InstanceId: licenseInstanceID})
 	if err != nil {
-		log.Fatal("Instance get error: " + err.Error())
+		log.Fatal("Instance get error:", err)
 	}
-	log.Println("Working with instance ", inst.GetId()+" "+inst.GetDescription())
+	log.Printf("Working with instance %s (%s)", inst.GetId(), inst.GetDescription())
+
 	buf := &bytes.Buffer{}
 	for {
 		err := checkLicense(ctx, sdk, licenseInstanceID, computeInstanceID)
 		buf.Reset()
-		fmt.Fprint(buf, time.Now(), ": ")
-		fmt.Fprint(buf, "check result for LicenseInstanceID="+licenseInstanceID+" and ResourceID="+computeInstanceID)
+		fmt.Fprint(buf, time.Now(), ": ",
+			"check result for LicenseInstanceID=", licenseInstanceID,
+			" and ResourceID=", computeInstanceID,
+		)
 		if err == nil {
 			fmt.Fprintln(buf, " is OK")
 		} else {
-			fmt.Fprintln(buf, " is ERROR:\n ", err.Error())
+			fmt.Fprintln(buf, " is ERROR:", err)
 		}
 		log.Println(buf.String())
 		time.Sleep(period)
 	}
 }
 
-func checkLicense(ctx context.Context, sdk *ycsdk.SDK, licenseInstanceID string, resourceID string) error {
-	op, err := sdk.WrapOperation(sdk.Marketplace().LicenseManager().Lock().Ensure(ctx, &licensemanager.EnsureLockRequest{
-		InstanceId: licenseInstanceID,
-		ResourceId: resourceID, // Use compute instance id as resource ID
-	}))
+func checkLicense(
+	ctx context.Context,
+	sdk *ycsdk.SDK,
+	licenseInstanceID, resourceID string,
+) error {
+	op, err := licensemanagersdk.
+		NewLockClient(sdk).
+		Ensure(ctx, &licensemanagerapi.EnsureLockRequest{
+			InstanceId: licenseInstanceID,
+			ResourceId: resourceID,
+		})
 	if err != nil {
 		return err
 	}
-	log.Println("OperationID:", op.Id())
-	err = op.Wait(ctx)
+	log.Println("OperationID:", op.ID())
+
+	lock, err := op.Wait(ctx)
 	if err != nil {
 		return err
 	}
-	if opErr := op.Error(); opErr != nil {
-		return opErr
-	}
-	resp, err := op.Response()
-	if err != nil {
-		return err
-	}
-	lock := resp.(*licensemanager.Lock)
 	log.Println("LockID:", lock.GetId())
 	log.Println("Start:", lock.GetStartTime().AsTime())
 	log.Println("End:", lock.GetEndTime().AsTime())
-	return err
+	return nil
 }
 
 func getInstanceID() (string, error) {
-	req, err := http.NewRequest("GET",
-		"http://169.254.169.254/computeMetadata/v1/instance/id", nil)
+	req, err := http.NewRequest(
+		"GET",
+		"http://169.254.169.254/computeMetadata/v1/instance/id",
+		nil,
+	)
 	if err != nil {
 		return "", err
 	}
 	req.Header.Set("Metadata-Flavor", "Google")
 	req.Header.Set("Connection", "close")
+
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return "", err
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		return "", fmt.Errorf("status code 200 != %v (%v)", resp.StatusCode, resp.Status)
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("unexpected status: %s", resp.Status)
 	}
-	respBytes, err := io.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
-	return strings.TrimSpace(string(respBytes)), nil
+	return strings.TrimSpace(string(body)), nil
 }
