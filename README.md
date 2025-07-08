@@ -19,7 +19,7 @@ Go SDK for Yandex Cloud services.
 ## Installation
 
 ```bash
-go get github.com/yandex-cloud/go-sdk-v2
+go get github.com/yandex-cloud/go-sdk/v2
 ```
 
 ## Example usages
@@ -31,7 +31,7 @@ sdk, err := ycsdk.Build(ctx,
     options..WithCredentials(credentials.IAMToken(os.Getenv("YC_IAM_TOKEN"))),
 )
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 ```
 
@@ -45,7 +45,7 @@ sdk, err := ycsdk.Build(ctx,
     options..WithCredentials(credentials.IAMToken(os.Getenv("YC_IAM_TOKEN"))),
 )
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 ```
 
@@ -56,7 +56,7 @@ sdk, err := ycsdk.Build(ctx,
     options.WithCredentials(credentials.InstanceServiceAccount()),
 )
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 ```
 
@@ -83,7 +83,7 @@ sdk, err := ycsdk.Build(ctx,
     options.WithCredentials(creds),
 )
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 ```
 
@@ -98,9 +98,9 @@ import (
     
     "github.com/yandex-cloud/go-sdk-v2"
     "github.com/yandex-cloud/go-sdk-v2/credentials"
-	"github.com/yandex-cloud/go-sdk-v2/pkg/options"
-	
-	computeapi "github.com/yandex-cloud/go-genproto/yandex/cloud/compute/v1"
+    "github.com/yandex-cloud/go-sdk-v2/pkg/options"
+    
+    computeapi "github.com/yandex-cloud/go-genproto/yandex/cloud/compute/v1"
     computesdk "github.com/yandex-cloud/go-sdk-v2/services/compute/v1"
 )
 
@@ -139,23 +139,22 @@ func main() {
 
 ### Retries
 
-SDK provide built-in retry policy, that supports [exponential backoff and jitter](https://aws.amazon.com/ru/blogs/architecture/exponential-backoff-and-jitter/), and also [retry budget](https://github.com/grpc/proposal/blob/master/A6-client-retries.md#throttling-retry-attempts-and-hedged-rpcs). 
+SDK provide built-in retry policy, that supports [exponential backoff and jitter](https://aws.amazon.com/ru/blogs/architecture/exponential-backoff-and-jitter/), and also [retry budget](https://github.com/grpc/proposal/blob/master/A6-client-retries.md#throttling-retry-attempts-and-hedged-rpcs).
 It's necessary to avoid retry amplification.
 
 ```go
 import (
-	...
-	ycsdk "github.com/yandex-cloud/go-sdk-v2"
+    ...
+    ycsdk "github.com/yandex-cloud/go-sdk-v2"
     "github.com/yandex-cloud/go-sdk-v2/pkg/options"
 )
 
 ...
 
 sdk, err := ycsdk.Build(
-	ctx,
+    ctx,
     options.WithCredentials(credentials.IAMToken(os.Getenv("YC_IAM_TOKEN"))),
     options.WithDefaultRetryOptions(),
-	
 )
 ```
 
