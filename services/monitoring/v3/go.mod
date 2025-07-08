@@ -1,4 +1,4 @@
-module github.com/yandex-cloud/go-sdk/v2/monitoring/v3
+module github.com/yandex-cloud/go-sdk/services/monitoring/v3
 
 go 1.23.0
 
