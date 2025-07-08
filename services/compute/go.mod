@@ -1,4 +1,4 @@
-module github.com/yandex-cloud/go-sdk/v2/services/compute
+module github.com/yandex-cloud/go-sdk/services/compute
 
 go 1.23.0
 
