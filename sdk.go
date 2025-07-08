@@ -24,8 +24,9 @@ import (
 	transportauth "github.com/yandex-cloud/go-sdk/v2/pkg/transport/middleware/authentication"
 	endpointsdk "github.com/yandex-cloud/go-sdk/v2/services/endpoint"
 	endpointssdk "github.com/yandex-cloud/go-sdk/v2/services/endpoints"
-	iamsdk "github.com/yandex-cloud/go-sdk/v2/services/iam/v1"
 )
+
+var IamTokenCreate = protoreflect.FullName("yandex.cloud.iam.v1.IamTokenService.Create")
 
 var _ transport.Connector = (*SDK)(nil)
 
@@ -151,7 +152,7 @@ func userAgent() string {
 
 // defaultAuthenticator initializes an Authenticator using provided credentials and an endpoint resolver in the given context.
 func defaultAuthenticator(ctx context.Context, logger *zap.Logger, creds credentials.Credentials, resolver endpoints.EndpointsResolver) (authentication.Authenticator, error) {
-	authEndpoint, err := resolver.Endpoint(ctx, iamsdk.IamTokenCreate)
+	authEndpoint, err := resolver.Endpoint(ctx, IamTokenCreate)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get auth endpoint: %w", err)
 	}

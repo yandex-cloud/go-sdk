@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 	"time"
-	
+
 	"github.com/google/go-cmp/cmp"
 	testing_interface "github.com/mitchellh/go-testing-interface"
 	"github.com/stretchr/testify/assert"
@@ -19,7 +19,7 @@ import (
 	"google.golang.org/protobuf/testing/protocmp"
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/durationpb"
-	
+
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/compute/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 )
@@ -31,10 +31,10 @@ func TestWaitReturnsPollError(t *testing.T) {
 	poll := func(context.Context, string, ...grpc.CallOption) (YCOperation, error) {
 		return nil, pollErr
 	}
-	
+
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 	defer cancel()
-	
+
 	_, err := (&Operation{&operation.Operation{}, &Concretization{poll, nil, nil, nil}, nil, nil, nil}).Wait(ctx)
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), pollErr.Error())
@@ -44,10 +44,10 @@ func TestWaitReturnsNotFound(t *testing.T) {
 	poll := func(context.Context, string, ...grpc.CallOption) (YCOperation, error) {
 		return nil, grpc_status.Error(codes.NotFound, "NotFound")
 	}
-	
+
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 	defer cancel()
-	
+
 	_, err := (&Operation{&operation.Operation{}, &Concretization{poll, nil, nil, nil}, nil, nil, nil}).Wait(ctx)
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), context.DeadlineExceeded.Error())
@@ -57,10 +57,10 @@ func TestWaitReturnsPollTimeout(t *testing.T) {
 	poll := func(context.Context, string, ...grpc.CallOption) (YCOperation, error) {
 		return &operation.Operation{Done: false}, nil
 	}
-	
+
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 	defer cancel()
-	
+
 	_, err := (&Operation{&operation.Operation{}, &Concretization{poll, nil, nil, nil}, nil, nil, nil}).Wait(ctx)
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), context.DeadlineExceeded.Error())
@@ -79,10 +79,10 @@ func TestReturnsOperationError(t *testing.T) {
 			},
 		}, nil
 	}
-	
+
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 	defer cancel()
-	
+
 	_, err := (&Operation{&operation.Operation{}, &Concretization{poll, nil, nil, nil}, nil, nil, nil}).Wait(ctx)
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), errors.New(errorDesc).Error())
@@ -97,10 +97,10 @@ func TestWaitReturnsErrorOnIncorrectResult(t *testing.T) {
 			},
 		}, nil
 	}
-	
+
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 	defer cancel()
-	
+
 	_, err := (&Operation{&operation.Operation{}, &Concretization{poll, nil, nil, nil}, nil, nil, nil}).Wait(ctx)
 	assert.NotNil(t, err)
 }
@@ -120,9 +120,9 @@ func TestPollUpdatesMetadata(t *testing.T) {
 		&Concretization{poll, &durationpb.Duration{}, &durationpb.Duration{}, nil},
 	)
 	require.NoError(t, err)
-	
+
 	Equal(t, initialMeta, op.Metadata())
-	
+
 	err = op.PollOnce(context.Background())
 	require.NoError(t, err)
 	Equal(t, updatedMeta, op.Metadata())
@@ -148,9 +148,9 @@ func TestWaitUpdatesMetadata(t *testing.T) {
 		&Concretization{poll, &durationpb.Duration{}, &durationpb.Duration{}, nil},
 	)
 	require.NoError(t, err)
-	
+
 	Equal(t, initialMeta, op.Metadata())
-	
+
 	resp, err := op.Wait(context.Background())
 	require.NoError(t, err)
 	Equal(t, expectedResp, resp)
@@ -178,7 +178,7 @@ func Equal(t testing_interface.T, expected, actual interface{}, msgAndArgs ...in
 			return true
 		}
 	}
-	
+
 	diff := Diff(expected, actual)
 	if diff == "" {
 		return true
