@@ -65,6 +65,24 @@ func (c *LoadBalancerServiceClient) Delete(ctx context.Context, in *apploadbalan
 	return apploadbalancer.NewLoadBalancerServiceClient(conn).Delete(ctx, in, opts...)
 }
 
+// DisableZones implements apploadbalancer.LoadBalancerServiceClient
+func (c *LoadBalancerServiceClient) DisableZones(ctx context.Context, in *apploadbalancer.DisableZonesRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return apploadbalancer.NewLoadBalancerServiceClient(conn).DisableZones(ctx, in, opts...)
+}
+
+// EnableZones implements apploadbalancer.LoadBalancerServiceClient
+func (c *LoadBalancerServiceClient) EnableZones(ctx context.Context, in *apploadbalancer.EnableZonesRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return apploadbalancer.NewLoadBalancerServiceClient(conn).EnableZones(ctx, in, opts...)
+}
+
 // Get implements apploadbalancer.LoadBalancerServiceClient
 func (c *LoadBalancerServiceClient) Get(ctx context.Context, in *apploadbalancer.GetLoadBalancerRequest, opts ...grpc.CallOption) (*apploadbalancer.LoadBalancer, error) {
 	conn, err := c.getConn(ctx)
