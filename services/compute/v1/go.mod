@@ -1,4 +1,4 @@
-module github.com/yandex-cloud/go-sdk/v2/compute
+module github.com/yandex-cloud/go-sdk/v2/services/compute/v1
 
 go 1.22
 
@@ -6,7 +6,7 @@ toolchain go1.23.9
 
 require (
 	github.com/yandex-cloud/go-genproto v0.14.0
-	github.com/yandex-cloud/go-sdk/v2 v2.0.0
+	github.com/yandex-cloud/go-sdk/v2 v2.0.1
 	google.golang.org/grpc v1.66.2
 	google.golang.org/protobuf v1.34.2
 )
