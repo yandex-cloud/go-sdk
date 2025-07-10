@@ -119,4 +119,5 @@ var DynamicEndpoints = map[protoreflect.FullName]string{
 	protoreflect.FullName("yandex.cloud.video.v1"):                                                           "video",
 	protoreflect.FullName("yandex.cloud.vpc.v1"):                                                             "vpc",
 	protoreflect.FullName("yandex.cloud.ydb.v1"):                                                             "ydb",
+	protoreflect.FullName("yandex.cloud.ytsaurus.v1"):                                                        "managed-ytsaurus",
 }
