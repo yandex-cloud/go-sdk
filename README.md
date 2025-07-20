@@ -96,12 +96,12 @@ import (
     "log"
     "os"
     
-    "github.com/yandex-cloud/go-sdk-v2"
-    "github.com/yandex-cloud/go-sdk-v2/credentials"
-    "github.com/yandex-cloud/go-sdk-v2/pkg/options"
+    "github.com/yandex-cloud/go-sdk/v2"
+    "github.com/yandex-cloud/go-sdk/v2/credentials"
+    "github.com/yandex-cloud/go-sdk/v2/pkg/options"
     
     computeapi "github.com/yandex-cloud/go-genproto/yandex/cloud/compute/v1"
-    computesdk "github.com/yandex-cloud/go-sdk-v2/services/compute/v1"
+    computesdk "github.com/yandex-cloud/go-sdk/services/compute/v1"
 )
 
 func main() {
@@ -145,8 +145,9 @@ It's necessary to avoid retry amplification.
 ```go
 import (
     ...
-    ycsdk "github.com/yandex-cloud/go-sdk-v2"
-    "github.com/yandex-cloud/go-sdk-v2/pkg/options"
+    ycsdk "github.com/yandex-cloud/go-sdk/v2"
+    "github.com/yandex-cloud/go-sdk/v2/credentials"
+    "github.com/yandex-cloud/go-sdk/v2/pkg/options"
 )
 
 ...

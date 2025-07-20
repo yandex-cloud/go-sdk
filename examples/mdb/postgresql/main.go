@@ -15,8 +15,8 @@ import (
 	ycsdk "github.com/yandex-cloud/go-sdk/v2"
 	"github.com/yandex-cloud/go-sdk/v2/credentials"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/options"
-	pgsdk "github.com/yandex-cloud/go-sdk/v2/services/mdb/postgresql/v1"
-	vpcsdk "github.com/yandex-cloud/go-sdk/v2/services/vpc/v1"
+	pgsdk "github.com/yandex-cloud/go-sdk/services/mdb/postgresql/v1"
+	vpcsdk "github.com/yandex-cloud/go-sdk/services/vpc/v1"
 )
 
 func main() {
