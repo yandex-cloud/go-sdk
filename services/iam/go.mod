@@ -1,4 +1,4 @@
-module github.com/yandex-cloud/go-sdk/services/dns
+module github.com/yandex-cloud/go-sdk/services/iam
 
 go 1.23.9
 

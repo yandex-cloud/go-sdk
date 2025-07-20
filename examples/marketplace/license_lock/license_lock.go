@@ -16,7 +16,7 @@ import (
 	ycsdk "github.com/yandex-cloud/go-sdk/v2"
 	credentials "github.com/yandex-cloud/go-sdk/v2/credentials"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/options"
-	licensemanagersdk "github.com/yandex-cloud/go-sdk/v2/services/marketplace/licensemanager/v1"
+	licensemanagersdk "github.com/yandex-cloud/go-sdk/services/marketplace/licensemanager/v1"
 )
 
 const (
