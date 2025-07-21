@@ -21,6 +21,15 @@ type FederationServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
 }
 
+// AddDomain implements saml.FederationServiceClient
+func (c *FederationServiceClient) AddDomain(ctx context.Context, in *saml.AddFederationDomainRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return saml.NewFederationServiceClient(conn).AddDomain(ctx, in, opts...)
+}
+
 // AddUserAccounts implements saml.FederationServiceClient
 func (c *FederationServiceClient) AddUserAccounts(ctx context.Context, in *saml.AddFederatedUserAccountsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -48,6 +57,15 @@ func (c *FederationServiceClient) Delete(ctx context.Context, in *saml.DeleteFed
 	return saml.NewFederationServiceClient(conn).Delete(ctx, in, opts...)
 }
 
+// DeleteDomain implements saml.FederationServiceClient
+func (c *FederationServiceClient) DeleteDomain(ctx context.Context, in *saml.DeleteFederationDomainRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return saml.NewFederationServiceClient(conn).DeleteDomain(ctx, in, opts...)
+}
+
 // DeleteUserAccounts implements saml.FederationServiceClient
 func (c *FederationServiceClient) DeleteUserAccounts(ctx context.Context, in *saml.DeleteFederatedUserAccountsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -64,6 +82,15 @@ func (c *FederationServiceClient) Get(ctx context.Context, in *saml.GetFederatio
 		return nil, err
 	}
 	return saml.NewFederationServiceClient(conn).Get(ctx, in, opts...)
+}
+
+// GetDomain implements saml.FederationServiceClient
+func (c *FederationServiceClient) GetDomain(ctx context.Context, in *saml.GetFederationDomainRequest, opts ...grpc.CallOption) (*saml.Domain, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return saml.NewFederationServiceClient(conn).GetDomain(ctx, in, opts...)
 }
 
 // List implements saml.FederationServiceClient
@@ -179,6 +206,122 @@ func (it *FederationIterator) Value() *saml.Federation {
 }
 
 func (it *FederationIterator) Error() error {
+	return it.err
+}
+
+// ListDomains implements saml.FederationServiceClient
+func (c *FederationServiceClient) ListDomains(ctx context.Context, in *saml.ListFederationDomainsRequest, opts ...grpc.CallOption) (*saml.ListFederationDomainsResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return saml.NewFederationServiceClient(conn).ListDomains(ctx, in, opts...)
+}
+
+type FederationDomainsIterator struct {
+	ctx  context.Context
+	opts []grpc.CallOption
+
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
+
+	client  *FederationServiceClient
+	request *saml.ListFederationDomainsRequest
+
+	items []*saml.Domain
+}
+
+func (c *FederationServiceClient) FederationDomainsIterator(ctx context.Context, req *saml.ListFederationDomainsRequest, opts ...grpc.CallOption) *FederationDomainsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
+	return &FederationDomainsIterator{
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
+	}
+}
+
+func (it *FederationDomainsIterator) Next() bool {
+	if it.err != nil {
+		return false
+	}
+	if len(it.items) > 1 {
+		it.items[0] = nil
+		it.items = it.items[1:]
+		return true
+	}
+	it.items = nil // consume last item, if any
+
+	if it.started && it.request.PageToken == "" {
+		return false
+	}
+	it.started = true
+
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
+	response, err := it.client.ListDomains(it.ctx, it.request, it.opts...)
+	it.err = err
+	if err != nil {
+		return false
+	}
+
+	it.items = response.Domains
+	it.request.PageToken = response.NextPageToken
+	return len(it.items) > 0
+}
+
+func (it *FederationDomainsIterator) Take(size int64) ([]*saml.Domain, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*saml.Domain
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *FederationDomainsIterator) TakeAll() ([]*saml.Domain, error) {
+	return it.Take(0)
+}
+
+func (it *FederationDomainsIterator) Value() *saml.Domain {
+	if len(it.items) == 0 {
+		panic("calling Value on empty iterator")
+	}
+	return it.items[0]
+}
+
+func (it *FederationDomainsIterator) Error() error {
 	return it.err
 }
 
@@ -421,4 +564,13 @@ func (c *FederationServiceClient) Update(ctx context.Context, in *saml.UpdateFed
 		return nil, err
 	}
 	return saml.NewFederationServiceClient(conn).Update(ctx, in, opts...)
+}
+
+// ValidateDomain implements saml.FederationServiceClient
+func (c *FederationServiceClient) ValidateDomain(ctx context.Context, in *saml.ValidateFederationDomainRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return saml.NewFederationServiceClient(conn).ValidateDomain(ctx, in, opts...)
 }

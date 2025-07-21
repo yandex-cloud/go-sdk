@@ -32,3 +32,8 @@ func (o *OpenSearch) ResourcePreset() *ResourcePresetServiceClient {
 func (o *OpenSearch) Backup() *BackupServiceClient {
 	return &BackupServiceClient{getConn: o.getConn}
 }
+
+// Extension gets ExtensionService client
+func (o *OpenSearch) Extension() *ExtensionServiceClient {
+	return &ExtensionServiceClient{getConn: o.getConn}
+}

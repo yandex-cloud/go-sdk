@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	YTsaurusServiceID Endpoint = "ytsaurus"
+	YTsaurusServiceID Endpoint = "managed-ytsaurus"
 )
 
 func (sdk *SDK) YTsaurus() *ytsaurus.YTsaurus {
