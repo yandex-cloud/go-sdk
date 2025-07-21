@@ -35,6 +35,7 @@ var Aliases map[string]protoreflect.FullName = map[string]protoreflect.FullName{
 	"cloudregistry":        protoreflect.FullName("yandex.cloud.cloudregistry"),
 	"cloudrouter":          protoreflect.FullName("yandex.cloud.cloudrouter"),
 	"compute":              protoreflect.FullName("yandex.cloud.compute"),
+	"connectionmanager":    protoreflect.FullName("yandex.cloud.connectionmanager"),
 	"datasphere":           protoreflect.FullName("yandex.cloud.datasphere"),
 	"datatransfer":         protoreflect.FullName("yandex.cloud.datatransfer"),
 	"dns":                  protoreflect.FullName("yandex.cloud.dns"),

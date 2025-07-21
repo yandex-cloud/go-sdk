@@ -18,14 +18,14 @@ import (
 type ClusterClient interface {
 	Get(context.Context, *metastore.GetClusterRequest, ...grpc.CallOption) (*metastore.Cluster, error)
 	List(context.Context, *metastore.ListClustersRequest, ...grpc.CallOption) (*metastore.ListClustersResponse, error)
-	ListOperations(context.Context, *metastore.ListClusterOperationsRequest, ...grpc.CallOption) (*metastore.ListClusterOperationsResponse, error)
 	Create(context.Context, *metastore.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)
 	Update(context.Context, *metastore.UpdateClusterRequest, ...grpc.CallOption) (*ClusterUpdateOperation, error)
 	Delete(context.Context, *metastore.DeleteClusterRequest, ...grpc.CallOption) (*ClusterDeleteOperation, error)
-	Stop(context.Context, *metastore.StopClusterRequest, ...grpc.CallOption) (*ClusterStopOperation, error)
 	Start(context.Context, *metastore.StartClusterRequest, ...grpc.CallOption) (*ClusterStartOperation, error)
+	Stop(context.Context, *metastore.StopClusterRequest, ...grpc.CallOption) (*ClusterStopOperation, error)
 	ImportData(context.Context, *metastore.ImportDataRequest, ...grpc.CallOption) (*ClusterImportDataOperation, error)
 	ExportData(context.Context, *metastore.ExportDataRequest, ...grpc.CallOption) (*ClusterExportDataOperation, error)
+	ListOperations(context.Context, *metastore.ListClusterOperationsRequest, ...grpc.CallOption) (*metastore.ListClusterOperationsResponse, error)
 }
 
 var _ ClusterClient = clusterClient{}
@@ -55,15 +55,6 @@ func (c clusterClient) List(ctx context.Context, in *metastore.ListClustersReque
 		return nil, err
 	}
 	return metastore.NewClusterServiceClient(connection).List(ctx, in, opts...)
-}
-
-// ListOperations is an operation of Yandex.Cloud Metastore Cluster service.
-func (c clusterClient) ListOperations(ctx context.Context, in *metastore.ListClusterOperationsRequest, opts ...grpc.CallOption) (*metastore.ListClusterOperationsResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, ClusterListOperations, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return metastore.NewClusterServiceClient(connection).ListOperations(ctx, in, opts...)
 }
 
 // ClusterCreateOperation is used to monitor the state of Create operations.
@@ -228,60 +219,6 @@ func (c clusterClient) Delete(ctx context.Context, in *metastore.DeleteClusterRe
 	return &ClusterDeleteOperation{*op}, nil
 }
 
-// ClusterStopOperation is used to monitor the state of Stop operations.
-type ClusterStopOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *ClusterStopOperation) Metadata() *metastore.StopClusterMetadata {
-	return o.Operation.Metadata().(*metastore.StopClusterMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *ClusterStopOperation) Response() *metastore.Cluster {
-	return o.Operation.Response().(*metastore.Cluster)
-}
-
-// Wait polls the operation until it's done.
-func (o *ClusterStopOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*metastore.Cluster, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*metastore.Cluster)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *ClusterStopOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*metastore.Cluster, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*metastore.Cluster)
-	return response, err
-}
-
-// Stop is an operation of Yandex.Cloud Metastore Cluster service.
-// It returns an object which should be used to monitor the operation state.
-func (c clusterClient) Stop(ctx context.Context, in *metastore.StopClusterRequest, opts ...grpc.CallOption) (*ClusterStopOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, ClusterStop, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := metastore.NewClusterServiceClient(connection).Stop(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*metastore.StopClusterMetadata).GetClusterId()
-		},
-		MetadataType: (*metastore.StopClusterMetadata)(nil),
-		ResponseType: (*metastore.Cluster)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &ClusterStopOperation{*op}, nil
-}
-
 // ClusterStartOperation is used to monitor the state of Start operations.
 type ClusterStartOperation struct {
 	sdkop.Operation
@@ -334,6 +271,60 @@ func (c clusterClient) Start(ctx context.Context, in *metastore.StartClusterRequ
 		return nil, err
 	}
 	return &ClusterStartOperation{*op}, nil
+}
+
+// ClusterStopOperation is used to monitor the state of Stop operations.
+type ClusterStopOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ClusterStopOperation) Metadata() *metastore.StopClusterMetadata {
+	return o.Operation.Metadata().(*metastore.StopClusterMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ClusterStopOperation) Response() *metastore.Cluster {
+	return o.Operation.Response().(*metastore.Cluster)
+}
+
+// Wait polls the operation until it's done.
+func (o *ClusterStopOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*metastore.Cluster, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*metastore.Cluster)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ClusterStopOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*metastore.Cluster, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*metastore.Cluster)
+	return response, err
+}
+
+// Stop is an operation of Yandex.Cloud Metastore Cluster service.
+// It returns an object which should be used to monitor the operation state.
+func (c clusterClient) Stop(ctx context.Context, in *metastore.StopClusterRequest, opts ...grpc.CallOption) (*ClusterStopOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ClusterStop, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := metastore.NewClusterServiceClient(connection).Stop(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*metastore.StopClusterMetadata).GetClusterId()
+		},
+		MetadataType: (*metastore.StopClusterMetadata)(nil),
+		ResponseType: (*metastore.Cluster)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ClusterStopOperation{*op}, nil
 }
 
 // ClusterImportDataOperation is used to monitor the state of ImportData operations.
@@ -444,6 +435,15 @@ func (c clusterClient) ExportData(ctx context.Context, in *metastore.ExportDataR
 	return &ClusterExportDataOperation{*op}, nil
 }
 
+// ListOperations is an operation of Yandex.Cloud Metastore Cluster service.
+func (c clusterClient) ListOperations(ctx context.Context, in *metastore.ListClusterOperationsRequest, opts ...grpc.CallOption) (*metastore.ListClusterOperationsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, ClusterListOperations, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return metastore.NewClusterServiceClient(connection).ListOperations(ctx, in, opts...)
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c clusterClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, ClusterOperationPoller, opts...)
@@ -456,13 +456,13 @@ func (c clusterClient) pollOperation(ctx context.Context, operationId string, op
 var (
 	ClusterGet             = protoreflect.FullName("yandex.cloud.metastore.v1.ClusterService.Get")
 	ClusterList            = protoreflect.FullName("yandex.cloud.metastore.v1.ClusterService.List")
-	ClusterListOperations  = protoreflect.FullName("yandex.cloud.metastore.v1.ClusterService.ListOperations")
 	ClusterCreate          = protoreflect.FullName("yandex.cloud.metastore.v1.ClusterService.Create")
 	ClusterUpdate          = protoreflect.FullName("yandex.cloud.metastore.v1.ClusterService.Update")
 	ClusterDelete          = protoreflect.FullName("yandex.cloud.metastore.v1.ClusterService.Delete")
-	ClusterStop            = protoreflect.FullName("yandex.cloud.metastore.v1.ClusterService.Stop")
 	ClusterStart           = protoreflect.FullName("yandex.cloud.metastore.v1.ClusterService.Start")
+	ClusterStop            = protoreflect.FullName("yandex.cloud.metastore.v1.ClusterService.Stop")
 	ClusterImportData      = protoreflect.FullName("yandex.cloud.metastore.v1.ClusterService.ImportData")
 	ClusterExportData      = protoreflect.FullName("yandex.cloud.metastore.v1.ClusterService.ExportData")
+	ClusterListOperations  = protoreflect.FullName("yandex.cloud.metastore.v1.ClusterService.ListOperations")
 	ClusterOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

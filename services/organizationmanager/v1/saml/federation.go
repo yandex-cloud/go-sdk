@@ -25,6 +25,11 @@ type FederationClient interface {
 	DeleteUserAccounts(context.Context, *saml.DeleteFederatedUserAccountsRequest, ...grpc.CallOption) (*FederationDeleteUserAccountsOperation, error)
 	ListUserAccounts(context.Context, *saml.ListFederatedUserAccountsRequest, ...grpc.CallOption) (*saml.ListFederatedUserAccountsResponse, error)
 	ListOperations(context.Context, *saml.ListFederationOperationsRequest, ...grpc.CallOption) (*saml.ListFederationOperationsResponse, error)
+	GetDomain(context.Context, *saml.GetFederationDomainRequest, ...grpc.CallOption) (*saml.Domain, error)
+	ListDomains(context.Context, *saml.ListFederationDomainsRequest, ...grpc.CallOption) (*saml.ListFederationDomainsResponse, error)
+	AddDomain(context.Context, *saml.AddFederationDomainRequest, ...grpc.CallOption) (*FederationAddDomainOperation, error)
+	ValidateDomain(context.Context, *saml.ValidateFederationDomainRequest, ...grpc.CallOption) (*FederationValidateDomainOperation, error)
+	DeleteDomain(context.Context, *saml.DeleteFederationDomainRequest, ...grpc.CallOption) (*FederationDeleteDomainOperation, error)
 }
 
 var _ FederationClient = federationClient{}
@@ -344,6 +349,186 @@ func (c federationClient) ListOperations(ctx context.Context, in *saml.ListFeder
 	return saml.NewFederationServiceClient(connection).ListOperations(ctx, in, opts...)
 }
 
+// GetDomain is an operation of Yandex.Cloud Saml Federation service.
+func (c federationClient) GetDomain(ctx context.Context, in *saml.GetFederationDomainRequest, opts ...grpc.CallOption) (*saml.Domain, error) {
+	connection, err := c.connector.GetConnection(ctx, FederationGetDomain, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return saml.NewFederationServiceClient(connection).GetDomain(ctx, in, opts...)
+}
+
+// ListDomains is an operation of Yandex.Cloud Saml Federation service.
+func (c federationClient) ListDomains(ctx context.Context, in *saml.ListFederationDomainsRequest, opts ...grpc.CallOption) (*saml.ListFederationDomainsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, FederationListDomains, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return saml.NewFederationServiceClient(connection).ListDomains(ctx, in, opts...)
+}
+
+// FederationAddDomainOperation is used to monitor the state of AddDomain operations.
+type FederationAddDomainOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *FederationAddDomainOperation) Metadata() *saml.AddFederationDomainMetadata {
+	return o.Operation.Metadata().(*saml.AddFederationDomainMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *FederationAddDomainOperation) Response() *saml.Domain {
+	return o.Operation.Response().(*saml.Domain)
+}
+
+// Wait polls the operation until it's done.
+func (o *FederationAddDomainOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*saml.Domain, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*saml.Domain)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *FederationAddDomainOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*saml.Domain, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*saml.Domain)
+	return response, err
+}
+
+// AddDomain is an operation of Yandex.Cloud Saml Federation service.
+// It returns an object which should be used to monitor the operation state.
+func (c federationClient) AddDomain(ctx context.Context, in *saml.AddFederationDomainRequest, opts ...grpc.CallOption) (*FederationAddDomainOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, FederationAddDomain, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := saml.NewFederationServiceClient(connection).AddDomain(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*saml.AddFederationDomainMetadata).GetFederationId()
+		},
+		MetadataType: (*saml.AddFederationDomainMetadata)(nil),
+		ResponseType: (*saml.Domain)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &FederationAddDomainOperation{*op}, nil
+}
+
+// FederationValidateDomainOperation is used to monitor the state of ValidateDomain operations.
+type FederationValidateDomainOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *FederationValidateDomainOperation) Metadata() *saml.ValidateFederationDomainMetadata {
+	return o.Operation.Metadata().(*saml.ValidateFederationDomainMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *FederationValidateDomainOperation) Response() *saml.Domain {
+	return o.Operation.Response().(*saml.Domain)
+}
+
+// Wait polls the operation until it's done.
+func (o *FederationValidateDomainOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*saml.Domain, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*saml.Domain)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *FederationValidateDomainOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*saml.Domain, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*saml.Domain)
+	return response, err
+}
+
+// ValidateDomain is an operation of Yandex.Cloud Saml Federation service.
+// It returns an object which should be used to monitor the operation state.
+func (c federationClient) ValidateDomain(ctx context.Context, in *saml.ValidateFederationDomainRequest, opts ...grpc.CallOption) (*FederationValidateDomainOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, FederationValidateDomain, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := saml.NewFederationServiceClient(connection).ValidateDomain(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*saml.ValidateFederationDomainMetadata).GetFederationId()
+		},
+		MetadataType: (*saml.ValidateFederationDomainMetadata)(nil),
+		ResponseType: (*saml.Domain)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &FederationValidateDomainOperation{*op}, nil
+}
+
+// FederationDeleteDomainOperation is used to monitor the state of DeleteDomain operations.
+type FederationDeleteDomainOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *FederationDeleteDomainOperation) Metadata() *saml.DeleteFederationDomainMetadata {
+	return o.Operation.Metadata().(*saml.DeleteFederationDomainMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *FederationDeleteDomainOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *FederationDeleteDomainOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *FederationDeleteDomainOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// DeleteDomain is an operation of Yandex.Cloud Saml Federation service.
+// It returns an object which should be used to monitor the operation state.
+func (c federationClient) DeleteDomain(ctx context.Context, in *saml.DeleteFederationDomainRequest, opts ...grpc.CallOption) (*FederationDeleteDomainOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, FederationDeleteDomain, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := saml.NewFederationServiceClient(connection).DeleteDomain(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*saml.DeleteFederationDomainMetadata).GetFederationId()
+		},
+		MetadataType: (*saml.DeleteFederationDomainMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &FederationDeleteDomainOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c federationClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, FederationOperationPoller, opts...)
@@ -363,5 +548,10 @@ var (
 	FederationDeleteUserAccounts = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.DeleteUserAccounts")
 	FederationListUserAccounts   = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.ListUserAccounts")
 	FederationListOperations     = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.ListOperations")
+	FederationGetDomain          = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.GetDomain")
+	FederationListDomains        = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.ListDomains")
+	FederationAddDomain          = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.AddDomain")
+	FederationValidateDomain     = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.ValidateDomain")
+	FederationDeleteDomain       = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.DeleteDomain")
 	FederationOperationPoller    = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
