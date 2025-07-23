@@ -8,10 +8,11 @@ import (
 func UserAgent() string {
 	cloudUserAgent := "yandex-cloud/go-sdk"
 
-	build, _ := debug.ReadBuildInfo()
 	version := "unknown"
-	if build.Main.Version != "" {
-		version = build.Main.Version
+	if build, ok := debug.ReadBuildInfo(); ok {
+		if build.Main.Version != "" {
+			version = build.Main.Version
+		}
 	}
 
 	return fmt.Sprintf("%s/%s", cloudUserAgent, version)
