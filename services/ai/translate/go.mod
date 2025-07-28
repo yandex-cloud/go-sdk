@@ -4,8 +4,8 @@ go 1.23.9
 
 require (
 	github.com/yandex-cloud/go-genproto v0.15.0
-	github.com/yandex-cloud/go-sdk/v2 v2.0.8
-	google.golang.org/grpc v1.73.0
+	github.com/yandex-cloud/go-sdk/v2 v2.1.0
+	google.golang.org/grpc v1.74.2
 	google.golang.org/protobuf v1.36.6
 )
 

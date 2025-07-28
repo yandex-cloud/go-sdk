@@ -18,9 +18,14 @@ import (
 // GroupClient provides methods for managing Group resources of Yandex.Cloud OrganizationManager.
 type GroupClient interface {
 	Get(context.Context, *organizationmanager.GetGroupRequest, ...grpc.CallOption) (*organizationmanager.Group, error)
+	ResolveExternal(context.Context, *organizationmanager.ResolveExternalGroupRequest, ...grpc.CallOption) (*organizationmanager.Group, error)
 	List(context.Context, *organizationmanager.ListGroupsRequest, ...grpc.CallOption) (*organizationmanager.ListGroupsResponse, error)
+	ListExternal(context.Context, *organizationmanager.ListExternalGroupsRequest, ...grpc.CallOption) (*organizationmanager.ListExternalGroupsResponse, error)
 	Create(context.Context, *organizationmanager.CreateGroupRequest, ...grpc.CallOption) (*GroupCreateOperation, error)
+	CreateExternal(context.Context, *organizationmanager.CreateExternalGroupRequest, ...grpc.CallOption) (*GroupCreateExternalOperation, error)
 	Update(context.Context, *organizationmanager.UpdateGroupRequest, ...grpc.CallOption) (*GroupUpdateOperation, error)
+	ConvertToExternal(context.Context, *organizationmanager.ConvertToExternalGroupRequest, ...grpc.CallOption) (*GroupConvertToExternalOperation, error)
+	ConvertAllToBasic(context.Context, *organizationmanager.ConvertAllToBasicGroupsRequest, ...grpc.CallOption) (*GroupConvertAllToBasicOperation, error)
 	Delete(context.Context, *organizationmanager.DeleteGroupRequest, ...grpc.CallOption) (*GroupDeleteOperation, error)
 	ListOperations(context.Context, *organizationmanager.ListGroupOperationsRequest, ...grpc.CallOption) (*organizationmanager.ListGroupOperationsResponse, error)
 	ListMembers(context.Context, *organizationmanager.ListGroupMembersRequest, ...grpc.CallOption) (*organizationmanager.ListGroupMembersResponse, error)
@@ -50,6 +55,15 @@ func (c groupClient) Get(ctx context.Context, in *organizationmanager.GetGroupRe
 	return organizationmanager.NewGroupServiceClient(connection).Get(ctx, in, opts...)
 }
 
+// ResolveExternal is an operation of Yandex.Cloud OrganizationManager Group service.
+func (c groupClient) ResolveExternal(ctx context.Context, in *organizationmanager.ResolveExternalGroupRequest, opts ...grpc.CallOption) (*organizationmanager.Group, error) {
+	connection, err := c.connector.GetConnection(ctx, GroupResolveExternal, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return organizationmanager.NewGroupServiceClient(connection).ResolveExternal(ctx, in, opts...)
+}
+
 // List is an operation of Yandex.Cloud OrganizationManager Group service.
 func (c groupClient) List(ctx context.Context, in *organizationmanager.ListGroupsRequest, opts ...grpc.CallOption) (*organizationmanager.ListGroupsResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, GroupList, opts...)
@@ -57,6 +71,15 @@ func (c groupClient) List(ctx context.Context, in *organizationmanager.ListGroup
 		return nil, err
 	}
 	return organizationmanager.NewGroupServiceClient(connection).List(ctx, in, opts...)
+}
+
+// ListExternal is an operation of Yandex.Cloud OrganizationManager Group service.
+func (c groupClient) ListExternal(ctx context.Context, in *organizationmanager.ListExternalGroupsRequest, opts ...grpc.CallOption) (*organizationmanager.ListExternalGroupsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, GroupListExternal, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return organizationmanager.NewGroupServiceClient(connection).ListExternal(ctx, in, opts...)
 }
 
 // GroupCreateOperation is used to monitor the state of Create operations.
@@ -113,6 +136,60 @@ func (c groupClient) Create(ctx context.Context, in *organizationmanager.CreateG
 	return &GroupCreateOperation{*op}, nil
 }
 
+// GroupCreateExternalOperation is used to monitor the state of CreateExternal operations.
+type GroupCreateExternalOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *GroupCreateExternalOperation) Metadata() *organizationmanager.CreateExternalGroupMetadata {
+	return o.Operation.Metadata().(*organizationmanager.CreateExternalGroupMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *GroupCreateExternalOperation) Response() *organizationmanager.Group {
+	return o.Operation.Response().(*organizationmanager.Group)
+}
+
+// Wait polls the operation until it's done.
+func (o *GroupCreateExternalOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*organizationmanager.Group, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*organizationmanager.Group)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *GroupCreateExternalOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*organizationmanager.Group, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*organizationmanager.Group)
+	return response, err
+}
+
+// CreateExternal is an operation of Yandex.Cloud OrganizationManager Group service.
+// It returns an object which should be used to monitor the operation state.
+func (c groupClient) CreateExternal(ctx context.Context, in *organizationmanager.CreateExternalGroupRequest, opts ...grpc.CallOption) (*GroupCreateExternalOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, GroupCreateExternal, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := organizationmanager.NewGroupServiceClient(connection).CreateExternal(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*organizationmanager.CreateExternalGroupMetadata).GetGroupId()
+		},
+		MetadataType: (*organizationmanager.CreateExternalGroupMetadata)(nil),
+		ResponseType: (*organizationmanager.Group)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &GroupCreateExternalOperation{*op}, nil
+}
+
 // GroupUpdateOperation is used to monitor the state of Update operations.
 type GroupUpdateOperation struct {
 	sdkop.Operation
@@ -165,6 +242,111 @@ func (c groupClient) Update(ctx context.Context, in *organizationmanager.UpdateG
 		return nil, err
 	}
 	return &GroupUpdateOperation{*op}, nil
+}
+
+// GroupConvertToExternalOperation is used to monitor the state of ConvertToExternal operations.
+type GroupConvertToExternalOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *GroupConvertToExternalOperation) Metadata() *organizationmanager.ConvertToExternalGroupMetadata {
+	return o.Operation.Metadata().(*organizationmanager.ConvertToExternalGroupMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *GroupConvertToExternalOperation) Response() *organizationmanager.Group {
+	return o.Operation.Response().(*organizationmanager.Group)
+}
+
+// Wait polls the operation until it's done.
+func (o *GroupConvertToExternalOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*organizationmanager.Group, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*organizationmanager.Group)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *GroupConvertToExternalOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*organizationmanager.Group, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*organizationmanager.Group)
+	return response, err
+}
+
+// ConvertToExternal is an operation of Yandex.Cloud OrganizationManager Group service.
+// It returns an object which should be used to monitor the operation state.
+func (c groupClient) ConvertToExternal(ctx context.Context, in *organizationmanager.ConvertToExternalGroupRequest, opts ...grpc.CallOption) (*GroupConvertToExternalOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, GroupConvertToExternal, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := organizationmanager.NewGroupServiceClient(connection).ConvertToExternal(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*organizationmanager.ConvertToExternalGroupMetadata).GetGroupId()
+		},
+		MetadataType: (*organizationmanager.ConvertToExternalGroupMetadata)(nil),
+		ResponseType: (*organizationmanager.Group)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &GroupConvertToExternalOperation{*op}, nil
+}
+
+// GroupConvertAllToBasicOperation is used to monitor the state of ConvertAllToBasic operations.
+type GroupConvertAllToBasicOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *GroupConvertAllToBasicOperation) Metadata() *organizationmanager.ConvertAllToBasicGroupsMetadata {
+	return o.Operation.Metadata().(*organizationmanager.ConvertAllToBasicGroupsMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *GroupConvertAllToBasicOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *GroupConvertAllToBasicOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *GroupConvertAllToBasicOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// ConvertAllToBasic is an operation of Yandex.Cloud OrganizationManager Group service.
+// It returns an object which should be used to monitor the operation state.
+func (c groupClient) ConvertAllToBasic(ctx context.Context, in *organizationmanager.ConvertAllToBasicGroupsRequest, opts ...grpc.CallOption) (*GroupConvertAllToBasicOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, GroupConvertAllToBasic, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := organizationmanager.NewGroupServiceClient(connection).ConvertAllToBasic(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*organizationmanager.ConvertAllToBasicGroupsMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &GroupConvertAllToBasicOperation{*op}, nil
 }
 
 // GroupDeleteOperation is used to monitor the state of Delete operations.
@@ -405,9 +587,14 @@ func (c groupClient) pollOperation(ctx context.Context, operationId string, opts
 
 var (
 	GroupGet                  = protoreflect.FullName("yandex.cloud.organizationmanager.v1.GroupService.Get")
+	GroupResolveExternal      = protoreflect.FullName("yandex.cloud.organizationmanager.v1.GroupService.ResolveExternal")
 	GroupList                 = protoreflect.FullName("yandex.cloud.organizationmanager.v1.GroupService.List")
+	GroupListExternal         = protoreflect.FullName("yandex.cloud.organizationmanager.v1.GroupService.ListExternal")
 	GroupCreate               = protoreflect.FullName("yandex.cloud.organizationmanager.v1.GroupService.Create")
+	GroupCreateExternal       = protoreflect.FullName("yandex.cloud.organizationmanager.v1.GroupService.CreateExternal")
 	GroupUpdate               = protoreflect.FullName("yandex.cloud.organizationmanager.v1.GroupService.Update")
+	GroupConvertToExternal    = protoreflect.FullName("yandex.cloud.organizationmanager.v1.GroupService.ConvertToExternal")
+	GroupConvertAllToBasic    = protoreflect.FullName("yandex.cloud.organizationmanager.v1.GroupService.ConvertAllToBasic")
 	GroupDelete               = protoreflect.FullName("yandex.cloud.organizationmanager.v1.GroupService.Delete")
 	GroupListOperations       = protoreflect.FullName("yandex.cloud.organizationmanager.v1.GroupService.ListOperations")
 	GroupListMembers          = protoreflect.FullName("yandex.cloud.organizationmanager.v1.GroupService.ListMembers")
