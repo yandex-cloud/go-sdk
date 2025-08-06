@@ -20,6 +20,8 @@ type ReservedInstancePoolClient interface {
 	Create(context.Context, *compute.CreateReservedInstancePoolRequest, ...grpc.CallOption) (*ReservedInstancePoolCreateOperation, error)
 	Update(context.Context, *compute.UpdateReservedInstancePoolRequest, ...grpc.CallOption) (*ReservedInstancePoolUpdateOperation, error)
 	Delete(context.Context, *compute.DeleteReservedInstancePoolRequest, ...grpc.CallOption) (*ReservedInstancePoolDeleteOperation, error)
+	ListOperations(context.Context, *compute.ListReservedInstancePoolOperationsRequest, ...grpc.CallOption) (*compute.ListReservedInstancePoolOperationsResponse, error)
+	ListInstances(context.Context, *compute.ListReservedInstancePoolInstancesRequest, ...grpc.CallOption) (*compute.ListReservedInstancePoolInstancesResponse, error)
 }
 
 var _ ReservedInstancePoolClient = reservedInstancePoolClient{}
@@ -213,6 +215,24 @@ func (c reservedInstancePoolClient) Delete(ctx context.Context, in *compute.Dele
 	return &ReservedInstancePoolDeleteOperation{*op}, nil
 }
 
+// ListOperations is an operation of Yandex.Cloud Compute ReservedInstancePool service.
+func (c reservedInstancePoolClient) ListOperations(ctx context.Context, in *compute.ListReservedInstancePoolOperationsRequest, opts ...grpc.CallOption) (*compute.ListReservedInstancePoolOperationsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, ReservedInstancePoolListOperations, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return compute.NewReservedInstancePoolServiceClient(connection).ListOperations(ctx, in, opts...)
+}
+
+// ListInstances is an operation of Yandex.Cloud Compute ReservedInstancePool service.
+func (c reservedInstancePoolClient) ListInstances(ctx context.Context, in *compute.ListReservedInstancePoolInstancesRequest, opts ...grpc.CallOption) (*compute.ListReservedInstancePoolInstancesResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, ReservedInstancePoolListInstances, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return compute.NewReservedInstancePoolServiceClient(connection).ListInstances(ctx, in, opts...)
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c reservedInstancePoolClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, ReservedInstancePoolOperationPoller, opts...)
@@ -228,5 +248,7 @@ var (
 	ReservedInstancePoolCreate          = protoreflect.FullName("yandex.cloud.compute.v1.ReservedInstancePoolService.Create")
 	ReservedInstancePoolUpdate          = protoreflect.FullName("yandex.cloud.compute.v1.ReservedInstancePoolService.Update")
 	ReservedInstancePoolDelete          = protoreflect.FullName("yandex.cloud.compute.v1.ReservedInstancePoolService.Delete")
+	ReservedInstancePoolListOperations  = protoreflect.FullName("yandex.cloud.compute.v1.ReservedInstancePoolService.ListOperations")
+	ReservedInstancePoolListInstances   = protoreflect.FullName("yandex.cloud.compute.v1.ReservedInstancePoolService.ListInstances")
 	ReservedInstancePoolOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
