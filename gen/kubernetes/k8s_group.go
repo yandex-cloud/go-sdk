@@ -28,6 +28,11 @@ func (k *Kubernetes) NodeGroup() *NodeGroupServiceClient {
 	return &NodeGroupServiceClient{getConn: k.getConn}
 }
 
+// ResourcePreset gets ResourcePresetService client
+func (k *Kubernetes) ResourcePreset() *ResourcePresetServiceClient {
+	return &ResourcePresetServiceClient{getConn: k.getConn}
+}
+
 // Version gets VersionService client
 func (k *Kubernetes) Version() *VersionServiceClient {
 	return &VersionServiceClient{getConn: k.getConn}

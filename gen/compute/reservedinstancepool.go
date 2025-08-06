@@ -163,6 +163,238 @@ func (it *ReservedInstancePoolIterator) Error() error {
 	return it.err
 }
 
+// ListInstances implements compute.ReservedInstancePoolServiceClient
+func (c *ReservedInstancePoolServiceClient) ListInstances(ctx context.Context, in *compute.ListReservedInstancePoolInstancesRequest, opts ...grpc.CallOption) (*compute.ListReservedInstancePoolInstancesResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return compute.NewReservedInstancePoolServiceClient(conn).ListInstances(ctx, in, opts...)
+}
+
+type ReservedInstancePoolInstancesIterator struct {
+	ctx  context.Context
+	opts []grpc.CallOption
+
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
+
+	client  *ReservedInstancePoolServiceClient
+	request *compute.ListReservedInstancePoolInstancesRequest
+
+	items []*compute.Instance
+}
+
+func (c *ReservedInstancePoolServiceClient) ReservedInstancePoolInstancesIterator(ctx context.Context, req *compute.ListReservedInstancePoolInstancesRequest, opts ...grpc.CallOption) *ReservedInstancePoolInstancesIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
+	return &ReservedInstancePoolInstancesIterator{
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
+	}
+}
+
+func (it *ReservedInstancePoolInstancesIterator) Next() bool {
+	if it.err != nil {
+		return false
+	}
+	if len(it.items) > 1 {
+		it.items[0] = nil
+		it.items = it.items[1:]
+		return true
+	}
+	it.items = nil // consume last item, if any
+
+	if it.started && it.request.PageToken == "" {
+		return false
+	}
+	it.started = true
+
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
+	response, err := it.client.ListInstances(it.ctx, it.request, it.opts...)
+	it.err = err
+	if err != nil {
+		return false
+	}
+
+	it.items = response.Instances
+	it.request.PageToken = response.NextPageToken
+	return len(it.items) > 0
+}
+
+func (it *ReservedInstancePoolInstancesIterator) Take(size int64) ([]*compute.Instance, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*compute.Instance
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ReservedInstancePoolInstancesIterator) TakeAll() ([]*compute.Instance, error) {
+	return it.Take(0)
+}
+
+func (it *ReservedInstancePoolInstancesIterator) Value() *compute.Instance {
+	if len(it.items) == 0 {
+		panic("calling Value on empty iterator")
+	}
+	return it.items[0]
+}
+
+func (it *ReservedInstancePoolInstancesIterator) Error() error {
+	return it.err
+}
+
+// ListOperations implements compute.ReservedInstancePoolServiceClient
+func (c *ReservedInstancePoolServiceClient) ListOperations(ctx context.Context, in *compute.ListReservedInstancePoolOperationsRequest, opts ...grpc.CallOption) (*compute.ListReservedInstancePoolOperationsResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return compute.NewReservedInstancePoolServiceClient(conn).ListOperations(ctx, in, opts...)
+}
+
+type ReservedInstancePoolOperationsIterator struct {
+	ctx  context.Context
+	opts []grpc.CallOption
+
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
+
+	client  *ReservedInstancePoolServiceClient
+	request *compute.ListReservedInstancePoolOperationsRequest
+
+	items []*operation.Operation
+}
+
+func (c *ReservedInstancePoolServiceClient) ReservedInstancePoolOperationsIterator(ctx context.Context, req *compute.ListReservedInstancePoolOperationsRequest, opts ...grpc.CallOption) *ReservedInstancePoolOperationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
+	return &ReservedInstancePoolOperationsIterator{
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
+	}
+}
+
+func (it *ReservedInstancePoolOperationsIterator) Next() bool {
+	if it.err != nil {
+		return false
+	}
+	if len(it.items) > 1 {
+		it.items[0] = nil
+		it.items = it.items[1:]
+		return true
+	}
+	it.items = nil // consume last item, if any
+
+	if it.started && it.request.PageToken == "" {
+		return false
+	}
+	it.started = true
+
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
+	response, err := it.client.ListOperations(it.ctx, it.request, it.opts...)
+	it.err = err
+	if err != nil {
+		return false
+	}
+
+	it.items = response.Operations
+	it.request.PageToken = response.NextPageToken
+	return len(it.items) > 0
+}
+
+func (it *ReservedInstancePoolOperationsIterator) Take(size int64) ([]*operation.Operation, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*operation.Operation
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ReservedInstancePoolOperationsIterator) TakeAll() ([]*operation.Operation, error) {
+	return it.Take(0)
+}
+
+func (it *ReservedInstancePoolOperationsIterator) Value() *operation.Operation {
+	if len(it.items) == 0 {
+		panic("calling Value on empty iterator")
+	}
+	return it.items[0]
+}
+
+func (it *ReservedInstancePoolOperationsIterator) Error() error {
+	return it.err
+}
+
 // Update implements compute.ReservedInstancePoolServiceClient
 func (c *ReservedInstancePoolServiceClient) Update(ctx context.Context, in *compute.UpdateReservedInstancePoolRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)

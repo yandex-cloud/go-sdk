@@ -18,6 +18,11 @@ func NewCompute(g func(ctx context.Context) (*grpc.ClientConn, error)) *Compute 
 	return &Compute{g}
 }
 
+// DiskPlacementGroup gets DiskPlacementGroupService client
+func (c *Compute) DiskPlacementGroup() *DiskPlacementGroupServiceClient {
+	return &DiskPlacementGroupServiceClient{getConn: c.getConn}
+}
+
 // Disk gets DiskService client
 func (c *Compute) Disk() *DiskServiceClient {
 	return &DiskServiceClient{getConn: c.getConn}
@@ -28,29 +33,14 @@ func (c *Compute) DiskType() *DiskTypeServiceClient {
 	return &DiskTypeServiceClient{getConn: c.getConn}
 }
 
-// Image gets ImageService client
-func (c *Compute) Image() *ImageServiceClient {
-	return &ImageServiceClient{getConn: c.getConn}
+// Filesystem gets FilesystemService client
+func (c *Compute) Filesystem() *FilesystemServiceClient {
+	return &FilesystemServiceClient{getConn: c.getConn}
 }
 
-// Instance gets InstanceService client
-func (c *Compute) Instance() *InstanceServiceClient {
-	return &InstanceServiceClient{getConn: c.getConn}
-}
-
-// Snapshot gets SnapshotService client
-func (c *Compute) Snapshot() *SnapshotServiceClient {
-	return &SnapshotServiceClient{getConn: c.getConn}
-}
-
-// Zone gets ZoneService client
-func (c *Compute) Zone() *ZoneServiceClient {
-	return &ZoneServiceClient{getConn: c.getConn}
-}
-
-// PlacementGroup gets PlacementGroupService client
-func (c *Compute) PlacementGroup() *PlacementGroupServiceClient {
-	return &PlacementGroupServiceClient{getConn: c.getConn}
+// GpuCluster gets GpuClusterService client
+func (c *Compute) GpuCluster() *GpuClusterServiceClient {
+	return &GpuClusterServiceClient{getConn: c.getConn}
 }
 
 // HostGroup gets HostGroupService client
@@ -63,14 +53,29 @@ func (c *Compute) HostType() *HostTypeServiceClient {
 	return &HostTypeServiceClient{getConn: c.getConn}
 }
 
-// DiskPlacementGroup gets DiskPlacementGroupService client
-func (c *Compute) DiskPlacementGroup() *DiskPlacementGroupServiceClient {
-	return &DiskPlacementGroupServiceClient{getConn: c.getConn}
+// Image gets ImageService client
+func (c *Compute) Image() *ImageServiceClient {
+	return &ImageServiceClient{getConn: c.getConn}
 }
 
-// Filesystem gets FilesystemService client
-func (c *Compute) Filesystem() *FilesystemServiceClient {
-	return &FilesystemServiceClient{getConn: c.getConn}
+// Instance gets InstanceService client
+func (c *Compute) Instance() *InstanceServiceClient {
+	return &InstanceServiceClient{getConn: c.getConn}
+}
+
+// Maintenance gets MaintenanceService client
+func (c *Compute) Maintenance() *MaintenanceServiceClient {
+	return &MaintenanceServiceClient{getConn: c.getConn}
+}
+
+// PlacementGroup gets PlacementGroupService client
+func (c *Compute) PlacementGroup() *PlacementGroupServiceClient {
+	return &PlacementGroupServiceClient{getConn: c.getConn}
+}
+
+// ReservedInstancePool gets ReservedInstancePoolService client
+func (c *Compute) ReservedInstancePool() *ReservedInstancePoolServiceClient {
+	return &ReservedInstancePoolServiceClient{getConn: c.getConn}
 }
 
 // SnapshotSchedule gets SnapshotScheduleService client
@@ -78,12 +83,12 @@ func (c *Compute) SnapshotSchedule() *SnapshotScheduleServiceClient {
 	return &SnapshotScheduleServiceClient{getConn: c.getConn}
 }
 
-// GpuCluster gets GpuClusterService client
-func (c *Compute) GpuCluster() *GpuClusterServiceClient {
-	return &GpuClusterServiceClient{getConn: c.getConn}
+// Snapshot gets SnapshotService client
+func (c *Compute) Snapshot() *SnapshotServiceClient {
+	return &SnapshotServiceClient{getConn: c.getConn}
 }
 
-// ReservedInstancePool gets ReservedInstancePoolService client
-func (c *Compute) ReservedInstancePool() *ReservedInstancePoolServiceClient {
-	return &ReservedInstancePoolServiceClient{getConn: c.getConn}
+// Zone gets ZoneService client
+func (c *Compute) Zone() *ZoneServiceClient {
+	return &ZoneServiceClient{getConn: c.getConn}
 }
