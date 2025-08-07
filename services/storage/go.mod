@@ -3,10 +3,10 @@ module github.com/yandex-cloud/go-sdk/services/storage
 go 1.23.9
 
 require (
-	github.com/yandex-cloud/go-genproto v0.16.0
-	github.com/yandex-cloud/go-sdk/v2 v2.2.0
+	github.com/yandex-cloud/go-genproto v0.17.0
+	github.com/yandex-cloud/go-sdk/v2 v2.3.0
 	google.golang.org/grpc v1.74.2
-	google.golang.org/protobuf v1.36.6
+	google.golang.org/protobuf v1.36.7
 )
 
 require (
