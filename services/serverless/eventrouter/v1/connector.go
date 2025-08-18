@@ -343,6 +343,11 @@ type ConnectorSetAccessBindingsOperation struct {
 	sdkop.Operation
 }
 
+// Metadata retrieves the operation metadata.
+func (o *ConnectorSetAccessBindingsOperation) Metadata() *access.SetAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.SetAccessBindingsMetadata)
+}
+
 // Response retrieves the operation response.
 func (o *ConnectorSetAccessBindingsOperation) Response() *emptypb.Empty {
 	return o.Operation.Response().(*emptypb.Empty)
@@ -375,7 +380,7 @@ func (c connectorClient) SetAccessBindings(ctx context.Context, in *access.SetAc
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: nil,
+		MetadataType: (*access.SetAccessBindingsMetadata)(nil),
 		ResponseType: (*emptypb.Empty)(nil),
 	})
 	if err != nil {
@@ -387,6 +392,11 @@ func (c connectorClient) SetAccessBindings(ctx context.Context, in *access.SetAc
 // ConnectorUpdateAccessBindingsOperation is used to monitor the state of UpdateAccessBindings operations.
 type ConnectorUpdateAccessBindingsOperation struct {
 	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ConnectorUpdateAccessBindingsOperation) Metadata() *access.UpdateAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.UpdateAccessBindingsMetadata)
 }
 
 // Response retrieves the operation response.
@@ -421,7 +431,7 @@ func (c connectorClient) UpdateAccessBindings(ctx context.Context, in *access.Up
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: nil,
+		MetadataType: (*access.UpdateAccessBindingsMetadata)(nil),
 		ResponseType: (*emptypb.Empty)(nil),
 	})
 	if err != nil {

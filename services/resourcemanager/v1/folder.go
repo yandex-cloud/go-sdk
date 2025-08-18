@@ -242,6 +242,11 @@ type FolderSetAccessBindingsOperation struct {
 	sdkop.Operation
 }
 
+// Metadata retrieves the operation metadata.
+func (o *FolderSetAccessBindingsOperation) Metadata() *access.SetAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.SetAccessBindingsMetadata)
+}
+
 // Response retrieves the operation response.
 func (o *FolderSetAccessBindingsOperation) Response() *access.AccessBindingsOperationResult {
 	return o.Operation.Response().(*access.AccessBindingsOperationResult)
@@ -274,7 +279,7 @@ func (c folderClient) SetAccessBindings(ctx context.Context, in *access.SetAcces
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: nil,
+		MetadataType: (*access.SetAccessBindingsMetadata)(nil),
 		ResponseType: (*access.AccessBindingsOperationResult)(nil),
 	})
 	if err != nil {
@@ -286,6 +291,11 @@ func (c folderClient) SetAccessBindings(ctx context.Context, in *access.SetAcces
 // FolderUpdateAccessBindingsOperation is used to monitor the state of UpdateAccessBindings operations.
 type FolderUpdateAccessBindingsOperation struct {
 	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *FolderUpdateAccessBindingsOperation) Metadata() *access.UpdateAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.UpdateAccessBindingsMetadata)
 }
 
 // Response retrieves the operation response.
@@ -320,7 +330,7 @@ func (c folderClient) UpdateAccessBindings(ctx context.Context, in *access.Updat
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: nil,
+		MetadataType: (*access.UpdateAccessBindingsMetadata)(nil),
 		ResponseType: (*access.AccessBindingsOperationResult)(nil),
 	})
 	if err != nil {

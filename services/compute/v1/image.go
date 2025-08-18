@@ -252,6 +252,11 @@ type ImageSetAccessBindingsOperation struct {
 	sdkop.Operation
 }
 
+// Metadata retrieves the operation metadata.
+func (o *ImageSetAccessBindingsOperation) Metadata() *access.SetAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.SetAccessBindingsMetadata)
+}
+
 // Response retrieves the operation response.
 func (o *ImageSetAccessBindingsOperation) Response() *access.AccessBindingsOperationResult {
 	return o.Operation.Response().(*access.AccessBindingsOperationResult)
@@ -284,7 +289,7 @@ func (c imageClient) SetAccessBindings(ctx context.Context, in *access.SetAccess
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: nil,
+		MetadataType: (*access.SetAccessBindingsMetadata)(nil),
 		ResponseType: (*access.AccessBindingsOperationResult)(nil),
 	})
 	if err != nil {
@@ -296,6 +301,11 @@ func (c imageClient) SetAccessBindings(ctx context.Context, in *access.SetAccess
 // ImageUpdateAccessBindingsOperation is used to monitor the state of UpdateAccessBindings operations.
 type ImageUpdateAccessBindingsOperation struct {
 	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ImageUpdateAccessBindingsOperation) Metadata() *access.UpdateAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.UpdateAccessBindingsMetadata)
 }
 
 // Response retrieves the operation response.
@@ -330,7 +340,7 @@ func (c imageClient) UpdateAccessBindings(ctx context.Context, in *access.Update
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: nil,
+		MetadataType: (*access.UpdateAccessBindingsMetadata)(nil),
 		ResponseType: (*access.AccessBindingsOperationResult)(nil),
 	})
 	if err != nil {

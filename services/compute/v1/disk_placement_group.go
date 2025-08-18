@@ -252,6 +252,11 @@ type DiskPlacementGroupSetAccessBindingsOperation struct {
 	sdkop.Operation
 }
 
+// Metadata retrieves the operation metadata.
+func (o *DiskPlacementGroupSetAccessBindingsOperation) Metadata() *access.SetAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.SetAccessBindingsMetadata)
+}
+
 // Response retrieves the operation response.
 func (o *DiskPlacementGroupSetAccessBindingsOperation) Response() *access.AccessBindingsOperationResult {
 	return o.Operation.Response().(*access.AccessBindingsOperationResult)
@@ -284,7 +289,7 @@ func (c diskPlacementGroupClient) SetAccessBindings(ctx context.Context, in *acc
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: nil,
+		MetadataType: (*access.SetAccessBindingsMetadata)(nil),
 		ResponseType: (*access.AccessBindingsOperationResult)(nil),
 	})
 	if err != nil {
@@ -296,6 +301,11 @@ func (c diskPlacementGroupClient) SetAccessBindings(ctx context.Context, in *acc
 // DiskPlacementGroupUpdateAccessBindingsOperation is used to monitor the state of UpdateAccessBindings operations.
 type DiskPlacementGroupUpdateAccessBindingsOperation struct {
 	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *DiskPlacementGroupUpdateAccessBindingsOperation) Metadata() *access.UpdateAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.UpdateAccessBindingsMetadata)
 }
 
 // Response retrieves the operation response.
@@ -330,7 +340,7 @@ func (c diskPlacementGroupClient) UpdateAccessBindings(ctx context.Context, in *
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: nil,
+		MetadataType: (*access.UpdateAccessBindingsMetadata)(nil),
 		ResponseType: (*access.AccessBindingsOperationResult)(nil),
 	})
 	if err != nil {

@@ -367,6 +367,11 @@ type DnsZoneSetAccessBindingsOperation struct {
 	sdkop.Operation
 }
 
+// Metadata retrieves the operation metadata.
+func (o *DnsZoneSetAccessBindingsOperation) Metadata() *access.SetAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.SetAccessBindingsMetadata)
+}
+
 // Response retrieves the operation response.
 func (o *DnsZoneSetAccessBindingsOperation) Response() *emptypb.Empty {
 	return o.Operation.Response().(*emptypb.Empty)
@@ -399,7 +404,7 @@ func (c dnsZoneClient) SetAccessBindings(ctx context.Context, in *access.SetAcce
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: nil,
+		MetadataType: (*access.SetAccessBindingsMetadata)(nil),
 		ResponseType: (*emptypb.Empty)(nil),
 	})
 	if err != nil {
@@ -411,6 +416,11 @@ func (c dnsZoneClient) SetAccessBindings(ctx context.Context, in *access.SetAcce
 // DnsZoneUpdateAccessBindingsOperation is used to monitor the state of UpdateAccessBindings operations.
 type DnsZoneUpdateAccessBindingsOperation struct {
 	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *DnsZoneUpdateAccessBindingsOperation) Metadata() *access.UpdateAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.UpdateAccessBindingsMetadata)
 }
 
 // Response retrieves the operation response.
@@ -445,7 +455,7 @@ func (c dnsZoneClient) UpdateAccessBindings(ctx context.Context, in *access.Upda
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: nil,
+		MetadataType: (*access.UpdateAccessBindingsMetadata)(nil),
 		ResponseType: (*emptypb.Empty)(nil),
 	})
 	if err != nil {

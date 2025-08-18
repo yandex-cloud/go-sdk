@@ -294,6 +294,11 @@ type ExportSetAccessBindingsOperation struct {
 	sdkop.Operation
 }
 
+// Metadata retrieves the operation metadata.
+func (o *ExportSetAccessBindingsOperation) Metadata() *access.SetAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.SetAccessBindingsMetadata)
+}
+
 // Response retrieves the operation response.
 func (o *ExportSetAccessBindingsOperation) Response() *emptypb.Empty {
 	return o.Operation.Response().(*emptypb.Empty)
@@ -326,7 +331,7 @@ func (c exportClient) SetAccessBindings(ctx context.Context, in *access.SetAcces
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: nil,
+		MetadataType: (*access.SetAccessBindingsMetadata)(nil),
 		ResponseType: (*emptypb.Empty)(nil),
 	})
 	if err != nil {
@@ -338,6 +343,11 @@ func (c exportClient) SetAccessBindings(ctx context.Context, in *access.SetAcces
 // ExportUpdateAccessBindingsOperation is used to monitor the state of UpdateAccessBindings operations.
 type ExportUpdateAccessBindingsOperation struct {
 	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ExportUpdateAccessBindingsOperation) Metadata() *access.UpdateAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.UpdateAccessBindingsMetadata)
 }
 
 // Response retrieves the operation response.
@@ -372,7 +382,7 @@ func (c exportClient) UpdateAccessBindings(ctx context.Context, in *access.Updat
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: nil,
+		MetadataType: (*access.UpdateAccessBindingsMetadata)(nil),
 		ResponseType: (*emptypb.Empty)(nil),
 	})
 	if err != nil {

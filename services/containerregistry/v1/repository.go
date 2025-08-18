@@ -187,6 +187,11 @@ type RepositorySetAccessBindingsOperation struct {
 	sdkop.Operation
 }
 
+// Metadata retrieves the operation metadata.
+func (o *RepositorySetAccessBindingsOperation) Metadata() *access.SetAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.SetAccessBindingsMetadata)
+}
+
 // Response retrieves the operation response.
 func (o *RepositorySetAccessBindingsOperation) Response() *emptypb.Empty {
 	return o.Operation.Response().(*emptypb.Empty)
@@ -219,7 +224,7 @@ func (c repositoryClient) SetAccessBindings(ctx context.Context, in *access.SetA
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: nil,
+		MetadataType: (*access.SetAccessBindingsMetadata)(nil),
 		ResponseType: (*emptypb.Empty)(nil),
 	})
 	if err != nil {
@@ -231,6 +236,11 @@ func (c repositoryClient) SetAccessBindings(ctx context.Context, in *access.SetA
 // RepositoryUpdateAccessBindingsOperation is used to monitor the state of UpdateAccessBindings operations.
 type RepositoryUpdateAccessBindingsOperation struct {
 	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *RepositoryUpdateAccessBindingsOperation) Metadata() *access.UpdateAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.UpdateAccessBindingsMetadata)
 }
 
 // Response retrieves the operation response.
@@ -265,7 +275,7 @@ func (c repositoryClient) UpdateAccessBindings(ctx context.Context, in *access.U
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: nil,
+		MetadataType: (*access.UpdateAccessBindingsMetadata)(nil),
 		ResponseType: (*emptypb.Empty)(nil),
 	})
 	if err != nil {

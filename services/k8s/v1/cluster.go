@@ -427,6 +427,11 @@ type ClusterSetAccessBindingsOperation struct {
 	sdkop.Operation
 }
 
+// Metadata retrieves the operation metadata.
+func (o *ClusterSetAccessBindingsOperation) Metadata() *access.SetAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.SetAccessBindingsMetadata)
+}
+
 // Response retrieves the operation response.
 func (o *ClusterSetAccessBindingsOperation) Response() *access.AccessBindingsOperationResult {
 	return o.Operation.Response().(*access.AccessBindingsOperationResult)
@@ -459,7 +464,7 @@ func (c clusterClient) SetAccessBindings(ctx context.Context, in *access.SetAcce
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: nil,
+		MetadataType: (*access.SetAccessBindingsMetadata)(nil),
 		ResponseType: (*access.AccessBindingsOperationResult)(nil),
 	})
 	if err != nil {
@@ -471,6 +476,11 @@ func (c clusterClient) SetAccessBindings(ctx context.Context, in *access.SetAcce
 // ClusterUpdateAccessBindingsOperation is used to monitor the state of UpdateAccessBindings operations.
 type ClusterUpdateAccessBindingsOperation struct {
 	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ClusterUpdateAccessBindingsOperation) Metadata() *access.UpdateAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.UpdateAccessBindingsMetadata)
 }
 
 // Response retrieves the operation response.
@@ -505,7 +515,7 @@ func (c clusterClient) UpdateAccessBindings(ctx context.Context, in *access.Upda
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: nil,
+		MetadataType: (*access.UpdateAccessBindingsMetadata)(nil),
 		ResponseType: (*access.AccessBindingsOperationResult)(nil),
 	})
 	if err != nil {

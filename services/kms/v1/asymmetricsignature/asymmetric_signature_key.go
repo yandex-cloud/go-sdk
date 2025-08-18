@@ -232,6 +232,11 @@ type AsymmetricSignatureKeySetAccessBindingsOperation struct {
 	sdkop.Operation
 }
 
+// Metadata retrieves the operation metadata.
+func (o *AsymmetricSignatureKeySetAccessBindingsOperation) Metadata() *access.SetAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.SetAccessBindingsMetadata)
+}
+
 // Response retrieves the operation response.
 func (o *AsymmetricSignatureKeySetAccessBindingsOperation) Response() *emptypb.Empty {
 	return o.Operation.Response().(*emptypb.Empty)
@@ -264,7 +269,7 @@ func (c asymmetricSignatureKeyClient) SetAccessBindings(ctx context.Context, in 
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: nil,
+		MetadataType: (*access.SetAccessBindingsMetadata)(nil),
 		ResponseType: (*emptypb.Empty)(nil),
 	})
 	if err != nil {
@@ -276,6 +281,11 @@ func (c asymmetricSignatureKeyClient) SetAccessBindings(ctx context.Context, in 
 // AsymmetricSignatureKeyUpdateAccessBindingsOperation is used to monitor the state of UpdateAccessBindings operations.
 type AsymmetricSignatureKeyUpdateAccessBindingsOperation struct {
 	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *AsymmetricSignatureKeyUpdateAccessBindingsOperation) Metadata() *access.UpdateAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.UpdateAccessBindingsMetadata)
 }
 
 // Response retrieves the operation response.
@@ -310,7 +320,7 @@ func (c asymmetricSignatureKeyClient) UpdateAccessBindings(ctx context.Context, 
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: nil,
+		MetadataType: (*access.UpdateAccessBindingsMetadata)(nil),
 		ResponseType: (*emptypb.Empty)(nil),
 	})
 	if err != nil {
