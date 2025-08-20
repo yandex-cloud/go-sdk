@@ -3,10 +3,10 @@ module github.com/yandex-cloud/go-sdk/services/ai/translate
 go 1.23.9
 
 require (
-	github.com/yandex-cloud/go-genproto v0.17.0
-	github.com/yandex-cloud/go-sdk/v2 v2.6.1
+	github.com/yandex-cloud/go-genproto v0.18.0
+	github.com/yandex-cloud/go-sdk/v2 v2.7.0
 	google.golang.org/grpc v1.75.0
-	google.golang.org/protobuf v1.36.7
+	google.golang.org/protobuf v1.36.8
 )
 
 require (

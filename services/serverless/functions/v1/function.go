@@ -23,18 +23,13 @@ type FunctionClient interface {
 	Update(context.Context, *functions.UpdateFunctionRequest, ...grpc.CallOption) (*FunctionUpdateOperation, error)
 	Delete(context.Context, *functions.DeleteFunctionRequest, ...grpc.CallOption) (*FunctionDeleteOperation, error)
 	GetVersion(context.Context, *functions.GetFunctionVersionRequest, ...grpc.CallOption) (*functions.Version, error)
-	GetFunctionVersion(context.Context, *functions.GetFunctionVersionRequest, ...grpc.CallOption) (*functions.Version, error)
 	GetVersionByTag(context.Context, *functions.GetFunctionVersionByTagRequest, ...grpc.CallOption) (*functions.Version, error)
-	GetFunctionVersionByTag(context.Context, *functions.GetFunctionVersionByTagRequest, ...grpc.CallOption) (*functions.Version, error)
 	ListVersions(context.Context, *functions.ListFunctionsVersionsRequest, ...grpc.CallOption) (*functions.ListFunctionsVersionsResponse, error)
-	ListFunctionVersions(context.Context, *functions.ListFunctionsVersionsRequest, ...grpc.CallOption) (*functions.ListFunctionsVersionsResponse, error)
 	DeleteVersion(context.Context, *functions.DeleteFunctionVersionRequest, ...grpc.CallOption) (*FunctionDeleteVersionOperation, error)
 	SetTag(context.Context, *functions.SetFunctionTagRequest, ...grpc.CallOption) (*FunctionSetTagOperation, error)
 	RemoveTag(context.Context, *functions.RemoveFunctionTagRequest, ...grpc.CallOption) (*FunctionRemoveTagOperation, error)
 	ListTagHistory(context.Context, *functions.ListFunctionTagHistoryRequest, ...grpc.CallOption) (*functions.ListFunctionTagHistoryResponse, error)
-	ListFunctionTagHistory(context.Context, *functions.ListFunctionTagHistoryRequest, ...grpc.CallOption) (*functions.ListFunctionTagHistoryResponse, error)
 	CreateVersion(context.Context, *functions.CreateFunctionVersionRequest, ...grpc.CallOption) (*FunctionCreateVersionOperation, error)
-	CreateFunctionVersion(context.Context, *functions.CreateFunctionVersionRequest, ...grpc.CallOption) (*FunctionCreateFunctionVersionOperation, error)
 	ListRuntimes(context.Context, *functions.ListRuntimesRequest, ...grpc.CallOption) (*functions.ListRuntimesResponse, error)
 	ListOperations(context.Context, *functions.ListFunctionOperationsRequest, ...grpc.CallOption) (*functions.ListFunctionOperationsResponse, error)
 	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
@@ -245,15 +240,6 @@ func (c functionClient) GetVersion(ctx context.Context, in *functions.GetFunctio
 	return functions.NewFunctionServiceClient(connection).GetVersion(ctx, in, opts...)
 }
 
-// GetFunctionVersion is an operation of Yandex.Cloud Functions Function service.
-func (c functionClient) GetFunctionVersion(ctx context.Context, in *functions.GetFunctionVersionRequest, opts ...grpc.CallOption) (*functions.Version, error) {
-	connection, err := c.connector.GetConnection(ctx, FunctionGetFunctionVersion, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return functions.NewFunctionServiceClient(connection).GetFunctionVersion(ctx, in, opts...)
-}
-
 // GetVersionByTag is an operation of Yandex.Cloud Functions Function service.
 func (c functionClient) GetVersionByTag(ctx context.Context, in *functions.GetFunctionVersionByTagRequest, opts ...grpc.CallOption) (*functions.Version, error) {
 	connection, err := c.connector.GetConnection(ctx, FunctionGetVersionByTag, opts...)
@@ -263,15 +249,6 @@ func (c functionClient) GetVersionByTag(ctx context.Context, in *functions.GetFu
 	return functions.NewFunctionServiceClient(connection).GetVersionByTag(ctx, in, opts...)
 }
 
-// GetFunctionVersionByTag is an operation of Yandex.Cloud Functions Function service.
-func (c functionClient) GetFunctionVersionByTag(ctx context.Context, in *functions.GetFunctionVersionByTagRequest, opts ...grpc.CallOption) (*functions.Version, error) {
-	connection, err := c.connector.GetConnection(ctx, FunctionGetFunctionVersionByTag, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return functions.NewFunctionServiceClient(connection).GetFunctionVersionByTag(ctx, in, opts...)
-}
-
 // ListVersions is an operation of Yandex.Cloud Functions Function service.
 func (c functionClient) ListVersions(ctx context.Context, in *functions.ListFunctionsVersionsRequest, opts ...grpc.CallOption) (*functions.ListFunctionsVersionsResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, FunctionListVersions, opts...)
@@ -279,15 +256,6 @@ func (c functionClient) ListVersions(ctx context.Context, in *functions.ListFunc
 		return nil, err
 	}
 	return functions.NewFunctionServiceClient(connection).ListVersions(ctx, in, opts...)
-}
-
-// ListFunctionVersions is an operation of Yandex.Cloud Functions Function service.
-func (c functionClient) ListFunctionVersions(ctx context.Context, in *functions.ListFunctionsVersionsRequest, opts ...grpc.CallOption) (*functions.ListFunctionsVersionsResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, FunctionListFunctionVersions, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return functions.NewFunctionServiceClient(connection).ListFunctionVersions(ctx, in, opts...)
 }
 
 // FunctionDeleteVersionOperation is used to monitor the state of DeleteVersion operations.
@@ -452,15 +420,6 @@ func (c functionClient) ListTagHistory(ctx context.Context, in *functions.ListFu
 	return functions.NewFunctionServiceClient(connection).ListTagHistory(ctx, in, opts...)
 }
 
-// ListFunctionTagHistory is an operation of Yandex.Cloud Functions Function service.
-func (c functionClient) ListFunctionTagHistory(ctx context.Context, in *functions.ListFunctionTagHistoryRequest, opts ...grpc.CallOption) (*functions.ListFunctionTagHistoryResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, FunctionListFunctionTagHistory, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return functions.NewFunctionServiceClient(connection).ListFunctionTagHistory(ctx, in, opts...)
-}
-
 // FunctionCreateVersionOperation is used to monitor the state of CreateVersion operations.
 type FunctionCreateVersionOperation struct {
 	sdkop.Operation
@@ -510,57 +469,6 @@ func (c functionClient) CreateVersion(ctx context.Context, in *functions.CreateF
 		return nil, err
 	}
 	return &FunctionCreateVersionOperation{*op}, nil
-}
-
-// FunctionCreateFunctionVersionOperation is used to monitor the state of CreateFunctionVersion operations.
-type FunctionCreateFunctionVersionOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *FunctionCreateFunctionVersionOperation) Metadata() *functions.CreateFunctionVersionMetadata {
-	return o.Operation.Metadata().(*functions.CreateFunctionVersionMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *FunctionCreateFunctionVersionOperation) Response() *functions.Version {
-	return o.Operation.Response().(*functions.Version)
-}
-
-// Wait polls the operation until it's done.
-func (o *FunctionCreateFunctionVersionOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*functions.Version, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*functions.Version)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *FunctionCreateFunctionVersionOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*functions.Version, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*functions.Version)
-	return response, err
-}
-
-// CreateFunctionVersion is an operation of Yandex.Cloud Functions Function service.
-// It returns an object which should be used to monitor the operation state.
-func (c functionClient) CreateFunctionVersion(ctx context.Context, in *functions.CreateFunctionVersionRequest, opts ...grpc.CallOption) (*FunctionCreateFunctionVersionOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, FunctionCreateFunctionVersion, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := functions.NewFunctionServiceClient(connection).CreateFunctionVersion(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll:         c.pollOperation,
-		MetadataType: (*functions.CreateFunctionVersionMetadata)(nil),
-		ResponseType: (*functions.Version)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &FunctionCreateFunctionVersionOperation{*op}, nil
 }
 
 // ListRuntimes is an operation of Yandex.Cloud Functions Function service.
@@ -819,31 +727,26 @@ func (c functionClient) pollOperation(ctx context.Context, operationId string, o
 }
 
 var (
-	FunctionGet                     = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.Get")
-	FunctionList                    = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.List")
-	FunctionCreate                  = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.Create")
-	FunctionUpdate                  = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.Update")
-	FunctionDelete                  = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.Delete")
-	FunctionGetVersion              = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.GetVersion")
-	FunctionGetFunctionVersion      = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.GetFunctionVersion")
-	FunctionGetVersionByTag         = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.GetVersionByTag")
-	FunctionGetFunctionVersionByTag = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.GetFunctionVersionByTag")
-	FunctionListVersions            = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.ListVersions")
-	FunctionListFunctionVersions    = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.ListFunctionVersions")
-	FunctionDeleteVersion           = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.DeleteVersion")
-	FunctionSetTag                  = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.SetTag")
-	FunctionRemoveTag               = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.RemoveTag")
-	FunctionListTagHistory          = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.ListTagHistory")
-	FunctionListFunctionTagHistory  = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.ListFunctionTagHistory")
-	FunctionCreateVersion           = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.CreateVersion")
-	FunctionCreateFunctionVersion   = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.CreateFunctionVersion")
-	FunctionListRuntimes            = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.ListRuntimes")
-	FunctionListOperations          = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.ListOperations")
-	FunctionListAccessBindings      = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.ListAccessBindings")
-	FunctionSetAccessBindings       = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.SetAccessBindings")
-	FunctionUpdateAccessBindings    = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.UpdateAccessBindings")
-	FunctionListScalingPolicies     = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.ListScalingPolicies")
-	FunctionSetScalingPolicy        = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.SetScalingPolicy")
-	FunctionRemoveScalingPolicy     = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.RemoveScalingPolicy")
-	FunctionOperationPoller         = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
+	FunctionGet                  = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.Get")
+	FunctionList                 = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.List")
+	FunctionCreate               = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.Create")
+	FunctionUpdate               = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.Update")
+	FunctionDelete               = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.Delete")
+	FunctionGetVersion           = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.GetVersion")
+	FunctionGetVersionByTag      = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.GetVersionByTag")
+	FunctionListVersions         = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.ListVersions")
+	FunctionDeleteVersion        = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.DeleteVersion")
+	FunctionSetTag               = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.SetTag")
+	FunctionRemoveTag            = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.RemoveTag")
+	FunctionListTagHistory       = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.ListTagHistory")
+	FunctionCreateVersion        = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.CreateVersion")
+	FunctionListRuntimes         = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.ListRuntimes")
+	FunctionListOperations       = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.ListOperations")
+	FunctionListAccessBindings   = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.ListAccessBindings")
+	FunctionSetAccessBindings    = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.SetAccessBindings")
+	FunctionUpdateAccessBindings = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.UpdateAccessBindings")
+	FunctionListScalingPolicies  = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.ListScalingPolicies")
+	FunctionSetScalingPolicy     = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.SetScalingPolicy")
+	FunctionRemoveScalingPolicy  = protoreflect.FullName("yandex.cloud.serverless.functions.v1.FunctionService.RemoveScalingPolicy")
+	FunctionOperationPoller      = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
