@@ -3,8 +3,8 @@ module github.com/yandex-cloud/go-sdk/services/serverless/containers
 go 1.23.9
 
 require (
-	github.com/yandex-cloud/go-genproto v0.18.0
-	github.com/yandex-cloud/go-sdk/v2 v2.7.0
+	github.com/yandex-cloud/go-genproto v0.19.0
+	github.com/yandex-cloud/go-sdk/v2 v2.7.3
 	google.golang.org/grpc v1.75.0
 	google.golang.org/protobuf v1.36.8
 )
