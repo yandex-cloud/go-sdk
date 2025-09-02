@@ -22,3 +22,8 @@ func NewStorageAPI(g func(ctx context.Context) (*grpc.ClientConn, error)) *Stora
 func (s *StorageAPI) Bucket() *BucketServiceClient {
 	return &BucketServiceClient{getConn: s.getConn}
 }
+
+// Presign gets PresignService client
+func (s *StorageAPI) Presign() *PresignServiceClient {
+	return &PresignServiceClient{getConn: s.getConn}
+}

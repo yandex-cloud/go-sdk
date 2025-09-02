@@ -47,6 +47,15 @@ func (c *ResourceServiceClient) Get(ctx context.Context, in *backup.GetResourceR
 	return backup.NewResourceServiceClient(conn).Get(ctx, in, opts...)
 }
 
+// GetInstanceRegistrationToken implements backup.ResourceServiceClient
+func (c *ResourceServiceClient) GetInstanceRegistrationToken(ctx context.Context, in *backup.GetInstanceRegistrationTokenRequest, opts ...grpc.CallOption) (*backup.GetInstanceRegistrationTokenResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return backup.NewResourceServiceClient(conn).GetInstanceRegistrationToken(ctx, in, opts...)
+}
+
 // List implements backup.ResourceServiceClient
 func (c *ResourceServiceClient) List(ctx context.Context, in *backup.ListResourcesRequest, opts ...grpc.CallOption) (*backup.ListResourcesResponse, error) {
 	conn, err := c.getConn(ctx)
