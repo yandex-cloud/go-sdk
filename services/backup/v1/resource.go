@@ -22,6 +22,7 @@ type ResourceClient interface {
 	ListDirectory(context.Context, *backup.ListDirectoryRequest, ...grpc.CallOption) (*backup.ListDirectoryResponse, error)
 	CreateDirectory(context.Context, *backup.CreateDirectoryRequest, ...grpc.CallOption) (*ResourceCreateDirectoryOperation, error)
 	ListOperations(context.Context, *backup.ListResourceOperationsRequest, ...grpc.CallOption) (*backup.ListResourceOperationsResponse, error)
+	GetInstanceRegistrationToken(context.Context, *backup.GetInstanceRegistrationTokenRequest, ...grpc.CallOption) (*backup.GetInstanceRegistrationTokenResponse, error)
 }
 
 var _ ResourceClient = resourceClient{}
@@ -182,6 +183,15 @@ func (c resourceClient) ListOperations(ctx context.Context, in *backup.ListResou
 	return backup.NewResourceServiceClient(connection).ListOperations(ctx, in, opts...)
 }
 
+// GetInstanceRegistrationToken is an operation of Yandex.Cloud Backup Resource service.
+func (c resourceClient) GetInstanceRegistrationToken(ctx context.Context, in *backup.GetInstanceRegistrationTokenRequest, opts ...grpc.CallOption) (*backup.GetInstanceRegistrationTokenResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, ResourceGetInstanceRegistrationToken, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return backup.NewResourceServiceClient(connection).GetInstanceRegistrationToken(ctx, in, opts...)
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c resourceClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, ResourceOperationPoller, opts...)
@@ -192,12 +202,13 @@ func (c resourceClient) pollOperation(ctx context.Context, operationId string, o
 }
 
 var (
-	ResourceList            = protoreflect.FullName("yandex.cloud.backup.v1.ResourceService.List")
-	ResourceGet             = protoreflect.FullName("yandex.cloud.backup.v1.ResourceService.Get")
-	ResourceDelete          = protoreflect.FullName("yandex.cloud.backup.v1.ResourceService.Delete")
-	ResourceListTasks       = protoreflect.FullName("yandex.cloud.backup.v1.ResourceService.ListTasks")
-	ResourceListDirectory   = protoreflect.FullName("yandex.cloud.backup.v1.ResourceService.ListDirectory")
-	ResourceCreateDirectory = protoreflect.FullName("yandex.cloud.backup.v1.ResourceService.CreateDirectory")
-	ResourceListOperations  = protoreflect.FullName("yandex.cloud.backup.v1.ResourceService.ListOperations")
-	ResourceOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
+	ResourceList                         = protoreflect.FullName("yandex.cloud.backup.v1.ResourceService.List")
+	ResourceGet                          = protoreflect.FullName("yandex.cloud.backup.v1.ResourceService.Get")
+	ResourceDelete                       = protoreflect.FullName("yandex.cloud.backup.v1.ResourceService.Delete")
+	ResourceListTasks                    = protoreflect.FullName("yandex.cloud.backup.v1.ResourceService.ListTasks")
+	ResourceListDirectory                = protoreflect.FullName("yandex.cloud.backup.v1.ResourceService.ListDirectory")
+	ResourceCreateDirectory              = protoreflect.FullName("yandex.cloud.backup.v1.ResourceService.CreateDirectory")
+	ResourceListOperations               = protoreflect.FullName("yandex.cloud.backup.v1.ResourceService.ListOperations")
+	ResourceGetInstanceRegistrationToken = protoreflect.FullName("yandex.cloud.backup.v1.ResourceService.GetInstanceRegistrationToken")
+	ResourceOperationPoller              = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

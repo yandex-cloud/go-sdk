@@ -4,7 +4,7 @@ go 1.23.9
 
 require (
 	github.com/c2h5oh/datasize v0.0.0-20231215233829-aa82cc1e6500
-	github.com/yandex-cloud/go-genproto v0.19.0
+	github.com/yandex-cloud/go-genproto v0.20.0
 	github.com/yandex-cloud/go-sdk/services/compute v1.0.17
 	github.com/yandex-cloud/go-sdk/services/lockbox v0.0.12
 	github.com/yandex-cloud/go-sdk/services/marketplace/licensemanager v0.0.2
@@ -12,7 +12,7 @@ require (
 	github.com/yandex-cloud/go-sdk/services/mdb/mongodb v0.0.2
 	github.com/yandex-cloud/go-sdk/services/mdb/postgresql v0.0.2
 	github.com/yandex-cloud/go-sdk/services/vpc v0.0.12
-	github.com/yandex-cloud/go-sdk/v2 v2.7.3
+	github.com/yandex-cloud/go-sdk/v2 v2.7.4
 	google.golang.org/grpc v1.75.0
 	google.golang.org/protobuf v1.36.8
 )
@@ -23,9 +23,9 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
-	github.com/hashicorp/go-retryablehttp v0.7.8 // indirect
+	github.com/hashicorp/go-retryablehttp v0.7.7 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	go.uber.org/multierr v1.11.0 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
