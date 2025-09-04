@@ -22,3 +22,8 @@ func NewQuotaManager(g func(ctx context.Context) (*grpc.ClientConn, error)) *Quo
 func (q *QuotaManager) QuotaLimit() *QuotaLimitServiceClient {
 	return &QuotaLimitServiceClient{getConn: q.getConn}
 }
+
+// QuotaRequest gets QuotaRequestService client
+func (q *QuotaManager) QuotaRequest() *QuotaRequestServiceClient {
+	return &QuotaRequestServiceClient{getConn: q.getConn}
+}
