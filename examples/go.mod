@@ -12,7 +12,7 @@ require (
 	github.com/yandex-cloud/go-sdk/services/mdb/mongodb v0.0.2
 	github.com/yandex-cloud/go-sdk/services/mdb/postgresql v0.0.2
 	github.com/yandex-cloud/go-sdk/services/vpc v0.0.12
-	github.com/yandex-cloud/go-sdk/v2 v2.7.4
+	github.com/yandex-cloud/go-sdk/v2 v2.8.0
 	google.golang.org/grpc v1.75.0
 	google.golang.org/protobuf v1.36.8
 )
