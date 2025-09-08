@@ -6,7 +6,6 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/clickhouse/v1"
-	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/elasticsearch/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/greenplum/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/kafka/v1"
 	"github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/mongodb/v1"
@@ -204,30 +203,6 @@ func (r *kafkaClusterResolver) Run(ctx context.Context, sdk *ycsdk.SDK, opts ...
 	}
 
 	resp, err := sdk.MDB().Kafka().Cluster().List(ctx, &kafka.ListClustersRequest{
-		FolderId: r.FolderID(),
-		Filter:   CreateResolverFilter("name", r.Name),
-		PageSize: DefaultResolverPageSize,
-	})
-	return r.findName(resp.GetClusters(), err)
-}
-
-func ElasticSearchClusterResolver(name string, opts ...ResolveOption) ycsdk.Resolver {
-	return &elasticSearchClusterResolver{
-		BaseNameResolver: NewBaseNameResolver(name, "cluster", opts...),
-	}
-}
-
-type elasticSearchClusterResolver struct {
-	BaseNameResolver
-}
-
-func (r *elasticSearchClusterResolver) Run(ctx context.Context, sdk *ycsdk.SDK, opts ...grpc.CallOption) error {
-	err := r.ensureFolderID()
-	if err != nil {
-		return err
-	}
-
-	resp, err := sdk.MDB().ElasticSearch().Cluster().List(ctx, &elasticsearch.ListClustersRequest{
 		FolderId: r.FolderID(),
 		Filter:   CreateResolverFilter("name", r.Name),
 		PageSize: DefaultResolverPageSize,

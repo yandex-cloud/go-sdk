@@ -5,7 +5,6 @@ package ycsdk
 
 import (
 	"github.com/yandex-cloud/go-sdk/gen/mdb/clickhouse"
-	"github.com/yandex-cloud/go-sdk/gen/mdb/elasticsearch"
 	"github.com/yandex-cloud/go-sdk/gen/mdb/greenplum"
 	"github.com/yandex-cloud/go-sdk/gen/mdb/kafka"
 	"github.com/yandex-cloud/go-sdk/gen/mdb/mongodb"
@@ -26,7 +25,6 @@ const (
 	MDBKafkaServiceID      Endpoint = "managed-kafka"
 	MDBSQLServerServiceID  Endpoint = "managed-sqlserver"
 	MDBGreenplumServiceID  Endpoint = "managed-greenplum"
-	MDBElasticSearchID     Endpoint = "managed-elasticsearch"
 	MDBOpenSearchID        Endpoint = "managed-opensearch"
 	MDBSPQRID              Endpoint = "managed-spqr"
 )
@@ -65,10 +63,6 @@ func (m *MDB) SQLServer() *sqlserver.SQLServer {
 
 func (m *MDB) Greenplum() *greenplum.Greenplum {
 	return greenplum.NewGreenplum(m.sdk.getConn(MDBGreenplumServiceID))
-}
-
-func (m *MDB) ElasticSearch() *elasticsearch.ElasticSearch {
-	return elasticsearch.NewElasticSearch(m.sdk.getConn(MDBElasticSearchID))
 }
 
 func (m *MDB) OpenSearch() *opensearch.OpenSearch {

@@ -62,3 +62,13 @@ func (i *IAM) ServiceControl() *ServiceControlServiceClient {
 func (i *IAM) RefreshToken() *RefreshTokenServiceClient {
 	return &RefreshTokenServiceClient{getConn: i.getConn}
 }
+
+// OAuthClient gets OAuthClientService client
+func (i *IAM) OAuthClient() *OAuthClientServiceClient {
+	return &OAuthClientServiceClient{getConn: i.getConn}
+}
+
+// OAuthClientSecret gets OAuthClientSecretService client
+func (i *IAM) OAuthClientSecret() *OAuthClientSecretServiceClient {
+	return &OAuthClientSecretServiceClient{getConn: i.getConn}
+}
