@@ -3,8 +3,8 @@ module github.com/yandex-cloud/go-sdk/services/mdb/opensearch
 go 1.23.9
 
 require (
-	github.com/yandex-cloud/go-genproto v0.20.0
-	github.com/yandex-cloud/go-sdk/v2 v2.8.0
+	github.com/yandex-cloud/go-genproto v0.22.0
+	github.com/yandex-cloud/go-sdk/v2 v2.9.0
 	google.golang.org/grpc v1.75.0
 	google.golang.org/protobuf v1.36.8
 )
