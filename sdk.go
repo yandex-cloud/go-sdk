@@ -33,6 +33,7 @@ import (
 	"github.com/yandex-cloud/go-sdk/gen/monitoring"
 	gen_operation "github.com/yandex-cloud/go-sdk/gen/operation"
 	"github.com/yandex-cloud/go-sdk/gen/organizationmanager"
+	organizationmanageridp "github.com/yandex-cloud/go-sdk/gen/organizationmanager/idp"
 	organizationmanagersaml "github.com/yandex-cloud/go-sdk/gen/organizationmanager/saml"
 	"github.com/yandex-cloud/go-sdk/gen/resourcemanager"
 	"github.com/yandex-cloud/go-sdk/gen/storage-api"
@@ -240,6 +241,10 @@ func (sdk *SDK) GroupMappingServiceClient() *organizationmanager.GroupMappingSer
 
 func (sdk *SDK) OrganizationManagerSAML() *organizationmanagersaml.OrganizationManagerSAML {
 	return organizationmanagersaml.NewOrganizationManagerSAML(sdk.getConn(OrganizationManagementServiceID))
+}
+
+func (sdk *SDK) OrganizationManagerIdp() *organizationmanageridp.OrganizationManagerIdp {
+	return organizationmanageridp.NewOrganizationManagerIdp(sdk.getConn(OrganizationManagementServiceID))
 }
 
 // ResourceManager returns ResourceManager object that is used to operate on Folders and Clouds
