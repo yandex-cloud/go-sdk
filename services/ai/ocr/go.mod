@@ -3,10 +3,10 @@ module github.com/yandex-cloud/go-sdk/services/ai/ocr
 go 1.23.9
 
 require (
-	github.com/yandex-cloud/go-genproto v0.22.0
-	github.com/yandex-cloud/go-sdk/v2 v2.9.0
-	google.golang.org/grpc v1.75.0
-	google.golang.org/protobuf v1.36.8
+	github.com/yandex-cloud/go-genproto v0.23.0
+	github.com/yandex-cloud/go-sdk/v2 v2.10.0
+	google.golang.org/grpc v1.75.1
+	google.golang.org/protobuf v1.36.9
 )
 
 require (

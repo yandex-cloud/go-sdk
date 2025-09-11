@@ -36,8 +36,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOfJA=
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
-github.com/yandex-cloud/go-genproto v0.22.0 h1:v6qSRdEW7NrPSSzmj8fBaTLiHXAxDTgV/bCI69FHHWQ=
-github.com/yandex-cloud/go-genproto v0.22.0/go.mod h1:0LDD/IZLIUIV4iPH+YcF+jysO3jkSvADFGm4dCAuwQo=
+github.com/yandex-cloud/go-genproto v0.23.0 h1:7nnb/o//eK4ZDd3wCuhWn2DoY1U2+dcUTJosoY49h0M=
+github.com/yandex-cloud/go-genproto v0.23.0/go.mod h1:0LDD/IZLIUIV4iPH+YcF+jysO3jkSvADFGm4dCAuwQo=
 github.com/yandex-cloud/go-sdk/services/compute v1.0.17 h1:ByQGhj51UWiQ02cnyBTK22fwDWQS4IkP6lxWhiVZwjM=
 github.com/yandex-cloud/go-sdk/services/compute v1.0.17/go.mod h1:6KVadiHcjMRfsi7mv2TClMiRYIc18Jd4NDmo2RbnuUs=
 github.com/yandex-cloud/go-sdk/services/lockbox v0.0.12 h1:+DGp6z1smxBC+fDJSO+10Y0G1zQ/XRocZt3IwqNsOwE=
@@ -52,8 +52,8 @@ github.com/yandex-cloud/go-sdk/services/mdb/postgresql v0.0.2 h1:aYWQkUAIfhRMCPZ
 github.com/yandex-cloud/go-sdk/services/mdb/postgresql v0.0.2/go.mod h1:O+CPI4LGNvT3gQ/DlqbWadXcJ88gFQAI3rPjV3JG8gE=
 github.com/yandex-cloud/go-sdk/services/vpc v0.0.12 h1:LDVIgGwTX+HF163KPQw+Mq9MIobAkIcBGUG4ZCT6FYA=
 github.com/yandex-cloud/go-sdk/services/vpc v0.0.12/go.mod h1:SEX3A8WeL0K7BjmgALMMIsxw3Lj/kddKHMuEivVpr7A=
-github.com/yandex-cloud/go-sdk/v2 v2.9.0 h1:d74nfRXhnKuZO3Mawzk1U+K6biyq5LF7jVzaNn7Jn0E=
-github.com/yandex-cloud/go-sdk/v2 v2.9.0/go.mod h1:0ZG2ecqRksqAPOoBe1UdbgJHt15M1MbvmBw2ifmoCqM=
+github.com/yandex-cloud/go-sdk/v2 v2.10.0 h1:xEIP3OSYDN61p1A4opOEqo3hM+mMFLASbcIbNP4z+kk=
+github.com/yandex-cloud/go-sdk/v2 v2.10.0/go.mod h1:9IbtRMVOx89vLXGkBvZzngGArL9pmXIEw/9EvGeGtMg=
 go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJySYA=
 go.opentelemetry.io/auto/sdk v1.1.0/go.mod h1:3wSPjt5PWp2RhlCcmmOial7AvC4DQqZb7a7wCow3W8A=
 go.opentelemetry.io/otel v1.37.0 h1:9zhNfelUvx0KBfu/gb+ZgeAfAgtWrfHJZcAqFC228wQ=
@@ -88,10 +88,10 @@ google.golang.org/genproto/googleapis/api v0.0.0-20250818200422-3122310a409c h1:
 google.golang.org/genproto/googleapis/api v0.0.0-20250818200422-3122310a409c/go.mod h1:ea2MjsO70ssTfCjiwHgI0ZFqcw45Ksuk2ckf9G468GA=
 google.golang.org/genproto/googleapis/rpc v0.0.0-20250818200422-3122310a409c h1:qXWI/sQtv5UKboZ/zUk7h+mrf/lXORyI+n9DKDAusdg=
 google.golang.org/genproto/googleapis/rpc v0.0.0-20250818200422-3122310a409c/go.mod h1:gw1tLEfykwDz2ET4a12jcXt4couGAm7IwsVaTy0Sflo=
-google.golang.org/grpc v1.75.0 h1:+TW+dqTd2Biwe6KKfhE5JpiYIBWq865PhKGSXiivqt4=
-google.golang.org/grpc v1.75.0/go.mod h1:JtPAzKiq4v1xcAB2hydNlWI2RnF85XXcV0mhKXr2ecQ=
-google.golang.org/protobuf v1.36.8 h1:xHScyCOEuuwZEc6UtSOvPbAT4zRh0xcNRYekJwfqyMc=
-google.golang.org/protobuf v1.36.8/go.mod h1:fuxRtAxBytpl4zzqUh6/eyUujkJdNiuEkXntxiD/uRU=
+google.golang.org/grpc v1.75.1 h1:/ODCNEuf9VghjgO3rqLcfg8fiOP0nSluljWFlDxELLI=
+google.golang.org/grpc v1.75.1/go.mod h1:JtPAzKiq4v1xcAB2hydNlWI2RnF85XXcV0mhKXr2ecQ=
+google.golang.org/protobuf v1.36.9 h1:w2gp2mA27hUeUzj9Ex9FBjsBm40zfaDtEWow293U7Iw=
+google.golang.org/protobuf v1.36.9/go.mod h1:fuxRtAxBytpl4zzqUh6/eyUujkJdNiuEkXntxiD/uRU=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v2 v2.4.0 h1:D8xgwECY7CYvx+Y2n4sBz93Jn9JRvxdiyyo8CTfuKaY=

@@ -32,8 +32,9 @@ var _ transport.Connector = (*SDK)(nil)
 
 // SDK provides a client connection wrapper managing connection pooling and endpoint resolution for gRPC services.
 type SDK struct {
-	connPool *transportgrpc.ConnPool
-	conn     transport.Connector
+	connPool      *transportgrpc.ConnPool
+	conn          transport.Connector
+	authenticator authentication.Authenticator
 }
 
 // Build initializes and configures an SDK instance with the provided options and context.
@@ -121,8 +122,9 @@ func Build(ctx context.Context, opts ...options.Option) (*SDK, error) {
 	connectionPool := transportgrpc.NewConnPool(dialOpts)
 
 	return &SDK{
-		conn:     transport.NewConnector(buildOptions.EndpointsResolver, connectionPool),
-		connPool: connectionPool,
+		conn:          transport.NewConnector(buildOptions.EndpointsResolver, connectionPool),
+		connPool:      connectionPool,
+		authenticator: buildOptions.Authenticator,
 	}, nil
 }
 
@@ -189,4 +191,8 @@ func buildEndpointsResolver(ctx context.Context, discoveryEndpoint string) (endp
 	}
 
 	return endpoints.NewPrefixEndpointsResolver(p2e), nil
+}
+
+func (sdk *SDK) CreateIAMToken(ctx context.Context) (authentication.IamToken, error) {
+	return sdk.authenticator.CreateIAMToken(ctx)
 }
