@@ -38,7 +38,22 @@ func (c *CDN) Provider() *ProviderServiceClient {
 	return &ProviderServiceClient{getConn: c.getConn}
 }
 
+// RawLogs gets RawLogsService client
+func (c *CDN) RawLogs() *RawLogsServiceClient {
+	return &RawLogsServiceClient{getConn: c.getConn}
+}
+
+// ResourceRules gets ResourceRulesService client
+func (c *CDN) ResourceRules() *ResourceRulesServiceClient {
+	return &ResourceRulesServiceClient{getConn: c.getConn}
+}
+
 // Resource gets ResourceService client
 func (c *CDN) Resource() *ResourceServiceClient {
 	return &ResourceServiceClient{getConn: c.getConn}
+}
+
+// Shielding gets ShieldingService client
+func (c *CDN) Shielding() *ShieldingServiceClient {
+	return &ShieldingServiceClient{getConn: c.getConn}
 }
