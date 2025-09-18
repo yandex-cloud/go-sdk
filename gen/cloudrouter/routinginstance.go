@@ -342,6 +342,15 @@ func (c *RoutingInstanceServiceClient) Update(ctx context.Context, in *cloudrout
 	return cloudrouter.NewRoutingInstanceServiceClient(conn).Update(ctx, in, opts...)
 }
 
+// UpdateNetworks implements cloudrouter.RoutingInstanceServiceClient
+func (c *RoutingInstanceServiceClient) UpdateNetworks(ctx context.Context, in *cloudrouter.UpdateNetworksRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudrouter.NewRoutingInstanceServiceClient(conn).UpdateNetworks(ctx, in, opts...)
+}
+
 // UpdatePrefixMask implements cloudrouter.RoutingInstanceServiceClient
 func (c *RoutingInstanceServiceClient) UpdatePrefixMask(ctx context.Context, in *cloudrouter.UpdatePrefixMaskRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)

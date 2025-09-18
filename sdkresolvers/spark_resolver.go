@@ -32,3 +32,22 @@ func (r *sparkClusterResolver) Run(ctx context.Context, sdk *ycsdk.SDK, opts ...
 	})
 	return r.findName(resp.GetClusters(), err)
 }
+
+type sparkJobResolver struct {
+	BaseNameResolver
+}
+
+func SparkJobResolver(name string, opts ...ResolveOption) ycsdk.Resolver {
+	return &sparkJobResolver{
+		BaseNameResolver: NewBaseNameResolver(name, "job", opts...),
+	}
+}
+
+func (r *sparkJobResolver) Run(ctx context.Context, sdk *ycsdk.SDK, opts ...grpc.CallOption) error {
+	resp, err := sdk.Spark().Job().List(ctx, &spark.ListJobsRequest{
+		ClusterId: r.opts.clusterID,
+		Filter:    CreateResolverFilter("name", r.Name),
+		PageSize:  DefaultResolverPageSize,
+	}, opts...)
+	return r.findName(resp.GetJobs(), err)
+}
