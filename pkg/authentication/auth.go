@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"go.uber.org/zap"
+	"google.golang.org/grpc/metadata"
 
 	iampb "github.com/yandex-cloud/go-genproto/yandex/cloud/iam/v1"
 	"github.com/yandex-cloud/go-sdk/v2/credentials"
@@ -102,7 +103,14 @@ func (a *AuthenticatorImpl) createTokenFromNonExchangeable(ctx context.Context, 
 // CreateIAMTokenForServiceAccount generates a new IAM token for the provided service account ID using the IAM token client.
 func (a *AuthenticatorImpl) CreateIAMTokenForServiceAccount(ctx context.Context, serviceAccountID string) (IamToken, error) {
 	a.logger.Debug("Creating IAM token for service account", zap.String("serviceAccountID", serviceAccountID))
-	tokenResp, err := a.iamTokenClient.CreateForServiceAccount(ctx,
+	token, err := a.CreateIAMToken(ctx)
+	if err != nil {
+		a.logger.Error("Failed to create IAM token", zap.Error(err))
+		return nil, &errors.AuthError{Err: err}
+	}
+	a.logger.Debug("Successfully created IAM token")
+	authctx := metadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+token.GetIamToken())
+	tokenResp, err := a.iamTokenClient.CreateForServiceAccount(authctx,
 		&iampb.CreateIamTokenForServiceAccountRequest{
 			ServiceAccountId: serviceAccountID,
 		},
