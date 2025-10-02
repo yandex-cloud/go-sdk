@@ -17,7 +17,6 @@ import (
 type UserClient interface {
 	Get(context.Context, *spqr.GetUserRequest, ...grpc.CallOption) (*spqr.User, error)
 	List(context.Context, *spqr.ListUsersRequest, ...grpc.CallOption) (*spqr.ListUsersResponse, error)
-	ListAtRevision(context.Context, *spqr.ListUsersAtRevisionRequest, ...grpc.CallOption) (*spqr.ListUsersResponse, error)
 	Create(context.Context, *spqr.CreateUserRequest, ...grpc.CallOption) (*UserCreateOperation, error)
 	Update(context.Context, *spqr.UpdateUserRequest, ...grpc.CallOption) (*UserUpdateOperation, error)
 	Delete(context.Context, *spqr.DeleteUserRequest, ...grpc.CallOption) (*UserDeleteOperation, error)
@@ -50,15 +49,6 @@ func (c userClient) List(ctx context.Context, in *spqr.ListUsersRequest, opts ..
 		return nil, err
 	}
 	return spqr.NewUserServiceClient(connection).List(ctx, in, opts...)
-}
-
-// ListAtRevision is an operation of Yandex.Cloud Spqr User service.
-func (c userClient) ListAtRevision(ctx context.Context, in *spqr.ListUsersAtRevisionRequest, opts ...grpc.CallOption) (*spqr.ListUsersResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, UserListAtRevision, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return spqr.NewUserServiceClient(connection).ListAtRevision(ctx, in, opts...)
 }
 
 // UserCreateOperation is used to monitor the state of Create operations.
@@ -226,7 +216,6 @@ func (c userClient) pollOperation(ctx context.Context, operationId string, opts 
 var (
 	UserGet             = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.UserService.Get")
 	UserList            = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.UserService.List")
-	UserListAtRevision  = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.UserService.ListAtRevision")
 	UserCreate          = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.UserService.Create")
 	UserUpdate          = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.UserService.Update")
 	UserDelete          = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.UserService.Delete")

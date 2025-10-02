@@ -17,7 +17,6 @@ import (
 type DatabaseClient interface {
 	Get(context.Context, *spqr.GetDatabaseRequest, ...grpc.CallOption) (*spqr.Database, error)
 	List(context.Context, *spqr.ListDatabasesRequest, ...grpc.CallOption) (*spqr.ListDatabasesResponse, error)
-	ListAtRevision(context.Context, *spqr.ListDatabasesAtRevisionRequest, ...grpc.CallOption) (*spqr.ListDatabasesResponse, error)
 	Create(context.Context, *spqr.CreateDatabaseRequest, ...grpc.CallOption) (*DatabaseCreateOperation, error)
 	Delete(context.Context, *spqr.DeleteDatabaseRequest, ...grpc.CallOption) (*DatabaseDeleteOperation, error)
 }
@@ -49,15 +48,6 @@ func (c databaseClient) List(ctx context.Context, in *spqr.ListDatabasesRequest,
 		return nil, err
 	}
 	return spqr.NewDatabaseServiceClient(connection).List(ctx, in, opts...)
-}
-
-// ListAtRevision is an operation of Yandex.Cloud Spqr Database service.
-func (c databaseClient) ListAtRevision(ctx context.Context, in *spqr.ListDatabasesAtRevisionRequest, opts ...grpc.CallOption) (*spqr.ListDatabasesResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, DatabaseListAtRevision, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return spqr.NewDatabaseServiceClient(connection).ListAtRevision(ctx, in, opts...)
 }
 
 // DatabaseCreateOperation is used to monitor the state of Create operations.
@@ -174,7 +164,6 @@ func (c databaseClient) pollOperation(ctx context.Context, operationId string, o
 var (
 	DatabaseGet             = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.DatabaseService.Get")
 	DatabaseList            = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.DatabaseService.List")
-	DatabaseListAtRevision  = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.DatabaseService.ListAtRevision")
 	DatabaseCreate          = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.DatabaseService.Create")
 	DatabaseDelete          = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.DatabaseService.Delete")
 	DatabaseOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")

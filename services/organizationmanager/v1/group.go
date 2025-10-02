@@ -33,6 +33,7 @@ type GroupClient interface {
 	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
 	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*GroupSetAccessBindingsOperation, error)
 	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*GroupUpdateAccessBindingsOperation, error)
+	ListEffective(context.Context, *organizationmanager.ListEffectiveRequest, ...grpc.CallOption) (*organizationmanager.ListEffectiveResponse, error)
 }
 
 var _ GroupClient = groupClient{}
@@ -586,6 +587,15 @@ func (c groupClient) UpdateAccessBindings(ctx context.Context, in *access.Update
 	return &GroupUpdateAccessBindingsOperation{*op}, nil
 }
 
+// ListEffective is an operation of Yandex.Cloud OrganizationManager Group service.
+func (c groupClient) ListEffective(ctx context.Context, in *organizationmanager.ListEffectiveRequest, opts ...grpc.CallOption) (*organizationmanager.ListEffectiveResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, GroupListEffective, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return organizationmanager.NewGroupServiceClient(connection).ListEffective(ctx, in, opts...)
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c groupClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, GroupOperationPoller, opts...)
@@ -612,5 +622,6 @@ var (
 	GroupListAccessBindings   = protoreflect.FullName("yandex.cloud.organizationmanager.v1.GroupService.ListAccessBindings")
 	GroupSetAccessBindings    = protoreflect.FullName("yandex.cloud.organizationmanager.v1.GroupService.SetAccessBindings")
 	GroupUpdateAccessBindings = protoreflect.FullName("yandex.cloud.organizationmanager.v1.GroupService.UpdateAccessBindings")
+	GroupListEffective        = protoreflect.FullName("yandex.cloud.organizationmanager.v1.GroupService.ListEffective")
 	GroupOperationPoller      = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

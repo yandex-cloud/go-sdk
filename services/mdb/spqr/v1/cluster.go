@@ -17,7 +17,6 @@ import (
 // ClusterClient provides methods for managing Cluster resources of Yandex.Cloud Spqr.
 type ClusterClient interface {
 	Get(context.Context, *spqr.GetClusterRequest, ...grpc.CallOption) (*spqr.Cluster, error)
-	GetAtRevision(context.Context, *spqr.GetClusterAtRevisionRequest, ...grpc.CallOption) (*spqr.Cluster, error)
 	List(context.Context, *spqr.ListClustersRequest, ...grpc.CallOption) (*spqr.ListClustersResponse, error)
 	Create(context.Context, *spqr.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)
 	Update(context.Context, *spqr.UpdateClusterRequest, ...grpc.CallOption) (*ClusterUpdateOperation, error)
@@ -34,14 +33,12 @@ type ClusterClient interface {
 	ListOperations(context.Context, *spqr.ListClusterOperationsRequest, ...grpc.CallOption) (*spqr.ListClusterOperationsResponse, error)
 	ListBackups(context.Context, *spqr.ListClusterBackupsRequest, ...grpc.CallOption) (*spqr.ListClusterBackupsResponse, error)
 	ListHosts(context.Context, *spqr.ListClusterHostsRequest, ...grpc.CallOption) (*spqr.ListClusterHostsResponse, error)
-	ListHostsAtRevision(context.Context, *spqr.ListClusterHostsAtRevisionRequest, ...grpc.CallOption) (*spqr.ListClusterHostsResponse, error)
 	AddHosts(context.Context, *spqr.AddClusterHostsRequest, ...grpc.CallOption) (*ClusterAddHostsOperation, error)
 	UpdateHosts(context.Context, *spqr.UpdateClusterHostsRequest, ...grpc.CallOption) (*ClusterUpdateHostsOperation, error)
 	DeleteHosts(context.Context, *spqr.DeleteClusterHostsRequest, ...grpc.CallOption) (*ClusterDeleteHostsOperation, error)
 	ResetupHosts(context.Context, *spqr.ResetupHostsRequest, ...grpc.CallOption) (*ClusterResetupHostsOperation, error)
 	GetShard(context.Context, *spqr.GetClusterShardRequest, ...grpc.CallOption) (*spqr.Shard, error)
 	ListShards(context.Context, *spqr.ListClusterShardsRequest, ...grpc.CallOption) (*spqr.ListClusterShardsResponse, error)
-	ListShardsAtRevision(context.Context, *spqr.ListClusterShardsAtRevisionRequest, ...grpc.CallOption) (*spqr.ListClusterShardsResponse, error)
 	AddShard(context.Context, *spqr.AddClusterShardRequest, ...grpc.CallOption) (*ClusterAddShardOperation, error)
 	DeleteShard(context.Context, *spqr.DeleteClusterShardRequest, ...grpc.CallOption) (*ClusterDeleteShardOperation, error)
 }
@@ -64,15 +61,6 @@ func (c clusterClient) Get(ctx context.Context, in *spqr.GetClusterRequest, opts
 		return nil, err
 	}
 	return spqr.NewClusterServiceClient(connection).Get(ctx, in, opts...)
-}
-
-// GetAtRevision is an operation of Yandex.Cloud Spqr Cluster service.
-func (c clusterClient) GetAtRevision(ctx context.Context, in *spqr.GetClusterAtRevisionRequest, opts ...grpc.CallOption) (*spqr.Cluster, error) {
-	connection, err := c.connector.GetConnection(ctx, ClusterGetAtRevision, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return spqr.NewClusterServiceClient(connection).GetAtRevision(ctx, in, opts...)
 }
 
 // List is an operation of Yandex.Cloud Spqr Cluster service.
@@ -669,15 +657,6 @@ func (c clusterClient) ListHosts(ctx context.Context, in *spqr.ListClusterHostsR
 	return spqr.NewClusterServiceClient(connection).ListHosts(ctx, in, opts...)
 }
 
-// ListHostsAtRevision is an operation of Yandex.Cloud Spqr Cluster service.
-func (c clusterClient) ListHostsAtRevision(ctx context.Context, in *spqr.ListClusterHostsAtRevisionRequest, opts ...grpc.CallOption) (*spqr.ListClusterHostsResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, ClusterListHostsAtRevision, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return spqr.NewClusterServiceClient(connection).ListHostsAtRevision(ctx, in, opts...)
-}
-
 // ClusterAddHostsOperation is used to monitor the state of AddHosts operations.
 type ClusterAddHostsOperation struct {
 	sdkop.Operation
@@ -912,15 +891,6 @@ func (c clusterClient) ListShards(ctx context.Context, in *spqr.ListClusterShard
 	return spqr.NewClusterServiceClient(connection).ListShards(ctx, in, opts...)
 }
 
-// ListShardsAtRevision is an operation of Yandex.Cloud Spqr Cluster service.
-func (c clusterClient) ListShardsAtRevision(ctx context.Context, in *spqr.ListClusterShardsAtRevisionRequest, opts ...grpc.CallOption) (*spqr.ListClusterShardsResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, ClusterListShardsAtRevision, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return spqr.NewClusterServiceClient(connection).ListShardsAtRevision(ctx, in, opts...)
-}
-
 // ClusterAddShardOperation is used to monitor the state of AddShard operations.
 type ClusterAddShardOperation struct {
 	sdkop.Operation
@@ -1040,7 +1010,6 @@ func (c clusterClient) pollOperation(ctx context.Context, operationId string, op
 
 var (
 	ClusterGet                   = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.Get")
-	ClusterGetAtRevision         = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.GetAtRevision")
 	ClusterList                  = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.List")
 	ClusterCreate                = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.Create")
 	ClusterUpdate                = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.Update")
@@ -1057,14 +1026,12 @@ var (
 	ClusterListOperations        = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.ListOperations")
 	ClusterListBackups           = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.ListBackups")
 	ClusterListHosts             = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.ListHosts")
-	ClusterListHostsAtRevision   = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.ListHostsAtRevision")
 	ClusterAddHosts              = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.AddHosts")
 	ClusterUpdateHosts           = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.UpdateHosts")
 	ClusterDeleteHosts           = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.DeleteHosts")
 	ClusterResetupHosts          = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.ResetupHosts")
 	ClusterGetShard              = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.GetShard")
 	ClusterListShards            = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.ListShards")
-	ClusterListShardsAtRevision  = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.ListShardsAtRevision")
 	ClusterAddShard              = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.AddShard")
 	ClusterDeleteShard           = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.DeleteShard")
 	ClusterOperationPoller       = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
