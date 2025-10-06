@@ -3,10 +3,10 @@ module github.com/yandex-cloud/go-sdk/services/ytsaurus
 go 1.23.9
 
 require (
-	github.com/yandex-cloud/go-genproto v0.27.0
-	github.com/yandex-cloud/go-sdk/v2 v2.14.0
+	github.com/yandex-cloud/go-genproto v0.28.0
+	github.com/yandex-cloud/go-sdk/v2 v2.15.0
 	google.golang.org/grpc v1.75.1
-	google.golang.org/protobuf v1.36.9
+	google.golang.org/protobuf v1.36.10
 )
 
 require (
