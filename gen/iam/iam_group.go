@@ -72,3 +72,8 @@ func (i *IAM) OAuthClient() *OAuthClientServiceClient {
 func (i *IAM) OAuthClientSecret() *OAuthClientSecretServiceClient {
 	return &OAuthClientSecretServiceClient{getConn: i.getConn}
 }
+
+// AccessAnalyzer gets AccessAnalyzerService client
+func (i *IAM) AccessAnalyzer() *AccessAnalyzerServiceClient {
+	return &AccessAnalyzerServiceClient{getConn: i.getConn}
+}
