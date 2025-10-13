@@ -62,3 +62,8 @@ func (b *Baremetal) HardwarePool() *HardwarePoolServiceClient {
 func (b *Baremetal) Configuration() *ConfigurationServiceClient {
 	return &ConfigurationServiceClient{getConn: b.getConn}
 }
+
+// RentalPeriod gets RentalPeriodService client
+func (b *Baremetal) RentalPeriod() *RentalPeriodServiceClient {
+	return &RentalPeriodServiceClient{getConn: b.getConn}
+}
