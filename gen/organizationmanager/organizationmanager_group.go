@@ -47,3 +47,8 @@ func (o *OrganizationManager) OsLogin() *OsLoginServiceClient {
 func (o *OrganizationManager) UserSshKey() *UserSshKeyServiceClient {
 	return &UserSshKeyServiceClient{getConn: o.getConn}
 }
+
+// MfaEnforcement gets MfaEnforcementService client
+func (o *OrganizationManager) MfaEnforcement() *MfaEnforcementServiceClient {
+	return &MfaEnforcementServiceClient{getConn: o.getConn}
+}
