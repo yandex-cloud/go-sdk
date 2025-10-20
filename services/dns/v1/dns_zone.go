@@ -21,6 +21,7 @@ type DnsZoneClient interface {
 	List(context.Context, *dns.ListDnsZonesRequest, ...grpc.CallOption) (*dns.ListDnsZonesResponse, error)
 	Create(context.Context, *dns.CreateDnsZoneRequest, ...grpc.CallOption) (*DnsZoneCreateOperation, error)
 	Update(context.Context, *dns.UpdateDnsZoneRequest, ...grpc.CallOption) (*DnsZoneUpdateOperation, error)
+	Move(context.Context, *dns.MoveDnsZoneRequest, ...grpc.CallOption) (*DnsZoneMoveOperation, error)
 	Delete(context.Context, *dns.DeleteDnsZoneRequest, ...grpc.CallOption) (*DnsZoneDeleteOperation, error)
 	GetRecordSet(context.Context, *dns.GetDnsZoneRecordSetRequest, ...grpc.CallOption) (*dns.RecordSet, error)
 	ListRecordSets(context.Context, *dns.ListDnsZoneRecordSetsRequest, ...grpc.CallOption) (*dns.ListDnsZoneRecordSetsResponse, error)
@@ -168,6 +169,60 @@ func (c dnsZoneClient) Update(ctx context.Context, in *dns.UpdateDnsZoneRequest,
 		return nil, err
 	}
 	return &DnsZoneUpdateOperation{*op}, nil
+}
+
+// DnsZoneMoveOperation is used to monitor the state of Move operations.
+type DnsZoneMoveOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *DnsZoneMoveOperation) Metadata() *dns.MoveDnsZoneMetadata {
+	return o.Operation.Metadata().(*dns.MoveDnsZoneMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *DnsZoneMoveOperation) Response() *dns.DnsZone {
+	return o.Operation.Response().(*dns.DnsZone)
+}
+
+// Wait polls the operation until it's done.
+func (o *DnsZoneMoveOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*dns.DnsZone, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*dns.DnsZone)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *DnsZoneMoveOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*dns.DnsZone, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*dns.DnsZone)
+	return response, err
+}
+
+// Move is an operation of Yandex.Cloud Dns DnsZone service.
+// It returns an object which should be used to monitor the operation state.
+func (c dnsZoneClient) Move(ctx context.Context, in *dns.MoveDnsZoneRequest, opts ...grpc.CallOption) (*DnsZoneMoveOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, DnsZoneMove, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := dns.NewDnsZoneServiceClient(connection).Move(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*dns.MoveDnsZoneMetadata).GetDnsZoneId()
+		},
+		MetadataType: (*dns.MoveDnsZoneMetadata)(nil),
+		ResponseType: (*dns.DnsZone)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &DnsZoneMoveOperation{*op}, nil
 }
 
 // DnsZoneDeleteOperation is used to monitor the state of Delete operations.
@@ -532,6 +587,7 @@ var (
 	DnsZoneList                  = protoreflect.FullName("yandex.cloud.dns.v1.DnsZoneService.List")
 	DnsZoneCreate                = protoreflect.FullName("yandex.cloud.dns.v1.DnsZoneService.Create")
 	DnsZoneUpdate                = protoreflect.FullName("yandex.cloud.dns.v1.DnsZoneService.Update")
+	DnsZoneMove                  = protoreflect.FullName("yandex.cloud.dns.v1.DnsZoneService.Move")
 	DnsZoneDelete                = protoreflect.FullName("yandex.cloud.dns.v1.DnsZoneService.Delete")
 	DnsZoneGetRecordSet          = protoreflect.FullName("yandex.cloud.dns.v1.DnsZoneService.GetRecordSet")
 	DnsZoneListRecordSets        = protoreflect.FullName("yandex.cloud.dns.v1.DnsZoneService.ListRecordSets")
