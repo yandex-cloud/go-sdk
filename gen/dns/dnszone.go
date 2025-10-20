@@ -521,6 +521,15 @@ func (it *DnsZoneRecordSetsIterator) Error() error {
 	return it.err
 }
 
+// Move implements dns.DnsZoneServiceClient
+func (c *DnsZoneServiceClient) Move(ctx context.Context, in *dns.MoveDnsZoneRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return dns.NewDnsZoneServiceClient(conn).Move(ctx, in, opts...)
+}
+
 // SetAccessBindings implements dns.DnsZoneServiceClient
 func (c *DnsZoneServiceClient) SetAccessBindings(ctx context.Context, in *access.SetAccessBindingsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
