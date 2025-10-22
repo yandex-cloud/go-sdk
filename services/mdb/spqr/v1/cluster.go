@@ -4,6 +4,7 @@ package spqrsdk
 import (
 	"context"
 
+	access "github.com/yandex-cloud/go-genproto/yandex/cloud/access"
 	spqr "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/spqr/v1"
 	operation "github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 	sdkop "github.com/yandex-cloud/go-sdk/v2/pkg/operation"
@@ -41,6 +42,9 @@ type ClusterClient interface {
 	ListShards(context.Context, *spqr.ListClusterShardsRequest, ...grpc.CallOption) (*spqr.ListClusterShardsResponse, error)
 	AddShard(context.Context, *spqr.AddClusterShardRequest, ...grpc.CallOption) (*ClusterAddShardOperation, error)
 	DeleteShard(context.Context, *spqr.DeleteClusterShardRequest, ...grpc.CallOption) (*ClusterDeleteShardOperation, error)
+	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
+	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*ClusterSetAccessBindingsOperation, error)
+	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*ClusterUpdateAccessBindingsOperation, error)
 }
 
 var _ ClusterClient = clusterClient{}
@@ -999,6 +1003,117 @@ func (c clusterClient) DeleteShard(ctx context.Context, in *spqr.DeleteClusterSh
 	return &ClusterDeleteShardOperation{*op}, nil
 }
 
+// ListAccessBindings is an operation of Yandex.Cloud Spqr Cluster service.
+func (c clusterClient) ListAccessBindings(ctx context.Context, in *access.ListAccessBindingsRequest, opts ...grpc.CallOption) (*access.ListAccessBindingsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, ClusterListAccessBindings, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return spqr.NewClusterServiceClient(connection).ListAccessBindings(ctx, in, opts...)
+}
+
+// ClusterSetAccessBindingsOperation is used to monitor the state of SetAccessBindings operations.
+type ClusterSetAccessBindingsOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ClusterSetAccessBindingsOperation) Metadata() *access.SetAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.SetAccessBindingsMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ClusterSetAccessBindingsOperation) Response() *access.AccessBindingsOperationResult {
+	return o.Operation.Response().(*access.AccessBindingsOperationResult)
+}
+
+// Wait polls the operation until it's done.
+func (o *ClusterSetAccessBindingsOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*access.AccessBindingsOperationResult, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*access.AccessBindingsOperationResult)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ClusterSetAccessBindingsOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*access.AccessBindingsOperationResult, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*access.AccessBindingsOperationResult)
+	return response, err
+}
+
+// SetAccessBindings is an operation of Yandex.Cloud Spqr Cluster service.
+// It returns an object which should be used to monitor the operation state.
+func (c clusterClient) SetAccessBindings(ctx context.Context, in *access.SetAccessBindingsRequest, opts ...grpc.CallOption) (*ClusterSetAccessBindingsOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ClusterSetAccessBindings, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := spqr.NewClusterServiceClient(connection).SetAccessBindings(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*access.SetAccessBindingsMetadata)(nil),
+		ResponseType: (*access.AccessBindingsOperationResult)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ClusterSetAccessBindingsOperation{*op}, nil
+}
+
+// ClusterUpdateAccessBindingsOperation is used to monitor the state of UpdateAccessBindings operations.
+type ClusterUpdateAccessBindingsOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ClusterUpdateAccessBindingsOperation) Metadata() *access.UpdateAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.UpdateAccessBindingsMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ClusterUpdateAccessBindingsOperation) Response() *access.AccessBindingsOperationResult {
+	return o.Operation.Response().(*access.AccessBindingsOperationResult)
+}
+
+// Wait polls the operation until it's done.
+func (o *ClusterUpdateAccessBindingsOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*access.AccessBindingsOperationResult, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*access.AccessBindingsOperationResult)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ClusterUpdateAccessBindingsOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*access.AccessBindingsOperationResult, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*access.AccessBindingsOperationResult)
+	return response, err
+}
+
+// UpdateAccessBindings is an operation of Yandex.Cloud Spqr Cluster service.
+// It returns an object which should be used to monitor the operation state.
+func (c clusterClient) UpdateAccessBindings(ctx context.Context, in *access.UpdateAccessBindingsRequest, opts ...grpc.CallOption) (*ClusterUpdateAccessBindingsOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ClusterUpdateAccessBindings, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := spqr.NewClusterServiceClient(connection).UpdateAccessBindings(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*access.UpdateAccessBindingsMetadata)(nil),
+		ResponseType: (*access.AccessBindingsOperationResult)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ClusterUpdateAccessBindingsOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c clusterClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, ClusterOperationPoller, opts...)
@@ -1034,5 +1149,8 @@ var (
 	ClusterListShards            = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.ListShards")
 	ClusterAddShard              = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.AddShard")
 	ClusterDeleteShard           = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.DeleteShard")
+	ClusterListAccessBindings    = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.ListAccessBindings")
+	ClusterSetAccessBindings     = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.SetAccessBindings")
+	ClusterUpdateAccessBindings  = protoreflect.FullName("yandex.cloud.mdb.spqr.v1.ClusterService.UpdateAccessBindings")
 	ClusterOperationPoller       = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
