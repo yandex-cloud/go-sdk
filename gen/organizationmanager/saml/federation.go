@@ -557,6 +557,24 @@ func (it *FederationUserAccountsIterator) Error() error {
 	return it.err
 }
 
+// ReactivateUserAccounts implements saml.FederationServiceClient
+func (c *FederationServiceClient) ReactivateUserAccounts(ctx context.Context, in *saml.ReactivateFederatedUserAccountsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return saml.NewFederationServiceClient(conn).ReactivateUserAccounts(ctx, in, opts...)
+}
+
+// SuspendUserAccounts implements saml.FederationServiceClient
+func (c *FederationServiceClient) SuspendUserAccounts(ctx context.Context, in *saml.SuspendFederatedUserAccountsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return saml.NewFederationServiceClient(conn).SuspendUserAccounts(ctx, in, opts...)
+}
+
 // Update implements saml.FederationServiceClient
 func (c *FederationServiceClient) Update(ctx context.Context, in *saml.UpdateFederationRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
