@@ -3,8 +3,8 @@ module github.com/yandex-cloud/go-sdk/services/mdb/postgresql
 go 1.23.9
 
 require (
-	github.com/yandex-cloud/go-genproto v0.33.0
-	github.com/yandex-cloud/go-sdk/v2 v2.21.0
+	github.com/yandex-cloud/go-genproto v0.34.0
+	github.com/yandex-cloud/go-sdk/v2 v2.22.0
 	google.golang.org/grpc v1.74.0-dev
 	google.golang.org/protobuf v1.36.6
 )

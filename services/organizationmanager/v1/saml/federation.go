@@ -30,6 +30,8 @@ type FederationClient interface {
 	AddDomain(context.Context, *saml.AddFederationDomainRequest, ...grpc.CallOption) (*FederationAddDomainOperation, error)
 	ValidateDomain(context.Context, *saml.ValidateFederationDomainRequest, ...grpc.CallOption) (*FederationValidateDomainOperation, error)
 	DeleteDomain(context.Context, *saml.DeleteFederationDomainRequest, ...grpc.CallOption) (*FederationDeleteDomainOperation, error)
+	SuspendUserAccounts(context.Context, *saml.SuspendFederatedUserAccountsRequest, ...grpc.CallOption) (*FederationSuspendUserAccountsOperation, error)
+	ReactivateUserAccounts(context.Context, *saml.ReactivateFederatedUserAccountsRequest, ...grpc.CallOption) (*FederationReactivateUserAccountsOperation, error)
 }
 
 var _ FederationClient = federationClient{}
@@ -529,6 +531,114 @@ func (c federationClient) DeleteDomain(ctx context.Context, in *saml.DeleteFeder
 	return &FederationDeleteDomainOperation{*op}, nil
 }
 
+// FederationSuspendUserAccountsOperation is used to monitor the state of SuspendUserAccounts operations.
+type FederationSuspendUserAccountsOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *FederationSuspendUserAccountsOperation) Metadata() *saml.SuspendFederatedUserAccountsMetadata {
+	return o.Operation.Metadata().(*saml.SuspendFederatedUserAccountsMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *FederationSuspendUserAccountsOperation) Response() *saml.SuspendFederatedUserAccountsResponse {
+	return o.Operation.Response().(*saml.SuspendFederatedUserAccountsResponse)
+}
+
+// Wait polls the operation until it's done.
+func (o *FederationSuspendUserAccountsOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*saml.SuspendFederatedUserAccountsResponse, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*saml.SuspendFederatedUserAccountsResponse)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *FederationSuspendUserAccountsOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*saml.SuspendFederatedUserAccountsResponse, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*saml.SuspendFederatedUserAccountsResponse)
+	return response, err
+}
+
+// SuspendUserAccounts is an operation of Yandex.Cloud Saml Federation service.
+// It returns an object which should be used to monitor the operation state.
+func (c federationClient) SuspendUserAccounts(ctx context.Context, in *saml.SuspendFederatedUserAccountsRequest, opts ...grpc.CallOption) (*FederationSuspendUserAccountsOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, FederationSuspendUserAccounts, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := saml.NewFederationServiceClient(connection).SuspendUserAccounts(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*saml.SuspendFederatedUserAccountsMetadata).GetFederationId()
+		},
+		MetadataType: (*saml.SuspendFederatedUserAccountsMetadata)(nil),
+		ResponseType: (*saml.SuspendFederatedUserAccountsResponse)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &FederationSuspendUserAccountsOperation{*op}, nil
+}
+
+// FederationReactivateUserAccountsOperation is used to monitor the state of ReactivateUserAccounts operations.
+type FederationReactivateUserAccountsOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *FederationReactivateUserAccountsOperation) Metadata() *saml.ReactivateFederatedUserAccountsMetadata {
+	return o.Operation.Metadata().(*saml.ReactivateFederatedUserAccountsMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *FederationReactivateUserAccountsOperation) Response() *saml.ReactivateFederatedUserAccountsResponse {
+	return o.Operation.Response().(*saml.ReactivateFederatedUserAccountsResponse)
+}
+
+// Wait polls the operation until it's done.
+func (o *FederationReactivateUserAccountsOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*saml.ReactivateFederatedUserAccountsResponse, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*saml.ReactivateFederatedUserAccountsResponse)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *FederationReactivateUserAccountsOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*saml.ReactivateFederatedUserAccountsResponse, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*saml.ReactivateFederatedUserAccountsResponse)
+	return response, err
+}
+
+// ReactivateUserAccounts is an operation of Yandex.Cloud Saml Federation service.
+// It returns an object which should be used to monitor the operation state.
+func (c federationClient) ReactivateUserAccounts(ctx context.Context, in *saml.ReactivateFederatedUserAccountsRequest, opts ...grpc.CallOption) (*FederationReactivateUserAccountsOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, FederationReactivateUserAccounts, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := saml.NewFederationServiceClient(connection).ReactivateUserAccounts(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*saml.ReactivateFederatedUserAccountsMetadata).GetFederationId()
+		},
+		MetadataType: (*saml.ReactivateFederatedUserAccountsMetadata)(nil),
+		ResponseType: (*saml.ReactivateFederatedUserAccountsResponse)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &FederationReactivateUserAccountsOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c federationClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, FederationOperationPoller, opts...)
@@ -539,19 +649,21 @@ func (c federationClient) pollOperation(ctx context.Context, operationId string,
 }
 
 var (
-	FederationGet                = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.Get")
-	FederationList               = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.List")
-	FederationCreate             = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.Create")
-	FederationUpdate             = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.Update")
-	FederationDelete             = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.Delete")
-	FederationAddUserAccounts    = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.AddUserAccounts")
-	FederationDeleteUserAccounts = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.DeleteUserAccounts")
-	FederationListUserAccounts   = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.ListUserAccounts")
-	FederationListOperations     = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.ListOperations")
-	FederationGetDomain          = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.GetDomain")
-	FederationListDomains        = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.ListDomains")
-	FederationAddDomain          = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.AddDomain")
-	FederationValidateDomain     = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.ValidateDomain")
-	FederationDeleteDomain       = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.DeleteDomain")
-	FederationOperationPoller    = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
+	FederationGet                    = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.Get")
+	FederationList                   = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.List")
+	FederationCreate                 = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.Create")
+	FederationUpdate                 = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.Update")
+	FederationDelete                 = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.Delete")
+	FederationAddUserAccounts        = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.AddUserAccounts")
+	FederationDeleteUserAccounts     = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.DeleteUserAccounts")
+	FederationListUserAccounts       = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.ListUserAccounts")
+	FederationListOperations         = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.ListOperations")
+	FederationGetDomain              = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.GetDomain")
+	FederationListDomains            = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.ListDomains")
+	FederationAddDomain              = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.AddDomain")
+	FederationValidateDomain         = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.ValidateDomain")
+	FederationDeleteDomain           = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.DeleteDomain")
+	FederationSuspendUserAccounts    = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.SuspendUserAccounts")
+	FederationReactivateUserAccounts = protoreflect.FullName("yandex.cloud.organizationmanager.v1.saml.FederationService.ReactivateUserAccounts")
+	FederationOperationPoller        = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
