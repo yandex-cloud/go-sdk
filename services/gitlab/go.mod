@@ -3,8 +3,8 @@ module github.com/yandex-cloud/go-sdk/services/gitlab
 go 1.23.9
 
 require (
-	github.com/yandex-cloud/go-genproto v0.34.0
-	github.com/yandex-cloud/go-sdk/v2 v2.23.0
+	github.com/yandex-cloud/go-genproto v0.35.0
+	github.com/yandex-cloud/go-sdk/v2 v2.24.0
 	google.golang.org/grpc v1.74.0-dev
 	google.golang.org/protobuf v1.36.6
 )

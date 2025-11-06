@@ -4,6 +4,7 @@ package workflowssdk
 import (
 	"context"
 
+	access "github.com/yandex-cloud/go-genproto/yandex/cloud/access"
 	operation "github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 	workflows "github.com/yandex-cloud/go-genproto/yandex/cloud/serverless/workflows/v1"
 	sdkop "github.com/yandex-cloud/go-sdk/v2/pkg/operation"
@@ -22,6 +23,9 @@ type WorkflowClient interface {
 	Delete(context.Context, *workflows.DeleteWorkflowRequest, ...grpc.CallOption) (*WorkflowDeleteOperation, error)
 	List(context.Context, *workflows.ListWorkflowsRequest, ...grpc.CallOption) (*workflows.ListWorkflowsResponse, error)
 	ListOperations(context.Context, *workflows.ListOperationsRequest, ...grpc.CallOption) (*workflows.ListOperationsResponse, error)
+	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
+	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*WorkflowSetAccessBindingsOperation, error)
+	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*WorkflowUpdateAccessBindingsOperation, error)
 }
 
 var _ WorkflowClient = workflowClient{}
@@ -224,6 +228,117 @@ func (c workflowClient) ListOperations(ctx context.Context, in *workflows.ListOp
 	return workflows.NewWorkflowServiceClient(connection).ListOperations(ctx, in, opts...)
 }
 
+// ListAccessBindings is an operation of Yandex.Cloud Workflows Workflow service.
+func (c workflowClient) ListAccessBindings(ctx context.Context, in *access.ListAccessBindingsRequest, opts ...grpc.CallOption) (*access.ListAccessBindingsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, WorkflowListAccessBindings, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return workflows.NewWorkflowServiceClient(connection).ListAccessBindings(ctx, in, opts...)
+}
+
+// WorkflowSetAccessBindingsOperation is used to monitor the state of SetAccessBindings operations.
+type WorkflowSetAccessBindingsOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *WorkflowSetAccessBindingsOperation) Metadata() *access.SetAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.SetAccessBindingsMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *WorkflowSetAccessBindingsOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *WorkflowSetAccessBindingsOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *WorkflowSetAccessBindingsOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// SetAccessBindings is an operation of Yandex.Cloud Workflows Workflow service.
+// It returns an object which should be used to monitor the operation state.
+func (c workflowClient) SetAccessBindings(ctx context.Context, in *access.SetAccessBindingsRequest, opts ...grpc.CallOption) (*WorkflowSetAccessBindingsOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, WorkflowSetAccessBindings, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := workflows.NewWorkflowServiceClient(connection).SetAccessBindings(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*access.SetAccessBindingsMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &WorkflowSetAccessBindingsOperation{*op}, nil
+}
+
+// WorkflowUpdateAccessBindingsOperation is used to monitor the state of UpdateAccessBindings operations.
+type WorkflowUpdateAccessBindingsOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *WorkflowUpdateAccessBindingsOperation) Metadata() *access.UpdateAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.UpdateAccessBindingsMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *WorkflowUpdateAccessBindingsOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *WorkflowUpdateAccessBindingsOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *WorkflowUpdateAccessBindingsOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// UpdateAccessBindings is an operation of Yandex.Cloud Workflows Workflow service.
+// It returns an object which should be used to monitor the operation state.
+func (c workflowClient) UpdateAccessBindings(ctx context.Context, in *access.UpdateAccessBindingsRequest, opts ...grpc.CallOption) (*WorkflowUpdateAccessBindingsOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, WorkflowUpdateAccessBindings, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := workflows.NewWorkflowServiceClient(connection).UpdateAccessBindings(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*access.UpdateAccessBindingsMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &WorkflowUpdateAccessBindingsOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c workflowClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, WorkflowOperationPoller, opts...)
@@ -234,11 +349,14 @@ func (c workflowClient) pollOperation(ctx context.Context, operationId string, o
 }
 
 var (
-	WorkflowCreate          = protoreflect.FullName("yandex.cloud.serverless.workflows.v1.WorkflowService.Create")
-	WorkflowUpdate          = protoreflect.FullName("yandex.cloud.serverless.workflows.v1.WorkflowService.Update")
-	WorkflowGet             = protoreflect.FullName("yandex.cloud.serverless.workflows.v1.WorkflowService.Get")
-	WorkflowDelete          = protoreflect.FullName("yandex.cloud.serverless.workflows.v1.WorkflowService.Delete")
-	WorkflowList            = protoreflect.FullName("yandex.cloud.serverless.workflows.v1.WorkflowService.List")
-	WorkflowListOperations  = protoreflect.FullName("yandex.cloud.serverless.workflows.v1.WorkflowService.ListOperations")
-	WorkflowOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
+	WorkflowCreate               = protoreflect.FullName("yandex.cloud.serverless.workflows.v1.WorkflowService.Create")
+	WorkflowUpdate               = protoreflect.FullName("yandex.cloud.serverless.workflows.v1.WorkflowService.Update")
+	WorkflowGet                  = protoreflect.FullName("yandex.cloud.serverless.workflows.v1.WorkflowService.Get")
+	WorkflowDelete               = protoreflect.FullName("yandex.cloud.serverless.workflows.v1.WorkflowService.Delete")
+	WorkflowList                 = protoreflect.FullName("yandex.cloud.serverless.workflows.v1.WorkflowService.List")
+	WorkflowListOperations       = protoreflect.FullName("yandex.cloud.serverless.workflows.v1.WorkflowService.ListOperations")
+	WorkflowListAccessBindings   = protoreflect.FullName("yandex.cloud.serverless.workflows.v1.WorkflowService.ListAccessBindings")
+	WorkflowSetAccessBindings    = protoreflect.FullName("yandex.cloud.serverless.workflows.v1.WorkflowService.SetAccessBindings")
+	WorkflowUpdateAccessBindings = protoreflect.FullName("yandex.cloud.serverless.workflows.v1.WorkflowService.UpdateAccessBindings")
+	WorkflowOperationPoller      = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

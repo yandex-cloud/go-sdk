@@ -65,7 +65,7 @@ func TestWrappedRequestIDs(t *testing.T) {
 	t.Run("wrap err with client request id and nil header", func(t *testing.T) {
 		err := fmt.Errorf("some error")
 		actual := wrapError(err, clientTraceID, clientRequestID, nil)
-		assert.Equal(t, &errorWithRequestIDs{err, RequestIDs{clientTraceID, clientRequestID, "", ""}}, actual)
+		assert.Equal(t, &ErrorWithRequestIDs{err, RequestIDs{clientTraceID, clientRequestID, "", ""}}, actual)
 
 		errorInfo, ok := RequestIDsFromError(actual)
 		assert.True(t, ok)
@@ -77,7 +77,7 @@ func TestWrappedRequestIDs(t *testing.T) {
 	t.Run("wrap err with client and server request id", func(t *testing.T) {
 		err := fmt.Errorf("some error")
 		actual := wrapError(err, clientTraceID, clientRequestID, responseHeader(serverRequestID, serverTraceID))
-		assert.Equal(t, &errorWithRequestIDs{err, RequestIDs{clientTraceID, clientRequestID, serverRequestID, serverTraceID}}, actual)
+		assert.Equal(t, &ErrorWithRequestIDs{err, RequestIDs{clientTraceID, clientRequestID, serverRequestID, serverTraceID}}, actual)
 
 		errorInfo, ok := RequestIDsFromError(actual)
 		assert.True(t, ok)
@@ -88,7 +88,7 @@ func TestWrappedRequestIDs(t *testing.T) {
 	t.Run("wrap err with empty header", func(t *testing.T) {
 		err := fmt.Errorf("some error")
 		actual := wrapError(err, clientTraceID, clientRequestID, metadata.New(map[string]string{}))
-		assert.Equal(t, &errorWithRequestIDs{err, RequestIDs{clientTraceID, clientRequestID, "", ""}}, actual)
+		assert.Equal(t, &ErrorWithRequestIDs{err, RequestIDs{clientTraceID, clientRequestID, "", ""}}, actual)
 
 		errorInfo, ok := RequestIDsFromError(actual)
 		assert.True(t, ok)
@@ -187,7 +187,7 @@ func TestWrappedErrorImplGRPCStatus(t *testing.T) {
 	t.Run("wrapped error impl StatusError interface", func(t *testing.T) {
 		err := fmt.Errorf("some error")
 		actual := wrapError(err, clientTraceID, clientRequestID, nil)
-		assert.Equal(t, &errorWithRequestIDs{err, RequestIDs{clientTraceID, clientRequestID, "", ""}}, actual)
+		assert.Equal(t, &ErrorWithRequestIDs{err, RequestIDs{clientTraceID, clientRequestID, "", ""}}, actual)
 		assert.Implements(t, (*StatusError)(nil), actual)
 	})
 	t.Run("get status by status.FromError method", func(t *testing.T) {

@@ -59,42 +59,42 @@ type RequestIDs struct {
 	ServerTraceID   string
 }
 
-// errorWithRequestIDs wraps an original error and associates it with client and server request/trace IDs.
-type errorWithRequestIDs struct {
-	origErr error
-	ids     RequestIDs
+// ErrorWithRequestIDs wraps an original error and associates it with client and server request/trace IDs.
+type ErrorWithRequestIDs struct {
+	OrigErr error
+	IDs     RequestIDs
 }
 
 // Error returns a formatted error message including server and client request/trace IDs, followed by the original error message.
-func (e *errorWithRequestIDs) Error() (msg string) {
-	if e.ids.ServerRequestID != "" {
-		msg += fmt.Sprintf("server-request-id = %s ", e.ids.ServerRequestID)
+func (e *ErrorWithRequestIDs) Error() (msg string) {
+	if e.IDs.ServerRequestID != "" {
+		msg += fmt.Sprintf("server-request-id = %s ", e.IDs.ServerRequestID)
 	}
 
-	if e.ids.ServerTraceID != "" {
-		msg += fmt.Sprintf("server-trace-id = %s ", e.ids.ServerTraceID)
+	if e.IDs.ServerTraceID != "" {
+		msg += fmt.Sprintf("server-trace-id = %s ", e.IDs.ServerTraceID)
 	}
 
-	if e.ids.ClientRequestID != "" {
-		msg += fmt.Sprintf("client-request-id = %s ", e.ids.ClientRequestID)
+	if e.IDs.ClientRequestID != "" {
+		msg += fmt.Sprintf("client-request-id = %s ", e.IDs.ClientRequestID)
 	}
 
-	if e.ids.ClientTraceID != "" {
-		msg += fmt.Sprintf("client-trace-id = %s ", e.ids.ClientTraceID)
+	if e.IDs.ClientTraceID != "" {
+		msg += fmt.Sprintf("client-trace-id = %s ", e.IDs.ClientTraceID)
 	}
 
-	return msg + e.origErr.Error()
+	return msg + e.OrigErr.Error()
 }
 
 // GRPCStatus converts the original error into a gRPC status representation and returns the associated status.
-func (e errorWithRequestIDs) GRPCStatus() *status.Status {
-	return status.Convert(e.origErr)
+func (e ErrorWithRequestIDs) GRPCStatus() *status.Status {
+	return status.Convert(e.OrigErr)
 }
 
 // RequestIDsFromError extracts RequestIDs from an error if it contains request-related context. Returns ok as true if successful.
 func RequestIDsFromError(err error) (*RequestIDs, bool) {
-	if withID, ok := err.(*errorWithRequestIDs); ok {
-		return &withID.ids, ok
+	if withID, ok := err.(*ErrorWithRequestIDs); ok {
+		return &withID.IDs, ok
 	}
 
 	return nil, false
@@ -114,14 +114,14 @@ func wrapError(err error, clientTraceID, clientRequestID string, responseHeader 
 		return nil
 	}
 
-	if _, ok := err.(*errorWithRequestIDs); ok {
+	if _, ok := err.(*ErrorWithRequestIDs); ok {
 		return err
 	}
 
 	serverRequestID := getServerHeader(responseHeader, serverRequestIDHeader)
 	serverTraceID := getServerHeader(responseHeader, serverTraceIDHeader)
 
-	return &errorWithRequestIDs{
+	return &ErrorWithRequestIDs{
 		err,
 		RequestIDs{
 			ClientTraceID:   clientTraceID,
