@@ -6,6 +6,7 @@ import (
 	"github.com/yandex-cloud/go-sdk/gen/containers"
 	"github.com/yandex-cloud/go-sdk/gen/eventrouter"
 	"github.com/yandex-cloud/go-sdk/gen/functions"
+	"github.com/yandex-cloud/go-sdk/gen/mcpgateway"
 	"github.com/yandex-cloud/go-sdk/gen/mdbproxy"
 	"github.com/yandex-cloud/go-sdk/gen/triggers"
 	"github.com/yandex-cloud/go-sdk/gen/workflows"
@@ -25,6 +26,7 @@ const (
 	EventrouterServiceID          Endpoint = "serverless-eventrouter"
 	EventrouterEventsServiceID    Endpoint = "serverlesseventrouter-events"
 	WorkflowServiceID             Endpoint = "serverless-workflows"
+	McpGatewayServiceID           Endpoint = "serverless-mcpgateway"
 )
 
 func (s *Serverless) Functions() *functions.Function {
@@ -61,4 +63,8 @@ func (s *Serverless) EventrouterEvents() *eventrouter.Eventrouter {
 
 func (s *Serverless) Workflow() *workflows.Workflow {
 	return workflows.NewWorkflow(s.sdk.getConn(WorkflowServiceID))
+}
+
+func (s *Serverless) McpGateway() *mcpgateway.McpGateway {
+	return mcpgateway.NewMcpGateway(s.sdk.getConn(McpGatewayServiceID))
 }

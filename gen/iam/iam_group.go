@@ -18,9 +18,44 @@ func NewIAM(g func(ctx context.Context) (*grpc.ClientConn, error)) *IAM {
 	return &IAM{g}
 }
 
+// AccessAnalyzer gets AccessAnalyzerService client
+func (i *IAM) AccessAnalyzer() *AccessAnalyzerServiceClient {
+	return &AccessAnalyzerServiceClient{getConn: i.getConn}
+}
+
+// AccessPolicyTemplate gets AccessPolicyTemplateService client
+func (i *IAM) AccessPolicyTemplate() *AccessPolicyTemplateServiceClient {
+	return &AccessPolicyTemplateServiceClient{getConn: i.getConn}
+}
+
+// ApiKey gets ApiKeyService client
+func (i *IAM) ApiKey() *ApiKeyServiceClient {
+	return &ApiKeyServiceClient{getConn: i.getConn}
+}
+
 // IamToken gets IamTokenService client
 func (i *IAM) IamToken() *IamTokenServiceClient {
 	return &IamTokenServiceClient{getConn: i.getConn}
+}
+
+// Key gets KeyService client
+func (i *IAM) Key() *KeyServiceClient {
+	return &KeyServiceClient{getConn: i.getConn}
+}
+
+// OAuthClientSecret gets OAuthClientSecretService client
+func (i *IAM) OAuthClientSecret() *OAuthClientSecretServiceClient {
+	return &OAuthClientSecretServiceClient{getConn: i.getConn}
+}
+
+// OAuthClient gets OAuthClientService client
+func (i *IAM) OAuthClient() *OAuthClientServiceClient {
+	return &OAuthClientServiceClient{getConn: i.getConn}
+}
+
+// RefreshToken gets RefreshTokenService client
+func (i *IAM) RefreshToken() *RefreshTokenServiceClient {
+	return &RefreshTokenServiceClient{getConn: i.getConn}
 }
 
 // Role gets RoleService client
@@ -33,6 +68,11 @@ func (i *IAM) ServiceAccount() *ServiceAccountServiceClient {
 	return &ServiceAccountServiceClient{getConn: i.getConn}
 }
 
+// ServiceControl gets ServiceControlService client
+func (i *IAM) ServiceControl() *ServiceControlServiceClient {
+	return &ServiceControlServiceClient{getConn: i.getConn}
+}
+
 // UserAccount gets UserAccountService client
 func (i *IAM) UserAccount() *UserAccountServiceClient {
 	return &UserAccountServiceClient{getConn: i.getConn}
@@ -41,39 +81,4 @@ func (i *IAM) UserAccount() *UserAccountServiceClient {
 // YandexPassportUserAccount gets YandexPassportUserAccountService client
 func (i *IAM) YandexPassportUserAccount() *YandexPassportUserAccountServiceClient {
 	return &YandexPassportUserAccountServiceClient{getConn: i.getConn}
-}
-
-// Key gets KeyService client
-func (i *IAM) Key() *KeyServiceClient {
-	return &KeyServiceClient{getConn: i.getConn}
-}
-
-// ApiKey gets ApiKeyService client
-func (i *IAM) ApiKey() *ApiKeyServiceClient {
-	return &ApiKeyServiceClient{getConn: i.getConn}
-}
-
-// ServiceControl gets ServiceControlService client
-func (i *IAM) ServiceControl() *ServiceControlServiceClient {
-	return &ServiceControlServiceClient{getConn: i.getConn}
-}
-
-// RefreshToken gets RefreshTokenService client
-func (i *IAM) RefreshToken() *RefreshTokenServiceClient {
-	return &RefreshTokenServiceClient{getConn: i.getConn}
-}
-
-// OAuthClient gets OAuthClientService client
-func (i *IAM) OAuthClient() *OAuthClientServiceClient {
-	return &OAuthClientServiceClient{getConn: i.getConn}
-}
-
-// OAuthClientSecret gets OAuthClientSecretService client
-func (i *IAM) OAuthClientSecret() *OAuthClientSecretServiceClient {
-	return &OAuthClientSecretServiceClient{getConn: i.getConn}
-}
-
-// AccessAnalyzer gets AccessAnalyzerService client
-func (i *IAM) AccessAnalyzer() *AccessAnalyzerServiceClient {
-	return &AccessAnalyzerServiceClient{getConn: i.getConn}
 }

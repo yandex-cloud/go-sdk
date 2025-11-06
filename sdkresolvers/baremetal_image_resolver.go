@@ -15,7 +15,7 @@ type baremetalImageResolver struct {
 
 func BaremetalImageResolver(name string, opts ...ResolveOption) ycsdk.Resolver {
 	return &baremetalImageResolver{
-		BaseNameResolver: NewBaseNameResolver(name, "boot-image", opts...),
+		BaseNameResolver: NewBaseNameResolver(name, "image", opts...),
 	}
 }
 
@@ -25,10 +25,10 @@ func (r *baremetalImageResolver) Run(ctx context.Context, sdk *ycsdk.SDK, opts .
 		return err
 	}
 
-	resp, err := sdk.Baremetal().Image().List(ctx, &baremetal.ListImagesRequest{
+	resp, err := sdk.Baremetal().StandardImage().List(ctx, &baremetal.ListStandardImagesRequest{
 		FolderId: r.FolderID(),
 		Filter:   CreateResolverFilter("name", r.Name),
 		PageSize: DefaultResolverPageSize,
 	}, opts...)
-	return r.findName(resp.GetImages(), err)
+	return r.findName(resp.GetStandardImages(), err)
 }

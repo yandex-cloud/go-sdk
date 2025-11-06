@@ -67,3 +67,13 @@ func (b *Baremetal) Configuration() *ConfigurationServiceClient {
 func (b *Baremetal) RentalPeriod() *RentalPeriodServiceClient {
 	return &RentalPeriodServiceClient{getConn: b.getConn}
 }
+
+// StandardImage gets StandardImageService client
+func (b *Baremetal) StandardImage() *StandardImageServiceClient {
+	return &StandardImageServiceClient{getConn: b.getConn}
+}
+
+// PrivateCloudConnection gets PrivateCloudConnectionService client
+func (b *Baremetal) PrivateCloudConnection() *PrivateCloudConnectionServiceClient {
+	return &PrivateCloudConnectionServiceClient{getConn: b.getConn}
+}
