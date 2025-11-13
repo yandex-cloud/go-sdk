@@ -21,6 +21,15 @@ type CloudServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
 }
 
+// BindAccessPolicy implements resourcemanager.CloudServiceClient
+func (c *CloudServiceClient) BindAccessPolicy(ctx context.Context, in *access.BindAccessPolicyRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return resourcemanager.NewCloudServiceClient(conn).BindAccessPolicy(ctx, in, opts...)
+}
+
 // Create implements resourcemanager.CloudServiceClient
 func (c *CloudServiceClient) Create(ctx context.Context, in *resourcemanager.CreateCloudRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -280,6 +289,122 @@ func (it *CloudAccessBindingsIterator) Error() error {
 	return it.err
 }
 
+// ListAccessPolicyBindings implements resourcemanager.CloudServiceClient
+func (c *CloudServiceClient) ListAccessPolicyBindings(ctx context.Context, in *access.ListAccessPolicyBindingsRequest, opts ...grpc.CallOption) (*access.ListAccessPolicyBindingsResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return resourcemanager.NewCloudServiceClient(conn).ListAccessPolicyBindings(ctx, in, opts...)
+}
+
+type CloudAccessPolicyBindingsIterator struct {
+	ctx  context.Context
+	opts []grpc.CallOption
+
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
+
+	client  *CloudServiceClient
+	request *access.ListAccessPolicyBindingsRequest
+
+	items []*access.AccessPolicyBinding
+}
+
+func (c *CloudServiceClient) CloudAccessPolicyBindingsIterator(ctx context.Context, req *access.ListAccessPolicyBindingsRequest, opts ...grpc.CallOption) *CloudAccessPolicyBindingsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
+	return &CloudAccessPolicyBindingsIterator{
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
+	}
+}
+
+func (it *CloudAccessPolicyBindingsIterator) Next() bool {
+	if it.err != nil {
+		return false
+	}
+	if len(it.items) > 1 {
+		it.items[0] = nil
+		it.items = it.items[1:]
+		return true
+	}
+	it.items = nil // consume last item, if any
+
+	if it.started && it.request.PageToken == "" {
+		return false
+	}
+	it.started = true
+
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
+	response, err := it.client.ListAccessPolicyBindings(it.ctx, it.request, it.opts...)
+	it.err = err
+	if err != nil {
+		return false
+	}
+
+	it.items = response.AccessPolicyBindings
+	it.request.PageToken = response.NextPageToken
+	return len(it.items) > 0
+}
+
+func (it *CloudAccessPolicyBindingsIterator) Take(size int64) ([]*access.AccessPolicyBinding, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*access.AccessPolicyBinding
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *CloudAccessPolicyBindingsIterator) TakeAll() ([]*access.AccessPolicyBinding, error) {
+	return it.Take(0)
+}
+
+func (it *CloudAccessPolicyBindingsIterator) Value() *access.AccessPolicyBinding {
+	if len(it.items) == 0 {
+		panic("calling Value on empty iterator")
+	}
+	return it.items[0]
+}
+
+func (it *CloudAccessPolicyBindingsIterator) Error() error {
+	return it.err
+}
+
 // ListOperations implements resourcemanager.CloudServiceClient
 func (c *CloudServiceClient) ListOperations(ctx context.Context, in *resourcemanager.ListCloudOperationsRequest, opts ...grpc.CallOption) (*resourcemanager.ListCloudOperationsResponse, error) {
 	conn, err := c.getConn(ctx)
@@ -403,6 +528,15 @@ func (c *CloudServiceClient) SetAccessBindings(ctx context.Context, in *access.S
 		return nil, err
 	}
 	return resourcemanager.NewCloudServiceClient(conn).SetAccessBindings(ctx, in, opts...)
+}
+
+// UnbindAccessPolicy implements resourcemanager.CloudServiceClient
+func (c *CloudServiceClient) UnbindAccessPolicy(ctx context.Context, in *access.UnbindAccessPolicyRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return resourcemanager.NewCloudServiceClient(conn).UnbindAccessPolicy(ctx, in, opts...)
 }
 
 // Update implements resourcemanager.CloudServiceClient
