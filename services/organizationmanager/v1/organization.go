@@ -24,6 +24,9 @@ type OrganizationClient interface {
 	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
 	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*OrganizationSetAccessBindingsOperation, error)
 	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*OrganizationUpdateAccessBindingsOperation, error)
+	ListAccessPolicyBindings(context.Context, *access.ListAccessPolicyBindingsRequest, ...grpc.CallOption) (*access.ListAccessPolicyBindingsResponse, error)
+	BindAccessPolicy(context.Context, *access.BindAccessPolicyRequest, ...grpc.CallOption) (*OrganizationBindAccessPolicyOperation, error)
+	UnbindAccessPolicy(context.Context, *access.UnbindAccessPolicyRequest, ...grpc.CallOption) (*OrganizationUnbindAccessPolicyOperation, error)
 }
 
 var _ OrganizationClient = organizationClient{}
@@ -229,6 +232,117 @@ func (c organizationClient) UpdateAccessBindings(ctx context.Context, in *access
 	return &OrganizationUpdateAccessBindingsOperation{*op}, nil
 }
 
+// ListAccessPolicyBindings is an operation of Yandex.Cloud OrganizationManager Organization service.
+func (c organizationClient) ListAccessPolicyBindings(ctx context.Context, in *access.ListAccessPolicyBindingsRequest, opts ...grpc.CallOption) (*access.ListAccessPolicyBindingsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, OrganizationListAccessPolicyBindings, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return organizationmanager.NewOrganizationServiceClient(connection).ListAccessPolicyBindings(ctx, in, opts...)
+}
+
+// OrganizationBindAccessPolicyOperation is used to monitor the state of BindAccessPolicy operations.
+type OrganizationBindAccessPolicyOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *OrganizationBindAccessPolicyOperation) Metadata() *access.BindAccessPolicyMetadata {
+	return o.Operation.Metadata().(*access.BindAccessPolicyMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *OrganizationBindAccessPolicyOperation) Response() *access.BindAccessPolicyResponse {
+	return o.Operation.Response().(*access.BindAccessPolicyResponse)
+}
+
+// Wait polls the operation until it's done.
+func (o *OrganizationBindAccessPolicyOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*access.BindAccessPolicyResponse, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*access.BindAccessPolicyResponse)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *OrganizationBindAccessPolicyOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*access.BindAccessPolicyResponse, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*access.BindAccessPolicyResponse)
+	return response, err
+}
+
+// BindAccessPolicy is an operation of Yandex.Cloud OrganizationManager Organization service.
+// It returns an object which should be used to monitor the operation state.
+func (c organizationClient) BindAccessPolicy(ctx context.Context, in *access.BindAccessPolicyRequest, opts ...grpc.CallOption) (*OrganizationBindAccessPolicyOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, OrganizationBindAccessPolicy, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := organizationmanager.NewOrganizationServiceClient(connection).BindAccessPolicy(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*access.BindAccessPolicyMetadata)(nil),
+		ResponseType: (*access.BindAccessPolicyResponse)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &OrganizationBindAccessPolicyOperation{*op}, nil
+}
+
+// OrganizationUnbindAccessPolicyOperation is used to monitor the state of UnbindAccessPolicy operations.
+type OrganizationUnbindAccessPolicyOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *OrganizationUnbindAccessPolicyOperation) Metadata() *access.UnbindAccessPolicyMetadata {
+	return o.Operation.Metadata().(*access.UnbindAccessPolicyMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *OrganizationUnbindAccessPolicyOperation) Response() *access.UnbindAccessPolicyResponse {
+	return o.Operation.Response().(*access.UnbindAccessPolicyResponse)
+}
+
+// Wait polls the operation until it's done.
+func (o *OrganizationUnbindAccessPolicyOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*access.UnbindAccessPolicyResponse, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*access.UnbindAccessPolicyResponse)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *OrganizationUnbindAccessPolicyOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*access.UnbindAccessPolicyResponse, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*access.UnbindAccessPolicyResponse)
+	return response, err
+}
+
+// UnbindAccessPolicy is an operation of Yandex.Cloud OrganizationManager Organization service.
+// It returns an object which should be used to monitor the operation state.
+func (c organizationClient) UnbindAccessPolicy(ctx context.Context, in *access.UnbindAccessPolicyRequest, opts ...grpc.CallOption) (*OrganizationUnbindAccessPolicyOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, OrganizationUnbindAccessPolicy, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := organizationmanager.NewOrganizationServiceClient(connection).UnbindAccessPolicy(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*access.UnbindAccessPolicyMetadata)(nil),
+		ResponseType: (*access.UnbindAccessPolicyResponse)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &OrganizationUnbindAccessPolicyOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c organizationClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, OrganizationOperationPoller, opts...)
@@ -239,12 +353,15 @@ func (c organizationClient) pollOperation(ctx context.Context, operationId strin
 }
 
 var (
-	OrganizationGet                  = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.Get")
-	OrganizationList                 = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.List")
-	OrganizationUpdate               = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.Update")
-	OrganizationListOperations       = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.ListOperations")
-	OrganizationListAccessBindings   = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.ListAccessBindings")
-	OrganizationSetAccessBindings    = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.SetAccessBindings")
-	OrganizationUpdateAccessBindings = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.UpdateAccessBindings")
-	OrganizationOperationPoller      = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
+	OrganizationGet                      = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.Get")
+	OrganizationList                     = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.List")
+	OrganizationUpdate                   = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.Update")
+	OrganizationListOperations           = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.ListOperations")
+	OrganizationListAccessBindings       = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.ListAccessBindings")
+	OrganizationSetAccessBindings        = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.SetAccessBindings")
+	OrganizationUpdateAccessBindings     = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.UpdateAccessBindings")
+	OrganizationListAccessPolicyBindings = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.ListAccessPolicyBindings")
+	OrganizationBindAccessPolicy         = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.BindAccessPolicy")
+	OrganizationUnbindAccessPolicy       = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.UnbindAccessPolicy")
+	OrganizationOperationPoller          = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

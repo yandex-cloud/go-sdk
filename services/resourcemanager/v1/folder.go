@@ -26,6 +26,9 @@ type FolderClient interface {
 	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
 	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*FolderSetAccessBindingsOperation, error)
 	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*FolderUpdateAccessBindingsOperation, error)
+	ListAccessPolicyBindings(context.Context, *access.ListAccessPolicyBindingsRequest, ...grpc.CallOption) (*access.ListAccessPolicyBindingsResponse, error)
+	BindAccessPolicy(context.Context, *access.BindAccessPolicyRequest, ...grpc.CallOption) (*FolderBindAccessPolicyOperation, error)
+	UnbindAccessPolicy(context.Context, *access.UnbindAccessPolicyRequest, ...grpc.CallOption) (*FolderUnbindAccessPolicyOperation, error)
 }
 
 var _ FolderClient = folderClient{}
@@ -339,6 +342,117 @@ func (c folderClient) UpdateAccessBindings(ctx context.Context, in *access.Updat
 	return &FolderUpdateAccessBindingsOperation{*op}, nil
 }
 
+// ListAccessPolicyBindings is an operation of Yandex.Cloud ResourceManager Folder service.
+func (c folderClient) ListAccessPolicyBindings(ctx context.Context, in *access.ListAccessPolicyBindingsRequest, opts ...grpc.CallOption) (*access.ListAccessPolicyBindingsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, FolderListAccessPolicyBindings, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return resourcemanager.NewFolderServiceClient(connection).ListAccessPolicyBindings(ctx, in, opts...)
+}
+
+// FolderBindAccessPolicyOperation is used to monitor the state of BindAccessPolicy operations.
+type FolderBindAccessPolicyOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *FolderBindAccessPolicyOperation) Metadata() *access.BindAccessPolicyMetadata {
+	return o.Operation.Metadata().(*access.BindAccessPolicyMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *FolderBindAccessPolicyOperation) Response() *access.BindAccessPolicyResponse {
+	return o.Operation.Response().(*access.BindAccessPolicyResponse)
+}
+
+// Wait polls the operation until it's done.
+func (o *FolderBindAccessPolicyOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*access.BindAccessPolicyResponse, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*access.BindAccessPolicyResponse)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *FolderBindAccessPolicyOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*access.BindAccessPolicyResponse, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*access.BindAccessPolicyResponse)
+	return response, err
+}
+
+// BindAccessPolicy is an operation of Yandex.Cloud ResourceManager Folder service.
+// It returns an object which should be used to monitor the operation state.
+func (c folderClient) BindAccessPolicy(ctx context.Context, in *access.BindAccessPolicyRequest, opts ...grpc.CallOption) (*FolderBindAccessPolicyOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, FolderBindAccessPolicy, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := resourcemanager.NewFolderServiceClient(connection).BindAccessPolicy(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*access.BindAccessPolicyMetadata)(nil),
+		ResponseType: (*access.BindAccessPolicyResponse)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &FolderBindAccessPolicyOperation{*op}, nil
+}
+
+// FolderUnbindAccessPolicyOperation is used to monitor the state of UnbindAccessPolicy operations.
+type FolderUnbindAccessPolicyOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *FolderUnbindAccessPolicyOperation) Metadata() *access.UnbindAccessPolicyMetadata {
+	return o.Operation.Metadata().(*access.UnbindAccessPolicyMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *FolderUnbindAccessPolicyOperation) Response() *access.UnbindAccessPolicyResponse {
+	return o.Operation.Response().(*access.UnbindAccessPolicyResponse)
+}
+
+// Wait polls the operation until it's done.
+func (o *FolderUnbindAccessPolicyOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*access.UnbindAccessPolicyResponse, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*access.UnbindAccessPolicyResponse)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *FolderUnbindAccessPolicyOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*access.UnbindAccessPolicyResponse, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*access.UnbindAccessPolicyResponse)
+	return response, err
+}
+
+// UnbindAccessPolicy is an operation of Yandex.Cloud ResourceManager Folder service.
+// It returns an object which should be used to monitor the operation state.
+func (c folderClient) UnbindAccessPolicy(ctx context.Context, in *access.UnbindAccessPolicyRequest, opts ...grpc.CallOption) (*FolderUnbindAccessPolicyOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, FolderUnbindAccessPolicy, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := resourcemanager.NewFolderServiceClient(connection).UnbindAccessPolicy(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*access.UnbindAccessPolicyMetadata)(nil),
+		ResponseType: (*access.UnbindAccessPolicyResponse)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &FolderUnbindAccessPolicyOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c folderClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, FolderOperationPoller, opts...)
@@ -349,14 +463,17 @@ func (c folderClient) pollOperation(ctx context.Context, operationId string, opt
 }
 
 var (
-	FolderGet                  = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.Get")
-	FolderList                 = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.List")
-	FolderCreate               = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.Create")
-	FolderUpdate               = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.Update")
-	FolderDelete               = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.Delete")
-	FolderListOperations       = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.ListOperations")
-	FolderListAccessBindings   = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.ListAccessBindings")
-	FolderSetAccessBindings    = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.SetAccessBindings")
-	FolderUpdateAccessBindings = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.UpdateAccessBindings")
-	FolderOperationPoller      = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
+	FolderGet                      = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.Get")
+	FolderList                     = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.List")
+	FolderCreate                   = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.Create")
+	FolderUpdate                   = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.Update")
+	FolderDelete                   = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.Delete")
+	FolderListOperations           = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.ListOperations")
+	FolderListAccessBindings       = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.ListAccessBindings")
+	FolderSetAccessBindings        = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.SetAccessBindings")
+	FolderUpdateAccessBindings     = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.UpdateAccessBindings")
+	FolderListAccessPolicyBindings = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.ListAccessPolicyBindings")
+	FolderBindAccessPolicy         = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.BindAccessPolicy")
+	FolderUnbindAccessPolicy       = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.UnbindAccessPolicy")
+	FolderOperationPoller          = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

@@ -3,8 +3,8 @@ module github.com/yandex-cloud/go-sdk/services/lockbox
 go 1.23.9
 
 require (
-	github.com/yandex-cloud/go-genproto v0.35.0
-	github.com/yandex-cloud/go-sdk/v2 v2.24.0
+	github.com/yandex-cloud/go-genproto v0.36.0
+	github.com/yandex-cloud/go-sdk/v2 v2.25.0
 	google.golang.org/grpc v1.74.0-dev
 	google.golang.org/protobuf v1.36.6
 )
