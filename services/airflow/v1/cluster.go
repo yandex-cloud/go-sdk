@@ -4,6 +4,7 @@ package airflowsdk
 import (
 	"context"
 
+	access "github.com/yandex-cloud/go-genproto/yandex/cloud/access"
 	airflow "github.com/yandex-cloud/go-genproto/yandex/cloud/airflow/v1"
 	operation "github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 	sdkop "github.com/yandex-cloud/go-sdk/v2/pkg/operation"
@@ -24,6 +25,9 @@ type ClusterClient interface {
 	Start(context.Context, *airflow.StartClusterRequest, ...grpc.CallOption) (*ClusterStartOperation, error)
 	Stop(context.Context, *airflow.StopClusterRequest, ...grpc.CallOption) (*ClusterStopOperation, error)
 	ListOperations(context.Context, *airflow.ListClusterOperationsRequest, ...grpc.CallOption) (*airflow.ListClusterOperationsResponse, error)
+	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
+	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*ClusterSetAccessBindingsOperation, error)
+	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*ClusterUpdateAccessBindingsOperation, error)
 }
 
 var _ ClusterClient = clusterClient{}
@@ -334,6 +338,117 @@ func (c clusterClient) ListOperations(ctx context.Context, in *airflow.ListClust
 	return airflow.NewClusterServiceClient(connection).ListOperations(ctx, in, opts...)
 }
 
+// ListAccessBindings is an operation of Yandex.Cloud Airflow Cluster service.
+func (c clusterClient) ListAccessBindings(ctx context.Context, in *access.ListAccessBindingsRequest, opts ...grpc.CallOption) (*access.ListAccessBindingsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, ClusterListAccessBindings, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return airflow.NewClusterServiceClient(connection).ListAccessBindings(ctx, in, opts...)
+}
+
+// ClusterSetAccessBindingsOperation is used to monitor the state of SetAccessBindings operations.
+type ClusterSetAccessBindingsOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ClusterSetAccessBindingsOperation) Metadata() *access.SetAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.SetAccessBindingsMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ClusterSetAccessBindingsOperation) Response() *access.AccessBindingsOperationResult {
+	return o.Operation.Response().(*access.AccessBindingsOperationResult)
+}
+
+// Wait polls the operation until it's done.
+func (o *ClusterSetAccessBindingsOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*access.AccessBindingsOperationResult, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*access.AccessBindingsOperationResult)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ClusterSetAccessBindingsOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*access.AccessBindingsOperationResult, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*access.AccessBindingsOperationResult)
+	return response, err
+}
+
+// SetAccessBindings is an operation of Yandex.Cloud Airflow Cluster service.
+// It returns an object which should be used to monitor the operation state.
+func (c clusterClient) SetAccessBindings(ctx context.Context, in *access.SetAccessBindingsRequest, opts ...grpc.CallOption) (*ClusterSetAccessBindingsOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ClusterSetAccessBindings, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := airflow.NewClusterServiceClient(connection).SetAccessBindings(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*access.SetAccessBindingsMetadata)(nil),
+		ResponseType: (*access.AccessBindingsOperationResult)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ClusterSetAccessBindingsOperation{*op}, nil
+}
+
+// ClusterUpdateAccessBindingsOperation is used to monitor the state of UpdateAccessBindings operations.
+type ClusterUpdateAccessBindingsOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ClusterUpdateAccessBindingsOperation) Metadata() *access.UpdateAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.UpdateAccessBindingsMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ClusterUpdateAccessBindingsOperation) Response() *access.AccessBindingsOperationResult {
+	return o.Operation.Response().(*access.AccessBindingsOperationResult)
+}
+
+// Wait polls the operation until it's done.
+func (o *ClusterUpdateAccessBindingsOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*access.AccessBindingsOperationResult, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*access.AccessBindingsOperationResult)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ClusterUpdateAccessBindingsOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*access.AccessBindingsOperationResult, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*access.AccessBindingsOperationResult)
+	return response, err
+}
+
+// UpdateAccessBindings is an operation of Yandex.Cloud Airflow Cluster service.
+// It returns an object which should be used to monitor the operation state.
+func (c clusterClient) UpdateAccessBindings(ctx context.Context, in *access.UpdateAccessBindingsRequest, opts ...grpc.CallOption) (*ClusterUpdateAccessBindingsOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ClusterUpdateAccessBindings, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := airflow.NewClusterServiceClient(connection).UpdateAccessBindings(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*access.UpdateAccessBindingsMetadata)(nil),
+		ResponseType: (*access.AccessBindingsOperationResult)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ClusterUpdateAccessBindingsOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c clusterClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, ClusterOperationPoller, opts...)
@@ -344,13 +459,16 @@ func (c clusterClient) pollOperation(ctx context.Context, operationId string, op
 }
 
 var (
-	ClusterGet             = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.Get")
-	ClusterList            = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.List")
-	ClusterCreate          = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.Create")
-	ClusterUpdate          = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.Update")
-	ClusterDelete          = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.Delete")
-	ClusterStart           = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.Start")
-	ClusterStop            = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.Stop")
-	ClusterListOperations  = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.ListOperations")
-	ClusterOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
+	ClusterGet                  = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.Get")
+	ClusterList                 = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.List")
+	ClusterCreate               = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.Create")
+	ClusterUpdate               = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.Update")
+	ClusterDelete               = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.Delete")
+	ClusterStart                = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.Start")
+	ClusterStop                 = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.Stop")
+	ClusterListOperations       = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.ListOperations")
+	ClusterListAccessBindings   = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.ListAccessBindings")
+	ClusterSetAccessBindings    = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.SetAccessBindings")
+	ClusterUpdateAccessBindings = protoreflect.FullName("yandex.cloud.airflow.v1.ClusterService.UpdateAccessBindings")
+	ClusterOperationPoller      = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
