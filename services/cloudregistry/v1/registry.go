@@ -22,6 +22,7 @@ type RegistryClient interface {
 	Create(context.Context, *cloudregistry.CreateRegistryRequest, ...grpc.CallOption) (*RegistryCreateOperation, error)
 	Update(context.Context, *cloudregistry.UpdateRegistryRequest, ...grpc.CallOption) (*RegistryUpdateOperation, error)
 	Delete(context.Context, *cloudregistry.DeleteRegistryRequest, ...grpc.CallOption) (*RegistryDeleteOperation, error)
+	ForceDelete(context.Context, *cloudregistry.DeleteRegistryRequest, ...grpc.CallOption) (*RegistryForceDeleteOperation, error)
 	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
 	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*RegistrySetAccessBindingsOperation, error)
 	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*RegistryUpdateAccessBindingsOperation, error)
@@ -220,6 +221,60 @@ func (c registryClient) Delete(ctx context.Context, in *cloudregistry.DeleteRegi
 		return nil, err
 	}
 	return &RegistryDeleteOperation{*op}, nil
+}
+
+// RegistryForceDeleteOperation is used to monitor the state of ForceDelete operations.
+type RegistryForceDeleteOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *RegistryForceDeleteOperation) Metadata() *cloudregistry.DeleteRegistryMetadata {
+	return o.Operation.Metadata().(*cloudregistry.DeleteRegistryMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *RegistryForceDeleteOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *RegistryForceDeleteOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *RegistryForceDeleteOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// ForceDelete is an operation of Yandex.Cloud Cloudregistry Registry service.
+// It returns an object which should be used to monitor the operation state.
+func (c registryClient) ForceDelete(ctx context.Context, in *cloudregistry.DeleteRegistryRequest, opts ...grpc.CallOption) (*RegistryForceDeleteOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, RegistryForceDelete, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := cloudregistry.NewRegistryServiceClient(connection).ForceDelete(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*cloudregistry.DeleteRegistryMetadata).GetRegistryId()
+		},
+		MetadataType: (*cloudregistry.DeleteRegistryMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &RegistryForceDeleteOperation{*op}, nil
 }
 
 // ListAccessBindings is an operation of Yandex.Cloud Cloudregistry Registry service.
@@ -474,6 +529,7 @@ var (
 	RegistryCreate               = protoreflect.FullName("yandex.cloud.cloudregistry.v1.RegistryService.Create")
 	RegistryUpdate               = protoreflect.FullName("yandex.cloud.cloudregistry.v1.RegistryService.Update")
 	RegistryDelete               = protoreflect.FullName("yandex.cloud.cloudregistry.v1.RegistryService.Delete")
+	RegistryForceDelete          = protoreflect.FullName("yandex.cloud.cloudregistry.v1.RegistryService.ForceDelete")
 	RegistryListAccessBindings   = protoreflect.FullName("yandex.cloud.cloudregistry.v1.RegistryService.ListAccessBindings")
 	RegistrySetAccessBindings    = protoreflect.FullName("yandex.cloud.cloudregistry.v1.RegistryService.SetAccessBindings")
 	RegistryUpdateAccessBindings = protoreflect.FullName("yandex.cloud.cloudregistry.v1.RegistryService.UpdateAccessBindings")

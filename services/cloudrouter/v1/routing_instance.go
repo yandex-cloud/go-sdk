@@ -30,6 +30,7 @@ type RoutingInstanceClient interface {
 	AddPrivateConnection(context.Context, *cloudrouter.AddPrivateConnectionRequest, ...grpc.CallOption) (*RoutingInstanceAddPrivateConnectionOperation, error)
 	RemovePrivateConnection(context.Context, *cloudrouter.RemovePrivateConnectionRequest, ...grpc.CallOption) (*RoutingInstanceRemovePrivateConnectionOperation, error)
 	Delete(context.Context, *cloudrouter.DeleteRoutingInstanceRequest, ...grpc.CallOption) (*RoutingInstanceDeleteOperation, error)
+	Move(context.Context, *cloudrouter.MoveRoutingInstanceRequest, ...grpc.CallOption) (*RoutingInstanceMoveOperation, error)
 	ListOperations(context.Context, *cloudrouter.ListRoutingInstanceOperationsRequest, ...grpc.CallOption) (*cloudrouter.ListRoutingInstanceOperationsResponse, error)
 }
 
@@ -620,6 +621,60 @@ func (c routingInstanceClient) Delete(ctx context.Context, in *cloudrouter.Delet
 	return &RoutingInstanceDeleteOperation{*op}, nil
 }
 
+// RoutingInstanceMoveOperation is used to monitor the state of Move operations.
+type RoutingInstanceMoveOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *RoutingInstanceMoveOperation) Metadata() *cloudrouter.MoveRoutingInstanceMetadata {
+	return o.Operation.Metadata().(*cloudrouter.MoveRoutingInstanceMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *RoutingInstanceMoveOperation) Response() *cloudrouter.RoutingInstance {
+	return o.Operation.Response().(*cloudrouter.RoutingInstance)
+}
+
+// Wait polls the operation until it's done.
+func (o *RoutingInstanceMoveOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*cloudrouter.RoutingInstance, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*cloudrouter.RoutingInstance)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *RoutingInstanceMoveOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*cloudrouter.RoutingInstance, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*cloudrouter.RoutingInstance)
+	return response, err
+}
+
+// Move is an operation of Yandex.Cloud Cloudrouter RoutingInstance service.
+// It returns an object which should be used to monitor the operation state.
+func (c routingInstanceClient) Move(ctx context.Context, in *cloudrouter.MoveRoutingInstanceRequest, opts ...grpc.CallOption) (*RoutingInstanceMoveOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, RoutingInstanceMove, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := cloudrouter.NewRoutingInstanceServiceClient(connection).Move(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*cloudrouter.MoveRoutingInstanceMetadata).GetRoutingInstanceId()
+		},
+		MetadataType: (*cloudrouter.MoveRoutingInstanceMetadata)(nil),
+		ResponseType: (*cloudrouter.RoutingInstance)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &RoutingInstanceMoveOperation{*op}, nil
+}
+
 // ListOperations is an operation of Yandex.Cloud Cloudrouter RoutingInstance service.
 func (c routingInstanceClient) ListOperations(ctx context.Context, in *cloudrouter.ListRoutingInstanceOperationsRequest, opts ...grpc.CallOption) (*cloudrouter.ListRoutingInstanceOperationsResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, RoutingInstanceListOperations, opts...)
@@ -653,6 +708,7 @@ var (
 	RoutingInstanceAddPrivateConnection        = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.AddPrivateConnection")
 	RoutingInstanceRemovePrivateConnection     = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.RemovePrivateConnection")
 	RoutingInstanceDelete                      = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.Delete")
+	RoutingInstanceMove                        = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.Move")
 	RoutingInstanceListOperations              = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.ListOperations")
 	RoutingInstanceOperationPoller             = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

@@ -5,8 +5,11 @@ import (
 	"context"
 
 	cic "github.com/yandex-cloud/go-genproto/yandex/cloud/cic/v1"
+	operation "github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
+	sdkop "github.com/yandex-cloud/go-sdk/v2/pkg/operation"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/transport"
 	"google.golang.org/grpc"
+	proto "google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -14,6 +17,7 @@ import (
 type PublicConnectionClient interface {
 	Get(context.Context, *cic.GetPublicConnectionRequest, ...grpc.CallOption) (*cic.PublicConnection, error)
 	List(context.Context, *cic.ListPublicConnectionsRequest, ...grpc.CallOption) (*cic.ListPublicConnectionsResponse, error)
+	Move(context.Context, *cic.MovePublicConnectionRequest, ...grpc.CallOption) (*PublicConnectionMoveOperation, error)
 }
 
 var _ PublicConnectionClient = publicConnectionClient{}
@@ -45,7 +49,72 @@ func (c publicConnectionClient) List(ctx context.Context, in *cic.ListPublicConn
 	return cic.NewPublicConnectionServiceClient(connection).List(ctx, in, opts...)
 }
 
+// PublicConnectionMoveOperation is used to monitor the state of Move operations.
+type PublicConnectionMoveOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *PublicConnectionMoveOperation) Metadata() *cic.MovePublicConnectionMetadata {
+	return o.Operation.Metadata().(*cic.MovePublicConnectionMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *PublicConnectionMoveOperation) Response() *cic.PublicConnection {
+	return o.Operation.Response().(*cic.PublicConnection)
+}
+
+// Wait polls the operation until it's done.
+func (o *PublicConnectionMoveOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*cic.PublicConnection, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*cic.PublicConnection)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *PublicConnectionMoveOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*cic.PublicConnection, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*cic.PublicConnection)
+	return response, err
+}
+
+// Move is an operation of Yandex.Cloud Cic PublicConnection service.
+// It returns an object which should be used to monitor the operation state.
+func (c publicConnectionClient) Move(ctx context.Context, in *cic.MovePublicConnectionRequest, opts ...grpc.CallOption) (*PublicConnectionMoveOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, PublicConnectionMove, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := cic.NewPublicConnectionServiceClient(connection).Move(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*cic.MovePublicConnectionMetadata).GetPublicConnectionId()
+		},
+		MetadataType: (*cic.MovePublicConnectionMetadata)(nil),
+		ResponseType: (*cic.PublicConnection)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &PublicConnectionMoveOperation{*op}, nil
+}
+
+// pollOperation returns the current state of the polled operation.
+func (c publicConnectionClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, PublicConnectionOperationPoller, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return operation.NewOperationServiceClient(connection).Get(ctx, &operation.GetOperationRequest{OperationId: operationId}, opts...)
+}
+
 var (
-	PublicConnectionGet  = protoreflect.FullName("yandex.cloud.cic.v1.PublicConnectionService.Get")
-	PublicConnectionList = protoreflect.FullName("yandex.cloud.cic.v1.PublicConnectionService.List")
+	PublicConnectionGet             = protoreflect.FullName("yandex.cloud.cic.v1.PublicConnectionService.Get")
+	PublicConnectionList            = protoreflect.FullName("yandex.cloud.cic.v1.PublicConnectionService.List")
+	PublicConnectionMove            = protoreflect.FullName("yandex.cloud.cic.v1.PublicConnectionService.Move")
+	PublicConnectionOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

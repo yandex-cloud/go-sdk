@@ -21,6 +21,7 @@ type TrunkConnectionClient interface {
 	Create(context.Context, *cic.CreateTrunkConnectionRequest, ...grpc.CallOption) (*TrunkConnectionCreateOperation, error)
 	Update(context.Context, *cic.UpdateTrunkConnectionRequest, ...grpc.CallOption) (*TrunkConnectionUpdateOperation, error)
 	Delete(context.Context, *cic.DeleteTrunkConnectionRequest, ...grpc.CallOption) (*TrunkConnectionDeleteOperation, error)
+	Move(context.Context, *cic.MoveTrunkConnectionRequest, ...grpc.CallOption) (*TrunkConnectionMoveOperation, error)
 	ListOperations(context.Context, *cic.ListTrunkConnectionOperationsRequest, ...grpc.CallOption) (*cic.ListTrunkConnectionOperationsResponse, error)
 }
 
@@ -215,6 +216,60 @@ func (c trunkConnectionClient) Delete(ctx context.Context, in *cic.DeleteTrunkCo
 	return &TrunkConnectionDeleteOperation{*op}, nil
 }
 
+// TrunkConnectionMoveOperation is used to monitor the state of Move operations.
+type TrunkConnectionMoveOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *TrunkConnectionMoveOperation) Metadata() *cic.MoveTrunkConnectionMetadata {
+	return o.Operation.Metadata().(*cic.MoveTrunkConnectionMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *TrunkConnectionMoveOperation) Response() *cic.TrunkConnection {
+	return o.Operation.Response().(*cic.TrunkConnection)
+}
+
+// Wait polls the operation until it's done.
+func (o *TrunkConnectionMoveOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*cic.TrunkConnection, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*cic.TrunkConnection)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *TrunkConnectionMoveOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*cic.TrunkConnection, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*cic.TrunkConnection)
+	return response, err
+}
+
+// Move is an operation of Yandex.Cloud Cic TrunkConnection service.
+// It returns an object which should be used to monitor the operation state.
+func (c trunkConnectionClient) Move(ctx context.Context, in *cic.MoveTrunkConnectionRequest, opts ...grpc.CallOption) (*TrunkConnectionMoveOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, TrunkConnectionMove, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := cic.NewTrunkConnectionServiceClient(connection).Move(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*cic.MoveTrunkConnectionMetadata).GetTrunkConnectionId()
+		},
+		MetadataType: (*cic.MoveTrunkConnectionMetadata)(nil),
+		ResponseType: (*cic.TrunkConnection)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &TrunkConnectionMoveOperation{*op}, nil
+}
+
 // ListOperations is an operation of Yandex.Cloud Cic TrunkConnection service.
 func (c trunkConnectionClient) ListOperations(ctx context.Context, in *cic.ListTrunkConnectionOperationsRequest, opts ...grpc.CallOption) (*cic.ListTrunkConnectionOperationsResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, TrunkConnectionListOperations, opts...)
@@ -239,6 +294,7 @@ var (
 	TrunkConnectionCreate          = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Create")
 	TrunkConnectionUpdate          = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Update")
 	TrunkConnectionDelete          = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Delete")
+	TrunkConnectionMove            = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Move")
 	TrunkConnectionListOperations  = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.ListOperations")
 	TrunkConnectionOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

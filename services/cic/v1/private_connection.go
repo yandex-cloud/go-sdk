@@ -23,6 +23,7 @@ type PrivateConnectionClient interface {
 	Delete(context.Context, *cic.DeletePrivateConnectionRequest, ...grpc.CallOption) (*PrivateConnectionDeleteOperation, error)
 	UpsertStaticRoute(context.Context, *cic.UpsertStaticRouteRequest, ...grpc.CallOption) (*PrivateConnectionUpsertStaticRouteOperation, error)
 	RemoveStaticRoute(context.Context, *cic.RemoveStaticRouteRequest, ...grpc.CallOption) (*PrivateConnectionRemoveStaticRouteOperation, error)
+	Move(context.Context, *cic.MovePrivateConnectionRequest, ...grpc.CallOption) (*PrivateConnectionMoveOperation, error)
 	ListOperations(context.Context, *cic.ListPrivateConnectionOperationsRequest, ...grpc.CallOption) (*cic.ListPrivateConnectionOperationsResponse, error)
 }
 
@@ -325,6 +326,60 @@ func (c privateConnectionClient) RemoveStaticRoute(ctx context.Context, in *cic.
 	return &PrivateConnectionRemoveStaticRouteOperation{*op}, nil
 }
 
+// PrivateConnectionMoveOperation is used to monitor the state of Move operations.
+type PrivateConnectionMoveOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *PrivateConnectionMoveOperation) Metadata() *cic.MovePrivateConnectionMetadata {
+	return o.Operation.Metadata().(*cic.MovePrivateConnectionMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *PrivateConnectionMoveOperation) Response() *cic.PrivateConnection {
+	return o.Operation.Response().(*cic.PrivateConnection)
+}
+
+// Wait polls the operation until it's done.
+func (o *PrivateConnectionMoveOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*cic.PrivateConnection, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*cic.PrivateConnection)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *PrivateConnectionMoveOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*cic.PrivateConnection, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*cic.PrivateConnection)
+	return response, err
+}
+
+// Move is an operation of Yandex.Cloud Cic PrivateConnection service.
+// It returns an object which should be used to monitor the operation state.
+func (c privateConnectionClient) Move(ctx context.Context, in *cic.MovePrivateConnectionRequest, opts ...grpc.CallOption) (*PrivateConnectionMoveOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, PrivateConnectionMove, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := cic.NewPrivateConnectionServiceClient(connection).Move(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*cic.MovePrivateConnectionMetadata).GetPrivateConnectionId()
+		},
+		MetadataType: (*cic.MovePrivateConnectionMetadata)(nil),
+		ResponseType: (*cic.PrivateConnection)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &PrivateConnectionMoveOperation{*op}, nil
+}
+
 // ListOperations is an operation of Yandex.Cloud Cic PrivateConnection service.
 func (c privateConnectionClient) ListOperations(ctx context.Context, in *cic.ListPrivateConnectionOperationsRequest, opts ...grpc.CallOption) (*cic.ListPrivateConnectionOperationsResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, PrivateConnectionListOperations, opts...)
@@ -351,6 +406,7 @@ var (
 	PrivateConnectionDelete            = protoreflect.FullName("yandex.cloud.cic.v1.PrivateConnectionService.Delete")
 	PrivateConnectionUpsertStaticRoute = protoreflect.FullName("yandex.cloud.cic.v1.PrivateConnectionService.UpsertStaticRoute")
 	PrivateConnectionRemoveStaticRoute = protoreflect.FullName("yandex.cloud.cic.v1.PrivateConnectionService.RemoveStaticRoute")
+	PrivateConnectionMove              = protoreflect.FullName("yandex.cloud.cic.v1.PrivateConnectionService.Move")
 	PrivateConnectionListOperations    = protoreflect.FullName("yandex.cloud.cic.v1.PrivateConnectionService.ListOperations")
 	PrivateConnectionOperationPoller   = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
