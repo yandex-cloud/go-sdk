@@ -279,6 +279,15 @@ func (it *TrunkConnectionOperationsIterator) Error() error {
 	return it.err
 }
 
+// Move implements cic.TrunkConnectionServiceClient
+func (c *TrunkConnectionServiceClient) Move(ctx context.Context, in *cic.MoveTrunkConnectionRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cic.NewTrunkConnectionServiceClient(conn).Move(ctx, in, opts...)
+}
+
 // Update implements cic.TrunkConnectionServiceClient
 func (c *TrunkConnectionServiceClient) Update(ctx context.Context, in *cic.UpdateTrunkConnectionRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)

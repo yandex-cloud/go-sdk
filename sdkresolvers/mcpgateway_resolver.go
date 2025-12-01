@@ -30,5 +30,5 @@ func (r *mcpGatewayResolver) Run(ctx context.Context, sdk *ycsdk.SDK, opts ...gr
 		Filter:   CreateResolverFilter("name", r.Name),
 		PageSize: DefaultResolverPageSize,
 	}, opts...)
-	return r.findName(resp, err)
+	return r.findName(resp.GetGateways(), err)
 }

@@ -57,6 +57,24 @@ func (c *InstanceGroupServiceClient) DeleteInstances(ctx context.Context, in *in
 	return instancegroup.NewInstanceGroupServiceClient(conn).DeleteInstances(ctx, in, opts...)
 }
 
+// DisableZones implements instancegroup.InstanceGroupServiceClient
+func (c *InstanceGroupServiceClient) DisableZones(ctx context.Context, in *instancegroup.DisableZonesRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return instancegroup.NewInstanceGroupServiceClient(conn).DisableZones(ctx, in, opts...)
+}
+
+// EnableZones implements instancegroup.InstanceGroupServiceClient
+func (c *InstanceGroupServiceClient) EnableZones(ctx context.Context, in *instancegroup.EnableZonesRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return instancegroup.NewInstanceGroupServiceClient(conn).EnableZones(ctx, in, opts...)
+}
+
 // Get implements instancegroup.InstanceGroupServiceClient
 func (c *InstanceGroupServiceClient) Get(ctx context.Context, in *instancegroup.GetInstanceGroupRequest, opts ...grpc.CallOption) (*instancegroup.InstanceGroup, error) {
 	conn, err := c.getConn(ctx)

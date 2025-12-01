@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 
 	cic "github.com/yandex-cloud/go-genproto/yandex/cloud/cic/v1"
+	"github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 )
 
 //revive:disable
@@ -142,4 +143,13 @@ func (it *PublicConnectionIterator) Value() *cic.PublicConnection {
 
 func (it *PublicConnectionIterator) Error() error {
 	return it.err
+}
+
+// Move implements cic.PublicConnectionServiceClient
+func (c *PublicConnectionServiceClient) Move(ctx context.Context, in *cic.MovePublicConnectionRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cic.NewPublicConnectionServiceClient(conn).Move(ctx, in, opts...)
 }

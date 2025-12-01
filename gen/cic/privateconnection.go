@@ -279,6 +279,15 @@ func (it *PrivateConnectionOperationsIterator) Error() error {
 	return it.err
 }
 
+// Move implements cic.PrivateConnectionServiceClient
+func (c *PrivateConnectionServiceClient) Move(ctx context.Context, in *cic.MovePrivateConnectionRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cic.NewPrivateConnectionServiceClient(conn).Move(ctx, in, opts...)
+}
+
 // RemoveStaticRoute implements cic.PrivateConnectionServiceClient
 func (c *PrivateConnectionServiceClient) RemoveStaticRoute(ctx context.Context, in *cic.RemoveStaticRouteRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)

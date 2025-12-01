@@ -22,3 +22,8 @@ func NewAWSCompatibility(g func(ctx context.Context) (*grpc.ClientConn, error)) 
 func (a *AWSCompatibility) AccessKey() *AccessKeyServiceClient {
 	return &AccessKeyServiceClient{getConn: a.getConn}
 }
+
+// TemporaryAccessKey gets TemporaryAccessKeyService client
+func (a *AWSCompatibility) TemporaryAccessKey() *TemporaryAccessKeyServiceClient {
+	return &TemporaryAccessKeyServiceClient{getConn: a.getConn}
+}

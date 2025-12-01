@@ -26,7 +26,7 @@ const (
 	EventrouterServiceID          Endpoint = "serverless-eventrouter"
 	EventrouterEventsServiceID    Endpoint = "serverlesseventrouter-events"
 	WorkflowServiceID             Endpoint = "serverless-workflows"
-	McpGatewayServiceID           Endpoint = "serverless-mcpgateway"
+	McpGatewayServiceID           Endpoint = "serverless-mcp-gateway"
 )
 
 func (s *Serverless) Functions() *functions.Function {

@@ -30,6 +30,15 @@ func (c *BucketServiceClient) Create(ctx context.Context, in *storage.CreateBuck
 	return storage.NewBucketServiceClient(conn).Create(ctx, in, opts...)
 }
 
+// CreateInventoryConfiguration implements storage.BucketServiceClient
+func (c *BucketServiceClient) CreateInventoryConfiguration(ctx context.Context, in *storage.CreateBucketInventoryConfigurationRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return storage.NewBucketServiceClient(conn).CreateInventoryConfiguration(ctx, in, opts...)
+}
+
 // Delete implements storage.BucketServiceClient
 func (c *BucketServiceClient) Delete(ctx context.Context, in *storage.DeleteBucketRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -48,6 +57,15 @@ func (c *BucketServiceClient) DeleteHTTPSConfig(ctx context.Context, in *storage
 	return storage.NewBucketServiceClient(conn).DeleteHTTPSConfig(ctx, in, opts...)
 }
 
+// DeleteInventoryConfiguration implements storage.BucketServiceClient
+func (c *BucketServiceClient) DeleteInventoryConfiguration(ctx context.Context, in *storage.DeleteBucketInventoryConfigurationRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return storage.NewBucketServiceClient(conn).DeleteInventoryConfiguration(ctx, in, opts...)
+}
+
 // Get implements storage.BucketServiceClient
 func (c *BucketServiceClient) Get(ctx context.Context, in *storage.GetBucketRequest, opts ...grpc.CallOption) (*storage.Bucket, error) {
 	conn, err := c.getConn(ctx)
@@ -64,6 +82,15 @@ func (c *BucketServiceClient) GetHTTPSConfig(ctx context.Context, in *storage.Ge
 		return nil, err
 	}
 	return storage.NewBucketServiceClient(conn).GetHTTPSConfig(ctx, in, opts...)
+}
+
+// GetInventoryConfiguration implements storage.BucketServiceClient
+func (c *BucketServiceClient) GetInventoryConfiguration(ctx context.Context, in *storage.GetBucketInventoryConfigurationRequest, opts ...grpc.CallOption) (*storage.InventoryConfiguration, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return storage.NewBucketServiceClient(conn).GetInventoryConfiguration(ctx, in, opts...)
 }
 
 // GetStats implements storage.BucketServiceClient
@@ -297,6 +324,116 @@ func (it *BucketAccessBindingsIterator) Value() *access.AccessBinding {
 }
 
 func (it *BucketAccessBindingsIterator) Error() error {
+	return it.err
+}
+
+// ListInventoryConfigurations implements storage.BucketServiceClient
+func (c *BucketServiceClient) ListInventoryConfigurations(ctx context.Context, in *storage.ListBucketInventoryConfigurationsRequest, opts ...grpc.CallOption) (*storage.ListBucketInventoryConfigurationsResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return storage.NewBucketServiceClient(conn).ListInventoryConfigurations(ctx, in, opts...)
+}
+
+type BucketInventoryConfigurationsIterator struct {
+	ctx  context.Context
+	opts []grpc.CallOption
+
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
+
+	client  *BucketServiceClient
+	request *storage.ListBucketInventoryConfigurationsRequest
+
+	items []*storage.InventoryConfiguration
+}
+
+func (c *BucketServiceClient) BucketInventoryConfigurationsIterator(ctx context.Context, req *storage.ListBucketInventoryConfigurationsRequest, opts ...grpc.CallOption) *BucketInventoryConfigurationsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
+	return &BucketInventoryConfigurationsIterator{
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
+	}
+}
+
+func (it *BucketInventoryConfigurationsIterator) Next() bool {
+	if it.err != nil {
+		return false
+	}
+	if len(it.items) > 1 {
+		it.items[0] = nil
+		it.items = it.items[1:]
+		return true
+	}
+	it.items = nil // consume last item, if any
+
+	if it.started && it.request.PageToken == "" {
+		return false
+	}
+	it.started = true
+
+	response, err := it.client.ListInventoryConfigurations(it.ctx, it.request, it.opts...)
+	it.err = err
+	if err != nil {
+		return false
+	}
+
+	it.items = response.Configurations
+	it.request.PageToken = response.NextPageToken
+	return len(it.items) > 0
+}
+
+func (it *BucketInventoryConfigurationsIterator) Take(size int64) ([]*storage.InventoryConfiguration, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*storage.InventoryConfiguration
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *BucketInventoryConfigurationsIterator) TakeAll() ([]*storage.InventoryConfiguration, error) {
+	return it.Take(0)
+}
+
+func (it *BucketInventoryConfigurationsIterator) Value() *storage.InventoryConfiguration {
+	if len(it.items) == 0 {
+		panic("calling Value on empty iterator")
+	}
+	return it.items[0]
+}
+
+func (it *BucketInventoryConfigurationsIterator) Error() error {
 	return it.err
 }
 

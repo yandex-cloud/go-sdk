@@ -306,6 +306,15 @@ func (it *RoutingInstanceOperationsIterator) Error() error {
 	return it.err
 }
 
+// Move implements cloudrouter.RoutingInstanceServiceClient
+func (c *RoutingInstanceServiceClient) Move(ctx context.Context, in *cloudrouter.MoveRoutingInstanceRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudrouter.NewRoutingInstanceServiceClient(conn).Move(ctx, in, opts...)
+}
+
 // MovePrefix implements cloudrouter.RoutingInstanceServiceClient
 func (c *RoutingInstanceServiceClient) MovePrefix(ctx context.Context, in *cloudrouter.MovePrefixRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
