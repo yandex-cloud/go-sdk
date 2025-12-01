@@ -38,6 +38,8 @@ type InstanceGroupClient interface {
 	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*InstanceGroupUpdateAccessBindingsOperation, error)
 	ResumeProcesses(context.Context, *instancegroup.ResumeInstanceGroupProcessesRequest, ...grpc.CallOption) (*InstanceGroupResumeProcessesOperation, error)
 	PauseProcesses(context.Context, *instancegroup.PauseInstanceGroupProcessesRequest, ...grpc.CallOption) (*InstanceGroupPauseProcessesOperation, error)
+	DisableZones(context.Context, *instancegroup.DisableZonesRequest, ...grpc.CallOption) (*InstanceGroupDisableZonesOperation, error)
+	EnableZones(context.Context, *instancegroup.EnableZonesRequest, ...grpc.CallOption) (*InstanceGroupEnableZonesOperation, error)
 }
 
 var _ InstanceGroupClient = instanceGroupClient{}
@@ -909,6 +911,114 @@ func (c instanceGroupClient) PauseProcesses(ctx context.Context, in *instancegro
 	return &InstanceGroupPauseProcessesOperation{*op}, nil
 }
 
+// InstanceGroupDisableZonesOperation is used to monitor the state of DisableZones operations.
+type InstanceGroupDisableZonesOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *InstanceGroupDisableZonesOperation) Metadata() *instancegroup.DisableZonesMetadata {
+	return o.Operation.Metadata().(*instancegroup.DisableZonesMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *InstanceGroupDisableZonesOperation) Response() *instancegroup.InstanceGroup {
+	return o.Operation.Response().(*instancegroup.InstanceGroup)
+}
+
+// Wait polls the operation until it's done.
+func (o *InstanceGroupDisableZonesOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*instancegroup.InstanceGroup, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*instancegroup.InstanceGroup)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *InstanceGroupDisableZonesOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*instancegroup.InstanceGroup, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*instancegroup.InstanceGroup)
+	return response, err
+}
+
+// DisableZones is an operation of Yandex.Cloud InstanceGroup InstanceGroup service.
+// It returns an object which should be used to monitor the operation state.
+func (c instanceGroupClient) DisableZones(ctx context.Context, in *instancegroup.DisableZonesRequest, opts ...grpc.CallOption) (*InstanceGroupDisableZonesOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, InstanceGroupDisableZones, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := instancegroup.NewInstanceGroupServiceClient(connection).DisableZones(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*instancegroup.DisableZonesMetadata).GetInstanceGroupId()
+		},
+		MetadataType: (*instancegroup.DisableZonesMetadata)(nil),
+		ResponseType: (*instancegroup.InstanceGroup)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &InstanceGroupDisableZonesOperation{*op}, nil
+}
+
+// InstanceGroupEnableZonesOperation is used to monitor the state of EnableZones operations.
+type InstanceGroupEnableZonesOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *InstanceGroupEnableZonesOperation) Metadata() *instancegroup.EnableZonesMetadata {
+	return o.Operation.Metadata().(*instancegroup.EnableZonesMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *InstanceGroupEnableZonesOperation) Response() *instancegroup.InstanceGroup {
+	return o.Operation.Response().(*instancegroup.InstanceGroup)
+}
+
+// Wait polls the operation until it's done.
+func (o *InstanceGroupEnableZonesOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*instancegroup.InstanceGroup, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*instancegroup.InstanceGroup)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *InstanceGroupEnableZonesOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*instancegroup.InstanceGroup, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*instancegroup.InstanceGroup)
+	return response, err
+}
+
+// EnableZones is an operation of Yandex.Cloud InstanceGroup InstanceGroup service.
+// It returns an object which should be used to monitor the operation state.
+func (c instanceGroupClient) EnableZones(ctx context.Context, in *instancegroup.EnableZonesRequest, opts ...grpc.CallOption) (*InstanceGroupEnableZonesOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, InstanceGroupEnableZones, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := instancegroup.NewInstanceGroupServiceClient(connection).EnableZones(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*instancegroup.EnableZonesMetadata).GetInstanceGroupId()
+		},
+		MetadataType: (*instancegroup.EnableZonesMetadata)(nil),
+		ResponseType: (*instancegroup.InstanceGroup)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &InstanceGroupEnableZonesOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c instanceGroupClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, InstanceGroupOperationPoller, opts...)
@@ -940,5 +1050,7 @@ var (
 	InstanceGroupUpdateAccessBindings = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.UpdateAccessBindings")
 	InstanceGroupResumeProcesses      = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.ResumeProcesses")
 	InstanceGroupPauseProcesses       = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.PauseProcesses")
+	InstanceGroupDisableZones         = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.DisableZones")
+	InstanceGroupEnableZones          = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.EnableZones")
 	InstanceGroupOperationPoller      = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

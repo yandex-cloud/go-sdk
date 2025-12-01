@@ -28,6 +28,10 @@ type BucketClient interface {
 	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*BucketSetAccessBindingsOperation, error)
 	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*BucketUpdateAccessBindingsOperation, error)
 	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
+	CreateInventoryConfiguration(context.Context, *storage.CreateBucketInventoryConfigurationRequest, ...grpc.CallOption) (*BucketCreateInventoryConfigurationOperation, error)
+	GetInventoryConfiguration(context.Context, *storage.GetBucketInventoryConfigurationRequest, ...grpc.CallOption) (*storage.InventoryConfiguration, error)
+	DeleteInventoryConfiguration(context.Context, *storage.DeleteBucketInventoryConfigurationRequest, ...grpc.CallOption) (*BucketDeleteInventoryConfigurationOperation, error)
+	ListInventoryConfigurations(context.Context, *storage.ListBucketInventoryConfigurationsRequest, ...grpc.CallOption) (*storage.ListBucketInventoryConfigurationsResponse, error)
 }
 
 var _ BucketClient = bucketClient{}
@@ -443,6 +447,126 @@ func (c bucketClient) ListAccessBindings(ctx context.Context, in *access.ListAcc
 	return storage.NewBucketServiceClient(connection).ListAccessBindings(ctx, in, opts...)
 }
 
+// BucketCreateInventoryConfigurationOperation is used to monitor the state of CreateInventoryConfiguration operations.
+type BucketCreateInventoryConfigurationOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *BucketCreateInventoryConfigurationOperation) Metadata() *storage.CreateBucketInventoryConfigurationMetadata {
+	return o.Operation.Metadata().(*storage.CreateBucketInventoryConfigurationMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *BucketCreateInventoryConfigurationOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *BucketCreateInventoryConfigurationOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *BucketCreateInventoryConfigurationOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// CreateInventoryConfiguration is an operation of Yandex.Cloud Storage Bucket service.
+// It returns an object which should be used to monitor the operation state.
+func (c bucketClient) CreateInventoryConfiguration(ctx context.Context, in *storage.CreateBucketInventoryConfigurationRequest, opts ...grpc.CallOption) (*BucketCreateInventoryConfigurationOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, BucketCreateInventoryConfiguration, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := storage.NewBucketServiceClient(connection).CreateInventoryConfiguration(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*storage.CreateBucketInventoryConfigurationMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &BucketCreateInventoryConfigurationOperation{*op}, nil
+}
+
+// GetInventoryConfiguration is an operation of Yandex.Cloud Storage Bucket service.
+func (c bucketClient) GetInventoryConfiguration(ctx context.Context, in *storage.GetBucketInventoryConfigurationRequest, opts ...grpc.CallOption) (*storage.InventoryConfiguration, error) {
+	connection, err := c.connector.GetConnection(ctx, BucketGetInventoryConfiguration, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return storage.NewBucketServiceClient(connection).GetInventoryConfiguration(ctx, in, opts...)
+}
+
+// BucketDeleteInventoryConfigurationOperation is used to monitor the state of DeleteInventoryConfiguration operations.
+type BucketDeleteInventoryConfigurationOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *BucketDeleteInventoryConfigurationOperation) Metadata() *storage.DeleteBucketInventoryConfigurationMetadata {
+	return o.Operation.Metadata().(*storage.DeleteBucketInventoryConfigurationMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *BucketDeleteInventoryConfigurationOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *BucketDeleteInventoryConfigurationOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *BucketDeleteInventoryConfigurationOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// DeleteInventoryConfiguration is an operation of Yandex.Cloud Storage Bucket service.
+// It returns an object which should be used to monitor the operation state.
+func (c bucketClient) DeleteInventoryConfiguration(ctx context.Context, in *storage.DeleteBucketInventoryConfigurationRequest, opts ...grpc.CallOption) (*BucketDeleteInventoryConfigurationOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, BucketDeleteInventoryConfiguration, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := storage.NewBucketServiceClient(connection).DeleteInventoryConfiguration(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*storage.DeleteBucketInventoryConfigurationMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &BucketDeleteInventoryConfigurationOperation{*op}, nil
+}
+
+// ListInventoryConfigurations is an operation of Yandex.Cloud Storage Bucket service.
+func (c bucketClient) ListInventoryConfigurations(ctx context.Context, in *storage.ListBucketInventoryConfigurationsRequest, opts ...grpc.CallOption) (*storage.ListBucketInventoryConfigurationsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, BucketListInventoryConfigurations, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return storage.NewBucketServiceClient(connection).ListInventoryConfigurations(ctx, in, opts...)
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c bucketClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, BucketOperationPoller, opts...)
@@ -453,17 +577,21 @@ func (c bucketClient) pollOperation(ctx context.Context, operationId string, opt
 }
 
 var (
-	BucketList                 = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.List")
-	BucketGet                  = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.Get")
-	BucketCreate               = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.Create")
-	BucketUpdate               = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.Update")
-	BucketDelete               = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.Delete")
-	BucketGetStats             = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.GetStats")
-	BucketGetHTTPSConfig       = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.GetHTTPSConfig")
-	BucketSetHTTPSConfig       = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.SetHTTPSConfig")
-	BucketDeleteHTTPSConfig    = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.DeleteHTTPSConfig")
-	BucketSetAccessBindings    = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.SetAccessBindings")
-	BucketUpdateAccessBindings = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.UpdateAccessBindings")
-	BucketListAccessBindings   = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.ListAccessBindings")
-	BucketOperationPoller      = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
+	BucketList                         = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.List")
+	BucketGet                          = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.Get")
+	BucketCreate                       = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.Create")
+	BucketUpdate                       = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.Update")
+	BucketDelete                       = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.Delete")
+	BucketGetStats                     = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.GetStats")
+	BucketGetHTTPSConfig               = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.GetHTTPSConfig")
+	BucketSetHTTPSConfig               = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.SetHTTPSConfig")
+	BucketDeleteHTTPSConfig            = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.DeleteHTTPSConfig")
+	BucketSetAccessBindings            = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.SetAccessBindings")
+	BucketUpdateAccessBindings         = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.UpdateAccessBindings")
+	BucketListAccessBindings           = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.ListAccessBindings")
+	BucketCreateInventoryConfiguration = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.CreateInventoryConfiguration")
+	BucketGetInventoryConfiguration    = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.GetInventoryConfiguration")
+	BucketDeleteInventoryConfiguration = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.DeleteInventoryConfiguration")
+	BucketListInventoryConfigurations  = protoreflect.FullName("yandex.cloud.storage.v1.BucketService.ListInventoryConfigurations")
+	BucketOperationPoller              = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
