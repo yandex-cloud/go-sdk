@@ -22,6 +22,7 @@ type ApiGatewayClient interface {
 	Create(context.Context, *apigateway.CreateApiGatewayRequest, ...grpc.CallOption) (*ApiGatewayCreateOperation, error)
 	Update(context.Context, *apigateway.UpdateApiGatewayRequest, ...grpc.CallOption) (*ApiGatewayUpdateOperation, error)
 	Delete(context.Context, *apigateway.DeleteApiGatewayRequest, ...grpc.CallOption) (*ApiGatewayDeleteOperation, error)
+	Resume(context.Context, *apigateway.ResumeApiGatewayRequest, ...grpc.CallOption) (*ApiGatewayResumeOperation, error)
 	AddDomain(context.Context, *apigateway.AddDomainRequest, ...grpc.CallOption) (*ApiGatewayAddDomainOperation, error)
 	RemoveDomain(context.Context, *apigateway.RemoveDomainRequest, ...grpc.CallOption) (*ApiGatewayRemoveDomainOperation, error)
 	GetOpenapiSpec(context.Context, *apigateway.GetOpenapiSpecRequest, ...grpc.CallOption) (*apigateway.GetOpenapiSpecResponse, error)
@@ -220,6 +221,60 @@ func (c apiGatewayClient) Delete(ctx context.Context, in *apigateway.DeleteApiGa
 		return nil, err
 	}
 	return &ApiGatewayDeleteOperation{*op}, nil
+}
+
+// ApiGatewayResumeOperation is used to monitor the state of Resume operations.
+type ApiGatewayResumeOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ApiGatewayResumeOperation) Metadata() *apigateway.ResumeApiGatewayMetadata {
+	return o.Operation.Metadata().(*apigateway.ResumeApiGatewayMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ApiGatewayResumeOperation) Response() *apigateway.ApiGateway {
+	return o.Operation.Response().(*apigateway.ApiGateway)
+}
+
+// Wait polls the operation until it's done.
+func (o *ApiGatewayResumeOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*apigateway.ApiGateway, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*apigateway.ApiGateway)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ApiGatewayResumeOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*apigateway.ApiGateway, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*apigateway.ApiGateway)
+	return response, err
+}
+
+// Resume is an operation of Yandex.Cloud APIGateway ApiGateway service.
+// It returns an object which should be used to monitor the operation state.
+func (c apiGatewayClient) Resume(ctx context.Context, in *apigateway.ResumeApiGatewayRequest, opts ...grpc.CallOption) (*ApiGatewayResumeOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ApiGatewayResume, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := apigateway.NewApiGatewayServiceClient(connection).Resume(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*apigateway.ResumeApiGatewayMetadata).GetApiGatewayId()
+		},
+		MetadataType: (*apigateway.ResumeApiGatewayMetadata)(nil),
+		ResponseType: (*apigateway.ApiGateway)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ApiGatewayResumeOperation{*op}, nil
 }
 
 // ApiGatewayAddDomainOperation is used to monitor the state of AddDomain operations.
@@ -474,6 +529,7 @@ var (
 	ApiGatewayCreate               = protoreflect.FullName("yandex.cloud.serverless.apigateway.v1.ApiGatewayService.Create")
 	ApiGatewayUpdate               = protoreflect.FullName("yandex.cloud.serverless.apigateway.v1.ApiGatewayService.Update")
 	ApiGatewayDelete               = protoreflect.FullName("yandex.cloud.serverless.apigateway.v1.ApiGatewayService.Delete")
+	ApiGatewayResume               = protoreflect.FullName("yandex.cloud.serverless.apigateway.v1.ApiGatewayService.Resume")
 	ApiGatewayAddDomain            = protoreflect.FullName("yandex.cloud.serverless.apigateway.v1.ApiGatewayService.AddDomain")
 	ApiGatewayRemoveDomain         = protoreflect.FullName("yandex.cloud.serverless.apigateway.v1.ApiGatewayService.RemoveDomain")
 	ApiGatewayGetOpenapiSpec       = protoreflect.FullName("yandex.cloud.serverless.apigateway.v1.ApiGatewayService.GetOpenapiSpec")

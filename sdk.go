@@ -32,9 +32,11 @@ var _ transport.Connector = (*SDK)(nil)
 
 // SDK provides a client connection wrapper managing connection pooling and endpoint resolution for gRPC services.
 type SDK struct {
-	connPool      *transportgrpc.ConnPool
-	conn          transport.Connector
-	authenticator authentication.Authenticator
+	ctx              context.Context
+	connPool         *transportgrpc.ConnPool
+	conn             transport.Connector
+	authenticator    authentication.Authenticator
+	endpointResolver endpoints.EndpointsResolver
 }
 
 // Build initializes and configures an SDK instance with the provided options and context.
@@ -120,11 +122,12 @@ func Build(ctx context.Context, opts ...options.Option) (*SDK, error) {
 	dialOpts = append(dialOpts, buildOptions.CustomDialOpts...)
 
 	connectionPool := transportgrpc.NewConnPool(dialOpts)
-
 	return &SDK{
-		conn:          transport.NewConnector(buildOptions.EndpointsResolver, connectionPool),
-		connPool:      connectionPool,
-		authenticator: buildOptions.Authenticator,
+		ctx:              ctx,
+		conn:             transport.NewConnector(buildOptions.EndpointsResolver, connectionPool),
+		endpointResolver: buildOptions.EndpointsResolver,
+		connPool:         connectionPool,
+		authenticator:    buildOptions.Authenticator,
 	}, nil
 }
 
@@ -189,10 +192,15 @@ func buildEndpointsResolver(ctx context.Context, discoveryEndpoint string) (endp
 			p2e[prefix] = endpoints.NewEndpointParams(addr)
 		}
 	}
+	p2e["yandex.cloud.endpoint"] = endpoints.NewEndpointParams(discoveryEndpoint)
 
 	return endpoints.NewPrefixEndpointsResolver(p2e), nil
 }
 
 func (sdk *SDK) CreateIAMToken(ctx context.Context) (authentication.IamToken, error) {
 	return sdk.authenticator.CreateIAMToken(ctx)
+}
+
+func (sdk *SDK) GetEndpoint(method protoreflect.FullName) (*endpoints.Endpoint, error) {
+	return sdk.endpointResolver.Endpoint(sdk.ctx, method)
 }

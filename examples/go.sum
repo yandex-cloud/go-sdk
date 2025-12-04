@@ -12,10 +12,10 @@ github.com/hashicorp/go-retryablehttp v0.7.7 h1:C8hUCYzor8PIfXHa4UrZkU4VvK8o9ISH
 github.com/hashicorp/go-retryablehttp v0.7.7/go.mod h1:pkQpWZeYWskR+D1tR2O5OcBFOxfA7DoAO6xtkuQnHTk=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
-github.com/yandex-cloud/go-genproto v0.39.0 h1:I3oBSv+tW1eaX9sZt6Qru7kuJqrCQz5HxuPDhURWFOM=
-github.com/yandex-cloud/go-genproto v0.39.0/go.mod h1:0LDD/IZLIUIV4iPH+YcF+jysO3jkSvADFGm4dCAuwQo=
-github.com/yandex-cloud/go-sdk/v2 v2.28.0 h1:KDOrN75xokZBYbgjq6Pjvo+hEpu32xFhErtomLBML5s=
-github.com/yandex-cloud/go-sdk/v2 v2.28.0/go.mod h1:6vmAhqoCVYSJEb5OuhHUqIdxDy2b9uUXp1e5sqMhTmo=
+github.com/yandex-cloud/go-genproto v0.40.0 h1:IqbMFh5Zxd/gtE/7N2VK+HExpX5m7r9C7f5t8QAOO5Q=
+github.com/yandex-cloud/go-genproto v0.40.0/go.mod h1:0LDD/IZLIUIV4iPH+YcF+jysO3jkSvADFGm4dCAuwQo=
+github.com/yandex-cloud/go-sdk/v2 v2.30.0 h1:nyau76osz0cQ+KBfUPOoPtgBil0NvF6oCNpe6m2kRzI=
+github.com/yandex-cloud/go-sdk/v2 v2.30.0/go.mod h1:ZJiRRVxMpgq5mb+v6VR7fqr7VkQLph1ZjBmb/zCmEp0=
 go.uber.org/multierr v1.10.0 h1:S0h4aNzvfcFsC3dRF1jLoaov7oRaKqRGC/pUEJ2yvPQ=
 go.uber.org/multierr v1.10.0/go.mod h1:20+QtiLqy0Nd6FdQB9TLXag12DsQkrbs3htMFfDN80Y=
 go.uber.org/zap v1.27.0 h1:aJMhYGrd5QSmlpLMr2MftRKl7t8J8PTZPA732ud/XR8=
