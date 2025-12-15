@@ -23,6 +23,7 @@ type ApiGatewayClient interface {
 	Update(context.Context, *apigateway.UpdateApiGatewayRequest, ...grpc.CallOption) (*ApiGatewayUpdateOperation, error)
 	Delete(context.Context, *apigateway.DeleteApiGatewayRequest, ...grpc.CallOption) (*ApiGatewayDeleteOperation, error)
 	Resume(context.Context, *apigateway.ResumeApiGatewayRequest, ...grpc.CallOption) (*ApiGatewayResumeOperation, error)
+	Stop(context.Context, *apigateway.StopApiGatewayRequest, ...grpc.CallOption) (*ApiGatewayStopOperation, error)
 	AddDomain(context.Context, *apigateway.AddDomainRequest, ...grpc.CallOption) (*ApiGatewayAddDomainOperation, error)
 	RemoveDomain(context.Context, *apigateway.RemoveDomainRequest, ...grpc.CallOption) (*ApiGatewayRemoveDomainOperation, error)
 	GetOpenapiSpec(context.Context, *apigateway.GetOpenapiSpecRequest, ...grpc.CallOption) (*apigateway.GetOpenapiSpecResponse, error)
@@ -275,6 +276,60 @@ func (c apiGatewayClient) Resume(ctx context.Context, in *apigateway.ResumeApiGa
 		return nil, err
 	}
 	return &ApiGatewayResumeOperation{*op}, nil
+}
+
+// ApiGatewayStopOperation is used to monitor the state of Stop operations.
+type ApiGatewayStopOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ApiGatewayStopOperation) Metadata() *apigateway.StopApiGatewayMetadata {
+	return o.Operation.Metadata().(*apigateway.StopApiGatewayMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ApiGatewayStopOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *ApiGatewayStopOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ApiGatewayStopOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// Stop is an operation of Yandex.Cloud APIGateway ApiGateway service.
+// It returns an object which should be used to monitor the operation state.
+func (c apiGatewayClient) Stop(ctx context.Context, in *apigateway.StopApiGatewayRequest, opts ...grpc.CallOption) (*ApiGatewayStopOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ApiGatewayStop, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := apigateway.NewApiGatewayServiceClient(connection).Stop(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*apigateway.StopApiGatewayMetadata).GetApiGatewayId()
+		},
+		MetadataType: (*apigateway.StopApiGatewayMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ApiGatewayStopOperation{*op}, nil
 }
 
 // ApiGatewayAddDomainOperation is used to monitor the state of AddDomain operations.
@@ -530,6 +585,7 @@ var (
 	ApiGatewayUpdate               = protoreflect.FullName("yandex.cloud.serverless.apigateway.v1.ApiGatewayService.Update")
 	ApiGatewayDelete               = protoreflect.FullName("yandex.cloud.serverless.apigateway.v1.ApiGatewayService.Delete")
 	ApiGatewayResume               = protoreflect.FullName("yandex.cloud.serverless.apigateway.v1.ApiGatewayService.Resume")
+	ApiGatewayStop                 = protoreflect.FullName("yandex.cloud.serverless.apigateway.v1.ApiGatewayService.Stop")
 	ApiGatewayAddDomain            = protoreflect.FullName("yandex.cloud.serverless.apigateway.v1.ApiGatewayService.AddDomain")
 	ApiGatewayRemoveDomain         = protoreflect.FullName("yandex.cloud.serverless.apigateway.v1.ApiGatewayService.RemoveDomain")
 	ApiGatewayGetOpenapiSpec       = protoreflect.FullName("yandex.cloud.serverless.apigateway.v1.ApiGatewayService.GetOpenapiSpec")
