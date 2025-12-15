@@ -27,3 +27,8 @@ func (c *CloudRegistry) Artifact() *ArtifactServiceClient {
 func (c *CloudRegistry) Registry() *RegistryServiceClient {
 	return &RegistryServiceClient{getConn: c.getConn}
 }
+
+// LifecyclePolicy gets LifecyclePolicyService client
+func (c *CloudRegistry) LifecyclePolicy() *LifecyclePolicyServiceClient {
+	return &LifecyclePolicyServiceClient{getConn: c.getConn}
+}

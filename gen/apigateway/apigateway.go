@@ -423,6 +423,15 @@ func (c *ApiGatewayServiceClient) RemoveDomain(ctx context.Context, in *apigatew
 	return apigateway.NewApiGatewayServiceClient(conn).RemoveDomain(ctx, in, opts...)
 }
 
+// Resume implements apigateway.ApiGatewayServiceClient
+func (c *ApiGatewayServiceClient) Resume(ctx context.Context, in *apigateway.ResumeApiGatewayRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return apigateway.NewApiGatewayServiceClient(conn).Resume(ctx, in, opts...)
+}
+
 // SetAccessBindings implements apigateway.ApiGatewayServiceClient
 func (c *ApiGatewayServiceClient) SetAccessBindings(ctx context.Context, in *access.SetAccessBindingsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -430,6 +439,15 @@ func (c *ApiGatewayServiceClient) SetAccessBindings(ctx context.Context, in *acc
 		return nil, err
 	}
 	return apigateway.NewApiGatewayServiceClient(conn).SetAccessBindings(ctx, in, opts...)
+}
+
+// Stop implements apigateway.ApiGatewayServiceClient
+func (c *ApiGatewayServiceClient) Stop(ctx context.Context, in *apigateway.StopApiGatewayRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return apigateway.NewApiGatewayServiceClient(conn).Stop(ctx, in, opts...)
 }
 
 // Update implements apigateway.ApiGatewayServiceClient
