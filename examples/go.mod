@@ -10,8 +10,8 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.7 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/yandex-cloud/go-genproto v0.41.0 // indirect
-	github.com/yandex-cloud/go-sdk/v2 v2.31.0 // indirect
+	github.com/yandex-cloud/go-genproto v0.42.0 // indirect
+	github.com/yandex-cloud/go-sdk/v2 v2.33.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/net v0.39.0 // indirect

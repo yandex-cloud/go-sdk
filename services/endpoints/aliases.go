@@ -51,6 +51,7 @@ var Aliases map[string]protoreflect.FullName = map[string]protoreflect.FullName{
 	"monitoring":           protoreflect.FullName("yandex.cloud.monitoring"),
 	"operation":            protoreflect.FullName("yandex.cloud.operation"),
 	"searchapi":            protoreflect.FullName("yandex.cloud.searchapi"),
+	"securitydeck":         protoreflect.FullName("yandex.cloud.securitydeck"),
 	"serverless":           protoreflect.FullName("yandex.cloud.serverless"),
 	"servicename":          protoreflect.FullName("yandex.cloud.servicename"),
 	"smartcaptcha":         protoreflect.FullName("yandex.cloud.smartcaptcha"),

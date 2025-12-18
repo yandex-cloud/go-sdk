@@ -103,6 +103,7 @@ var DynamicEndpoints = map[protoreflect.FullName]string{
 	protoreflect.FullName("yandex.cloud.quotamanager.v1"):                                                    "quota-manager",
 	protoreflect.FullName("yandex.cloud.resourcemanager.v1"):                                                 "resource-manager",
 	protoreflect.FullName("yandex.cloud.searchapi.v2"):                                                       "searchapi",
+	protoreflect.FullName("yandex.cloud.securitydeck.alerts.v1"):                                             "alert-sink",
 	protoreflect.FullName("yandex.cloud.serverless.apigateway.v1"):                                           "serverless-apigateway",
 	protoreflect.FullName("yandex.cloud.serverless.apigateway.websocket.v1"):                                 "serverless-gateway-connections",
 	protoreflect.FullName("yandex.cloud.serverless.containers.v1"):                                           "serverless-containers",
