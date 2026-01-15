@@ -15,6 +15,7 @@ import (
 
 // RawLogsClient provides methods for managing RawLogs resources of Yandex.Cloud Cdn.
 type RawLogsClient interface {
+	RawLogsClientIterator
 	Activate(context.Context, *cdn.ActivateRawLogsRequest, ...grpc.CallOption) (*RawLogsActivateOperation, error)
 	Deactivate(context.Context, *cdn.DeactivateRawLogsRequest, ...grpc.CallOption) (*RawLogsDeactivateOperation, error)
 	Get(context.Context, *cdn.GetRawLogsRequest, ...grpc.CallOption) (*cdn.GetRawLogsResponse, error)

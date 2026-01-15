@@ -15,6 +15,7 @@ import (
 
 // CustomerClient provides methods for managing Customer resources of Yandex.Cloud Billing.
 type CustomerClient interface {
+	CustomerClientIterator
 	List(context.Context, *billing.ListCustomersRequest, ...grpc.CallOption) (*billing.ListCustomersResponse, error)
 	Invite(context.Context, *billing.InviteCustomerRequest, ...grpc.CallOption) (*CustomerInviteOperation, error)
 	CreateResellerServed(context.Context, *billing.CreateResellerServedCustomerRequest, ...grpc.CallOption) (*CustomerCreateResellerServedOperation, error)

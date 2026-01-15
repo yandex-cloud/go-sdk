@@ -17,6 +17,7 @@ import (
 
 // SinkClient provides methods for managing Sink resources of Yandex.Cloud Logging.
 type SinkClient interface {
+	SinkClientIterator
 	Get(context.Context, *logging.GetSinkRequest, ...grpc.CallOption) (*logging.Sink, error)
 	List(context.Context, *logging.ListSinksRequest, ...grpc.CallOption) (*logging.ListSinksResponse, error)
 	Create(context.Context, *logging.CreateSinkRequest, ...grpc.CallOption) (*SinkCreateOperation, error)

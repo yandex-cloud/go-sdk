@@ -16,6 +16,7 @@ import (
 
 // SymmetricKeyClient provides methods for managing SymmetricKey resources of Yandex.Cloud KMS.
 type SymmetricKeyClient interface {
+	SymmetricKeyClientIterator
 	Create(context.Context, *kms.CreateSymmetricKeyRequest, ...grpc.CallOption) (*SymmetricKeyCreateOperation, error)
 	Get(context.Context, *kms.GetSymmetricKeyRequest, ...grpc.CallOption) (*kms.SymmetricKey, error)
 	List(context.Context, *kms.ListSymmetricKeysRequest, ...grpc.CallOption) (*kms.ListSymmetricKeysResponse, error)

@@ -14,6 +14,7 @@ import (
 
 // AgentRegistrationClient provides methods for managing AgentRegistration resources of Yandex.Cloud Agent.
 type AgentRegistrationClient interface {
+	AgentRegistrationClientIterator
 	Register(context.Context, *agent.RegisterRequest, ...grpc.CallOption) (*agent.RegisterResponse, error)
 	ExternalAgentRegister(context.Context, *agent.ExternalAgentRegisterRequest, ...grpc.CallOption) (*AgentRegistrationExternalAgentRegisterOperation, error)
 }

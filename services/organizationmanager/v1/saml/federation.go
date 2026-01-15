@@ -16,6 +16,7 @@ import (
 
 // FederationClient provides methods for managing Federation resources of Yandex.Cloud Saml.
 type FederationClient interface {
+	FederationClientIterator
 	Get(context.Context, *saml.GetFederationRequest, ...grpc.CallOption) (*saml.Federation, error)
 	List(context.Context, *saml.ListFederationsRequest, ...grpc.CallOption) (*saml.ListFederationsResponse, error)
 	Create(context.Context, *saml.CreateFederationRequest, ...grpc.CallOption) (*FederationCreateOperation, error)

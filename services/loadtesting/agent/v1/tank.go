@@ -12,6 +12,7 @@ import (
 
 // TankClient provides methods for managing Tank resources of Yandex.Cloud Agent.
 type TankClient interface {
+	TankClientIterator
 	ClaimStatus(context.Context, *agent.ClaimTankStatusRequest, ...grpc.CallOption) (*agent.ClaimTankStatusResponse, error)
 }
 

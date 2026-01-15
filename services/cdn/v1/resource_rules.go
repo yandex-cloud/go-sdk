@@ -15,6 +15,7 @@ import (
 
 // ResourceRulesClient provides methods for managing ResourceRules resources of Yandex.Cloud Cdn.
 type ResourceRulesClient interface {
+	ResourceRulesClientIterator
 	List(context.Context, *cdn.ListResourceRulesRequest, ...grpc.CallOption) (*cdn.ListResourceRulesResponse, error)
 	Create(context.Context, *cdn.CreateResourceRuleRequest, ...grpc.CallOption) (*ResourceRulesCreateOperation, error)
 	Get(context.Context, *cdn.GetResourceRuleRequest, ...grpc.CallOption) (*cdn.Rule, error)

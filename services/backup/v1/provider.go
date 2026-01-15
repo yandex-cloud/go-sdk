@@ -15,6 +15,7 @@ import (
 
 // ProviderClient provides methods for managing Provider resources of Yandex.Cloud Backup.
 type ProviderClient interface {
+	ProviderClientIterator
 	Activate(context.Context, *backup.ActivateProviderRequest, ...grpc.CallOption) (*ProviderActivateOperation, error)
 	ListActivated(context.Context, *backup.ListActivatedProvidersRequest, ...grpc.CallOption) (*backup.ListActivatedProvidersResponse, error)
 }

@@ -16,6 +16,7 @@ import (
 
 // BillingAccountClient provides methods for managing BillingAccount resources of Yandex.Cloud Billing.
 type BillingAccountClient interface {
+	BillingAccountClientIterator
 	Get(context.Context, *billing.GetBillingAccountRequest, ...grpc.CallOption) (*billing.BillingAccount, error)
 	List(context.Context, *billing.ListBillingAccountsRequest, ...grpc.CallOption) (*billing.ListBillingAccountsResponse, error)
 	ListBillableObjectBindings(context.Context, *billing.ListBillableObjectBindingsRequest, ...grpc.CallOption) (*billing.ListBillableObjectBindingsResponse, error)

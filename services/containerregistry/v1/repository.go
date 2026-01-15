@@ -17,6 +17,7 @@ import (
 
 // RepositoryClient provides methods for managing Repository resources of Yandex.Cloud ContainerRegistry.
 type RepositoryClient interface {
+	RepositoryClientIterator
 	Get(context.Context, *containerregistry.GetRepositoryRequest, ...grpc.CallOption) (*containerregistry.Repository, error)
 	GetByName(context.Context, *containerregistry.GetRepositoryByNameRequest, ...grpc.CallOption) (*containerregistry.Repository, error)
 	List(context.Context, *containerregistry.ListRepositoriesRequest, ...grpc.CallOption) (*containerregistry.ListRepositoriesResponse, error)

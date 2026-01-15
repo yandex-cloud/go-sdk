@@ -12,6 +12,7 @@ import (
 
 // AccessPolicyTemplateClient provides methods for managing AccessPolicyTemplate resources of Yandex.Cloud IAM.
 type AccessPolicyTemplateClient interface {
+	AccessPolicyTemplateClientIterator
 	List(context.Context, *iam.ListAccessPolicyTemplatesRequest, ...grpc.CallOption) (*iam.ListAccessPolicyTemplatesResponse, error)
 }
 

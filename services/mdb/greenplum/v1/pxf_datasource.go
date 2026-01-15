@@ -15,6 +15,7 @@ import (
 
 // PXFDatasourceClient provides methods for managing PXFDatasource resources of Yandex.Cloud Greenplum.
 type PXFDatasourceClient interface {
+	PXFDatasourceClientIterator
 	List(context.Context, *greenplum.ListPXFDatasourcesRequest, ...grpc.CallOption) (*greenplum.ListPXFDatasourcesResponse, error)
 	Create(context.Context, *greenplum.CreatePXFDatasourceRequest, ...grpc.CallOption) (*PXFDatasourceCreateOperation, error)
 	Update(context.Context, *greenplum.UpdatePXFDatasourceRequest, ...grpc.CallOption) (*PXFDatasourceUpdateOperation, error)

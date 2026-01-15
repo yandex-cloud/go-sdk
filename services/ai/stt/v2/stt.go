@@ -14,6 +14,7 @@ import (
 
 // SttClient provides methods for managing Stt resources of Yandex.Cloud STT.
 type SttClient interface {
+	SttClientIterator
 	LongRunningRecognize(context.Context, *stt.LongRunningRecognitionRequest, ...grpc.CallOption) (*SttLongRunningRecognizeOperation, error)
 	StreamingRecognize(context.Context, ...grpc.CallOption) (stt.SttService_StreamingRecognizeClient, error)
 }

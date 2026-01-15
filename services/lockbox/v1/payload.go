@@ -12,6 +12,7 @@ import (
 
 // PayloadClient provides methods for managing Payload resources of Yandex.Cloud Lockbox.
 type PayloadClient interface {
+	PayloadClientIterator
 	Get(context.Context, *lockbox.GetPayloadRequest, ...grpc.CallOption) (*lockbox.Payload, error)
 	GetEx(context.Context, *lockbox.GetExRequest, ...grpc.CallOption) (*lockbox.GetExResponse, error)
 }

@@ -13,7 +13,7 @@ require (
 	github.com/mitchellh/go-testing-interface v1.14.1
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.10.0
-	github.com/yandex-cloud/go-genproto v0.43.0
+	github.com/yandex-cloud/go-genproto v0.44.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/sync v0.8.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1

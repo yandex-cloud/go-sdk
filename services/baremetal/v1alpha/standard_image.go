@@ -12,6 +12,7 @@ import (
 
 // StandardImageClient provides methods for managing StandardImage resources of Yandex.Cloud Baremetal.
 type StandardImageClient interface {
+	StandardImageClientIterator
 	Get(context.Context, *baremetal.GetStandardImageRequest, ...grpc.CallOption) (*baremetal.StandardImage, error)
 	List(context.Context, *baremetal.ListStandardImagesRequest, ...grpc.CallOption) (*baremetal.ListStandardImagesResponse, error)
 }

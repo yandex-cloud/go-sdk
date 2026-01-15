@@ -15,6 +15,7 @@ import (
 
 // DesktopImageClient provides methods for managing DesktopImage resources of Yandex.Cloud Api.
 type DesktopImageClient interface {
+	DesktopImageClientIterator
 	List(context.Context, *clouddesktop.ListDesktopImagesRequest, ...grpc.CallOption) (*clouddesktop.ListDesktopImagesResponse, error)
 	Get(context.Context, *clouddesktop.GetDesktopImageRequest, ...grpc.CallOption) (*clouddesktop.DesktopImage, error)
 	Copy(context.Context, *clouddesktop.CopyDesktopImageRequest, ...grpc.CallOption) (*DesktopImageCopyOperation, error)

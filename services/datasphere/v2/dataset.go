@@ -15,6 +15,7 @@ import (
 
 // DatasetClient provides methods for managing Dataset resources of Yandex.Cloud Datasphere.
 type DatasetClient interface {
+	DatasetClientIterator
 	Activate(context.Context, *datasphere.ActivateDatasetRequest, ...grpc.CallOption) (*DatasetActivateOperation, error)
 	Deactivate(context.Context, *datasphere.DeactivateDatasetRequest, ...grpc.CallOption) (*DatasetDeactivateOperation, error)
 }

@@ -16,6 +16,7 @@ import (
 
 // InstanceClient provides methods for managing Instance resources of Yandex.Cloud Gitlab.
 type InstanceClient interface {
+	InstanceClientIterator
 	Get(context.Context, *gitlab.GetInstanceRequest, ...grpc.CallOption) (*gitlab.Instance, error)
 	List(context.Context, *gitlab.ListInstancesRequest, ...grpc.CallOption) (*gitlab.ListInstancesResponse, error)
 	Create(context.Context, *gitlab.CreateInstanceRequest, ...grpc.CallOption) (*InstanceCreateOperation, error)

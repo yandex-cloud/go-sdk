@@ -12,6 +12,7 @@ import (
 
 // PartnerClient provides methods for managing Partner resources of Yandex.Cloud Cic.
 type PartnerClient interface {
+	PartnerClientIterator
 	Get(context.Context, *cic.GetPartnerRequest, ...grpc.CallOption) (*cic.Partner, error)
 	List(context.Context, *cic.ListPartnersRequest, ...grpc.CallOption) (*cic.ListPartnersResponse, error)
 }

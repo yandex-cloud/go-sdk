@@ -15,6 +15,7 @@ import (
 
 // ConnectorClient provides methods for managing Connector resources of Yandex.Cloud Kafka.
 type ConnectorClient interface {
+	ConnectorClientIterator
 	Get(context.Context, *kafka.GetConnectorRequest, ...grpc.CallOption) (*kafka.Connector, error)
 	List(context.Context, *kafka.ListConnectorsRequest, ...grpc.CallOption) (*kafka.ListConnectorsResponse, error)
 	Create(context.Context, *kafka.CreateConnectorRequest, ...grpc.CallOption) (*ConnectorCreateOperation, error)

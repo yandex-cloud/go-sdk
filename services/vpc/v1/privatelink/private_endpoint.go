@@ -16,6 +16,7 @@ import (
 
 // PrivateEndpointClient provides methods for managing PrivateEndpoint resources of Yandex.Cloud Privatelink.
 type PrivateEndpointClient interface {
+	PrivateEndpointClientIterator
 	Get(context.Context, *privatelink.GetPrivateEndpointRequest, ...grpc.CallOption) (*privatelink.PrivateEndpoint, error)
 	List(context.Context, *privatelink.ListPrivateEndpointsRequest, ...grpc.CallOption) (*privatelink.ListPrivateEndpointsResponse, error)
 	Create(context.Context, *privatelink.CreatePrivateEndpointRequest, ...grpc.CallOption) (*PrivateEndpointCreateOperation, error)

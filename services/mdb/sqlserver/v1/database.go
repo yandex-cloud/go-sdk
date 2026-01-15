@@ -15,6 +15,7 @@ import (
 
 // DatabaseClient provides methods for managing Database resources of Yandex.Cloud Sqlserver.
 type DatabaseClient interface {
+	DatabaseClientIterator
 	Get(context.Context, *sqlserver.GetDatabaseRequest, ...grpc.CallOption) (*sqlserver.Database, error)
 	List(context.Context, *sqlserver.ListDatabasesRequest, ...grpc.CallOption) (*sqlserver.ListDatabasesResponse, error)
 	Create(context.Context, *sqlserver.CreateDatabaseRequest, ...grpc.CallOption) (*DatabaseCreateOperation, error)

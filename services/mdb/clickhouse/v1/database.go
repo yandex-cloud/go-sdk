@@ -15,6 +15,7 @@ import (
 
 // DatabaseClient provides methods for managing Database resources of Yandex.Cloud Clickhouse.
 type DatabaseClient interface {
+	DatabaseClientIterator
 	Get(context.Context, *clickhouse.GetDatabaseRequest, ...grpc.CallOption) (*clickhouse.Database, error)
 	List(context.Context, *clickhouse.ListDatabasesRequest, ...grpc.CallOption) (*clickhouse.ListDatabasesResponse, error)
 	Create(context.Context, *clickhouse.CreateDatabaseRequest, ...grpc.CallOption) (*DatabaseCreateOperation, error)

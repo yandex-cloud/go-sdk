@@ -16,6 +16,7 @@ import (
 
 // BackupClient provides methods for managing Backup resources of Yandex.Cloud Clickhouse.
 type BackupClient interface {
+	BackupClientIterator
 	Get(context.Context, *clickhouse.GetBackupRequest, ...grpc.CallOption) (*clickhouse.Backup, error)
 	List(context.Context, *clickhouse.ListBackupsRequest, ...grpc.CallOption) (*clickhouse.ListBackupsResponse, error)
 	Delete(context.Context, *clickhouse.DeleteBackupRequest, ...grpc.CallOption) (*BackupDeleteOperation, error)

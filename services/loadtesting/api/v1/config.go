@@ -17,6 +17,7 @@ import (
 
 // ConfigClient provides methods for managing Config resources of Yandex.Cloud Api.
 type ConfigClient interface {
+	ConfigClientIterator
 	Create(context.Context, *api.CreateConfigRequest, ...grpc.CallOption) (*ConfigCreateOperation, error)
 	Get(context.Context, *api.GetConfigRequest, ...grpc.CallOption) (*config.Config, error)
 	List(context.Context, *api.ListConfigsRequest, ...grpc.CallOption) (*api.ListConfigsResponse, error)

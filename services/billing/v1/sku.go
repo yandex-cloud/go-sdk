@@ -12,6 +12,7 @@ import (
 
 // SkuClient provides methods for managing Sku resources of Yandex.Cloud Billing.
 type SkuClient interface {
+	SkuClientIterator
 	Get(context.Context, *billing.GetSkuRequest, ...grpc.CallOption) (*billing.Sku, error)
 	List(context.Context, *billing.ListSkusRequest, ...grpc.CallOption) (*billing.ListSkusResponse, error)
 }

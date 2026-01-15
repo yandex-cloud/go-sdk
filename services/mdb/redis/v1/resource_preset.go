@@ -12,6 +12,7 @@ import (
 
 // ResourcePresetClient provides methods for managing ResourcePreset resources of Yandex.Cloud Redis.
 type ResourcePresetClient interface {
+	ResourcePresetClientIterator
 	Get(context.Context, *redis.GetResourcePresetRequest, ...grpc.CallOption) (*redis.ResourcePreset, error)
 	List(context.Context, *redis.ListResourcePresetsRequest, ...grpc.CallOption) (*redis.ListResourcePresetsResponse, error)
 }

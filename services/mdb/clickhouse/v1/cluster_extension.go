@@ -15,6 +15,7 @@ import (
 
 // ClusterExtensionClient provides methods for managing ClusterExtension resources of Yandex.Cloud Clickhouse.
 type ClusterExtensionClient interface {
+	ClusterExtensionClientIterator
 	Get(context.Context, *clickhouse.GetClusterExtensionRequest, ...grpc.CallOption) (*clickhouse.ClusterExtension, error)
 	List(context.Context, *clickhouse.ListClusterExtensionsRequest, ...grpc.CallOption) (*clickhouse.ListClusterExtensionsResponse, error)
 	Create(context.Context, *clickhouse.CreateClusterExtensionRequest, ...grpc.CallOption) (*ClusterExtensionCreateOperation, error)

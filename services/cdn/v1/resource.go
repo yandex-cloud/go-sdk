@@ -16,6 +16,7 @@ import (
 
 // ResourceClient provides methods for managing Resource resources of Yandex.Cloud Cdn.
 type ResourceClient interface {
+	ResourceClientIterator
 	Get(context.Context, *cdn.GetResourceRequest, ...grpc.CallOption) (*cdn.Resource, error)
 	List(context.Context, *cdn.ListResourcesRequest, ...grpc.CallOption) (*cdn.ListResourcesResponse, error)
 	Create(context.Context, *cdn.CreateResourceRequest, ...grpc.CallOption) (*ResourceCreateOperation, error)

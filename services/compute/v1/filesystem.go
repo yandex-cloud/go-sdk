@@ -17,6 +17,7 @@ import (
 
 // FilesystemClient provides methods for managing Filesystem resources of Yandex.Cloud Compute.
 type FilesystemClient interface {
+	FilesystemClientIterator
 	Get(context.Context, *compute.GetFilesystemRequest, ...grpc.CallOption) (*compute.Filesystem, error)
 	List(context.Context, *compute.ListFilesystemsRequest, ...grpc.CallOption) (*compute.ListFilesystemsResponse, error)
 	Create(context.Context, *compute.CreateFilesystemRequest, ...grpc.CallOption) (*FilesystemCreateOperation, error)

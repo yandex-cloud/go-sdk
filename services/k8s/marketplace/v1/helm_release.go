@@ -16,6 +16,7 @@ import (
 
 // HelmReleaseClient provides methods for managing HelmRelease resources of Yandex.Cloud Marketplace.
 type HelmReleaseClient interface {
+	HelmReleaseClientIterator
 	List(context.Context, *marketplace.ListHelmReleasesRequest, ...grpc.CallOption) (*marketplace.ListHelmReleasesResponse, error)
 	Get(context.Context, *marketplace.GetHelmReleaseRequest, ...grpc.CallOption) (*marketplace.HelmRelease, error)
 	Install(context.Context, *marketplace.InstallHelmReleaseRequest, ...grpc.CallOption) (*HelmReleaseInstallOperation, error)

@@ -15,6 +15,7 @@ import (
 
 // UserClient provides methods for managing User resources of Yandex.Cloud Clickhouse.
 type UserClient interface {
+	UserClientIterator
 	Get(context.Context, *clickhouse.GetUserRequest, ...grpc.CallOption) (*clickhouse.User, error)
 	List(context.Context, *clickhouse.ListUsersRequest, ...grpc.CallOption) (*clickhouse.ListUsersResponse, error)
 	Create(context.Context, *clickhouse.CreateUserRequest, ...grpc.CallOption) (*UserCreateOperation, error)

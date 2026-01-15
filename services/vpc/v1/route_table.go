@@ -16,6 +16,7 @@ import (
 
 // RouteTableClient provides methods for managing RouteTable resources of Yandex.Cloud VPC.
 type RouteTableClient interface {
+	RouteTableClientIterator
 	Get(context.Context, *vpc.GetRouteTableRequest, ...grpc.CallOption) (*vpc.RouteTable, error)
 	List(context.Context, *vpc.ListRouteTablesRequest, ...grpc.CallOption) (*vpc.ListRouteTablesResponse, error)
 	Create(context.Context, *vpc.CreateRouteTableRequest, ...grpc.CallOption) (*RouteTableCreateOperation, error)

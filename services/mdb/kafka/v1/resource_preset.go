@@ -12,6 +12,7 @@ import (
 
 // ResourcePresetClient provides methods for managing ResourcePreset resources of Yandex.Cloud Kafka.
 type ResourcePresetClient interface {
+	ResourcePresetClientIterator
 	Get(context.Context, *kafka.GetResourcePresetRequest, ...grpc.CallOption) (*kafka.ResourcePreset, error)
 	List(context.Context, *kafka.ListResourcePresetsRequest, ...grpc.CallOption) (*kafka.ListResourcePresetsResponse, error)
 }

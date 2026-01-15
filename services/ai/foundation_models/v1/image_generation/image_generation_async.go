@@ -14,6 +14,7 @@ import (
 
 // ImageGenerationAsyncClient provides methods for managing ImageGenerationAsync resources of Yandex.Cloud ImageGeneration.
 type ImageGenerationAsyncClient interface {
+	ImageGenerationAsyncClientIterator
 	Generate(context.Context, *image_generation.ImageGenerationRequest, ...grpc.CallOption) (*ImageGenerationAsyncGenerateOperation, error)
 }
 

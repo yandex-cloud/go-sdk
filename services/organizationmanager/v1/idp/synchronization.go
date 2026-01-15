@@ -15,6 +15,7 @@ import (
 
 // SynchronizationClient provides methods for managing Synchronization resources of Yandex.Cloud Idp.
 type SynchronizationClient interface {
+	SynchronizationClientIterator
 	SetReplicationToken(context.Context, *idp.SetReplicationTokenRequest, ...grpc.CallOption) (*SynchronizationSetReplicationTokenOperation, error)
 	ResetReplicationToken(context.Context, *idp.ResetReplicationTokenRequest, ...grpc.CallOption) (*SynchronizationResetReplicationTokenOperation, error)
 	CreateSynchronizationSettings(context.Context, *idp.CreateSynchronizationSettingsRequest, ...grpc.CallOption) (*SynchronizationCreateSynchronizationSettingsOperation, error)

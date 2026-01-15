@@ -16,6 +16,7 @@ import (
 
 // PrivateSubnetClient provides methods for managing PrivateSubnet resources of Yandex.Cloud Baremetal.
 type PrivateSubnetClient interface {
+	PrivateSubnetClientIterator
 	Get(context.Context, *baremetal.GetPrivateSubnetRequest, ...grpc.CallOption) (*baremetal.PrivateSubnet, error)
 	List(context.Context, *baremetal.ListPrivateSubnetRequest, ...grpc.CallOption) (*baremetal.ListPrivateSubnetResponse, error)
 	Create(context.Context, *baremetal.CreatePrivateSubnetRequest, ...grpc.CallOption) (*PrivateSubnetCreateOperation, error)

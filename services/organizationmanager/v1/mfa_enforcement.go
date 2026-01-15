@@ -16,6 +16,7 @@ import (
 
 // MfaEnforcementClient provides methods for managing MfaEnforcement resources of Yandex.Cloud OrganizationManager.
 type MfaEnforcementClient interface {
+	MfaEnforcementClientIterator
 	Create(context.Context, *organizationmanager.CreateMfaEnforcementRequest, ...grpc.CallOption) (*MfaEnforcementCreateOperation, error)
 	Update(context.Context, *organizationmanager.UpdateMfaEnforcementRequest, ...grpc.CallOption) (*MfaEnforcementUpdateOperation, error)
 	Activate(context.Context, *organizationmanager.ActivateMfaEnforcementRequest, ...grpc.CallOption) (*MfaEnforcementActivateOperation, error)

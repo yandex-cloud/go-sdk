@@ -16,6 +16,7 @@ import (
 
 // NetworkClient provides methods for managing Network resources of Yandex.Cloud VPC.
 type NetworkClient interface {
+	NetworkClientIterator
 	Get(context.Context, *vpc.GetNetworkRequest, ...grpc.CallOption) (*vpc.Network, error)
 	List(context.Context, *vpc.ListNetworksRequest, ...grpc.CallOption) (*vpc.ListNetworksResponse, error)
 	Create(context.Context, *vpc.CreateNetworkRequest, ...grpc.CallOption) (*NetworkCreateOperation, error)

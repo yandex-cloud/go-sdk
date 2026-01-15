@@ -12,6 +12,7 @@ import (
 
 // MonitoringClient provides methods for managing Monitoring resources of Yandex.Cloud Agent.
 type MonitoringClient interface {
+	MonitoringClientIterator
 	AddMetric(context.Context, *agent.AddMetricRequest, ...grpc.CallOption) (*agent.AddMetricResponse, error)
 }
 

@@ -17,6 +17,7 @@ import (
 
 // LogGroupClient provides methods for managing LogGroup resources of Yandex.Cloud Logging.
 type LogGroupClient interface {
+	LogGroupClientIterator
 	Get(context.Context, *logging.GetLogGroupRequest, ...grpc.CallOption) (*logging.LogGroup, error)
 	Stats(context.Context, *logging.GetLogGroupStatsRequest, ...grpc.CallOption) (*logging.GetLogGroupStatsResponse, error)
 	List(context.Context, *logging.ListLogGroupsRequest, ...grpc.CallOption) (*logging.ListLogGroupsResponse, error)

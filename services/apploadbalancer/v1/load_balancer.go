@@ -16,6 +16,7 @@ import (
 
 // LoadBalancerClient provides methods for managing LoadBalancer resources of Yandex.Cloud Apploadbalancer.
 type LoadBalancerClient interface {
+	LoadBalancerClientIterator
 	Get(context.Context, *apploadbalancer.GetLoadBalancerRequest, ...grpc.CallOption) (*apploadbalancer.LoadBalancer, error)
 	List(context.Context, *apploadbalancer.ListLoadBalancersRequest, ...grpc.CallOption) (*apploadbalancer.ListLoadBalancersResponse, error)
 	Create(context.Context, *apploadbalancer.CreateLoadBalancerRequest, ...grpc.CallOption) (*LoadBalancerCreateOperation, error)

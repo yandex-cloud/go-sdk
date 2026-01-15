@@ -12,6 +12,7 @@ import (
 
 // TextGenerationClient provides methods for managing TextGeneration resources of Yandex.Cloud FoundationModels.
 type TextGenerationClient interface {
+	TextGenerationClientIterator
 	Completion(context.Context, *text_generation.CompletionRequest, ...grpc.CallOption) (text_generation.TextGenerationService_CompletionClient, error)
 }
 

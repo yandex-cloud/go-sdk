@@ -15,6 +15,7 @@ import (
 
 // UserClient provides methods for managing User resources of Yandex.Cloud MySQL.
 type UserClient interface {
+	UserClientIterator
 	Get(context.Context, *mysql.GetUserRequest, ...grpc.CallOption) (*mysql.User, error)
 	List(context.Context, *mysql.ListUsersRequest, ...grpc.CallOption) (*mysql.ListUsersResponse, error)
 	Create(context.Context, *mysql.CreateUserRequest, ...grpc.CallOption) (*UserCreateOperation, error)

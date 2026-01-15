@@ -12,6 +12,7 @@ import (
 
 // LogReadingClient provides methods for managing LogReading resources of Yandex.Cloud Logging.
 type LogReadingClient interface {
+	LogReadingClientIterator
 	Read(context.Context, *logging.ReadRequest, ...grpc.CallOption) (*logging.ReadResponse, error)
 }
 

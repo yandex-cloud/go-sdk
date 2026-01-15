@@ -15,6 +15,7 @@ import (
 
 // LifecyclePolicyClient provides methods for managing LifecyclePolicy resources of Yandex.Cloud Cloudregistry.
 type LifecyclePolicyClient interface {
+	LifecyclePolicyClientIterator
 	Create(context.Context, *cloudregistry.CreateLifecyclePolicyRequest, ...grpc.CallOption) (*LifecyclePolicyCreateOperation, error)
 	Update(context.Context, *cloudregistry.UpdateLifecyclePolicyRequest, ...grpc.CallOption) (*LifecyclePolicyUpdateOperation, error)
 	Delete(context.Context, *cloudregistry.DeleteLifecyclePolicyRequest, ...grpc.CallOption) (*LifecyclePolicyDeleteOperation, error)

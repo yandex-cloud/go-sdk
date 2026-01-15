@@ -17,6 +17,7 @@ import (
 
 // ConnectorClient provides methods for managing Connector resources of Yandex.Cloud Eventrouter.
 type ConnectorClient interface {
+	ConnectorClientIterator
 	Get(context.Context, *eventrouter.GetConnectorRequest, ...grpc.CallOption) (*eventrouter.Connector, error)
 	List(context.Context, *eventrouter.ListConnectorsRequest, ...grpc.CallOption) (*eventrouter.ListConnectorsResponse, error)
 	Create(context.Context, *eventrouter.CreateConnectorRequest, ...grpc.CallOption) (*ConnectorCreateOperation, error)

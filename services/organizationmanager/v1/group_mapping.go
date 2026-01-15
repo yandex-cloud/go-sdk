@@ -15,6 +15,7 @@ import (
 
 // GroupMappingClient provides methods for managing GroupMapping resources of Yandex.Cloud OrganizationManager.
 type GroupMappingClient interface {
+	GroupMappingClientIterator
 	Get(context.Context, *organizationmanager.GetGroupMappingRequest, ...grpc.CallOption) (*organizationmanager.GetGroupMappingResponse, error)
 	Create(context.Context, *organizationmanager.CreateGroupMappingRequest, ...grpc.CallOption) (*GroupMappingCreateOperation, error)
 	Update(context.Context, *organizationmanager.UpdateGroupMappingRequest, ...grpc.CallOption) (*GroupMappingUpdateOperation, error)

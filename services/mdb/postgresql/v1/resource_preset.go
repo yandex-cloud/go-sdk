@@ -12,6 +12,7 @@ import (
 
 // ResourcePresetClient provides methods for managing ResourcePreset resources of Yandex.Cloud PostgreSQL.
 type ResourcePresetClient interface {
+	ResourcePresetClientIterator
 	Get(context.Context, *postgresql.GetResourcePresetRequest, ...grpc.CallOption) (*postgresql.ResourcePreset, error)
 	List(context.Context, *postgresql.ListResourcePresetsRequest, ...grpc.CallOption) (*postgresql.ListResourcePresetsResponse, error)
 }

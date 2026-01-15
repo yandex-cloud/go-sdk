@@ -17,6 +17,7 @@ import (
 
 // DnsZoneClient provides methods for managing DnsZone resources of Yandex.Cloud Dns.
 type DnsZoneClient interface {
+	DnsZoneClientIterator
 	Get(context.Context, *dns.GetDnsZoneRequest, ...grpc.CallOption) (*dns.DnsZone, error)
 	List(context.Context, *dns.ListDnsZonesRequest, ...grpc.CallOption) (*dns.ListDnsZonesResponse, error)
 	Create(context.Context, *dns.CreateDnsZoneRequest, ...grpc.CallOption) (*DnsZoneCreateOperation, error)

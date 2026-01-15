@@ -12,6 +12,7 @@ import (
 
 // TokenizerClient provides methods for managing Tokenizer resources of Yandex.Cloud FoundationModels.
 type TokenizerClient interface {
+	TokenizerClientIterator
 	Tokenize(context.Context, *text_generation.TokenizeRequest, ...grpc.CallOption) (*text_generation.TokenizeResponse, error)
 	TokenizeCompletion(context.Context, *text_generation.CompletionRequest, ...grpc.CallOption) (*text_generation.TokenizeResponse, error)
 }

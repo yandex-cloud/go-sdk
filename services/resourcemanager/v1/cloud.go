@@ -17,6 +17,7 @@ import (
 
 // CloudClient provides methods for managing Cloud resources of Yandex.Cloud ResourceManager.
 type CloudClient interface {
+	CloudClientIterator
 	Get(context.Context, *resourcemanager.GetCloudRequest, ...grpc.CallOption) (*resourcemanager.Cloud, error)
 	List(context.Context, *resourcemanager.ListCloudsRequest, ...grpc.CallOption) (*resourcemanager.ListCloudsResponse, error)
 	Create(context.Context, *resourcemanager.CreateCloudRequest, ...grpc.CallOption) (*CloudCreateOperation, error)

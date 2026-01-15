@@ -12,6 +12,7 @@ import (
 
 // StorageTypeClient provides methods for managing StorageType resources of Yandex.Cloud YDB.
 type StorageTypeClient interface {
+	StorageTypeClientIterator
 	Get(context.Context, *ydb.GetStorageTypeRequest, ...grpc.CallOption) (*ydb.StorageType, error)
 	List(context.Context, *ydb.ListStorageTypesRequest, ...grpc.CallOption) (*ydb.ListStorageTypesResponse, error)
 }

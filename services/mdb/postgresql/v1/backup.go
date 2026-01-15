@@ -16,6 +16,7 @@ import (
 
 // BackupClient provides methods for managing Backup resources of Yandex.Cloud PostgreSQL.
 type BackupClient interface {
+	BackupClientIterator
 	Get(context.Context, *postgresql.GetBackupRequest, ...grpc.CallOption) (*postgresql.Backup, error)
 	List(context.Context, *postgresql.ListBackupsRequest, ...grpc.CallOption) (*postgresql.ListBackupsResponse, error)
 	Delete(context.Context, *postgresql.DeleteBackupRequest, ...grpc.CallOption) (*BackupDeleteOperation, error)

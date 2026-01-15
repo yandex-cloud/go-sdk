@@ -15,6 +15,7 @@ import (
 
 // ProviderClient provides methods for managing Provider resources of Yandex.Cloud Cdn.
 type ProviderClient interface {
+	ProviderClientIterator
 	Activate(context.Context, *cdn.ActivateProviderRequest, ...grpc.CallOption) (*ProviderActivateOperation, error)
 	ListActivated(context.Context, *cdn.ListActivatedProvidersRequest, ...grpc.CallOption) (*cdn.ListActivatedProvidersResponse, error)
 }

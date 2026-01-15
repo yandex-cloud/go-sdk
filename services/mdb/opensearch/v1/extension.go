@@ -16,6 +16,7 @@ import (
 
 // ExtensionClient provides methods for managing Extension resources of Yandex.Cloud Opensearch.
 type ExtensionClient interface {
+	ExtensionClientIterator
 	Get(context.Context, *opensearch.GetExtensionRequest, ...grpc.CallOption) (*opensearch.Extension, error)
 	List(context.Context, *opensearch.ListExtensionsRequest, ...grpc.CallOption) (*opensearch.ListExtensionsResponse, error)
 	Create(context.Context, *opensearch.CreateExtensionRequest, ...grpc.CallOption) (*ExtensionCreateOperation, error)

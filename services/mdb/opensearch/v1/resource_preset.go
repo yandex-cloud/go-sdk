@@ -12,6 +12,7 @@ import (
 
 // ResourcePresetClient provides methods for managing ResourcePreset resources of Yandex.Cloud Opensearch.
 type ResourcePresetClient interface {
+	ResourcePresetClientIterator
 	Get(context.Context, *opensearch.GetResourcePresetRequest, ...grpc.CallOption) (*opensearch.ResourcePreset, error)
 	List(context.Context, *opensearch.ListResourcePresetsRequest, ...grpc.CallOption) (*opensearch.ListResourcePresetsResponse, error)
 }

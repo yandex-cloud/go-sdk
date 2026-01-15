@@ -12,6 +12,7 @@ import (
 
 // VersionClient provides methods for managing Version resources of Yandex.Cloud K8s.
 type VersionClient interface {
+	VersionClientIterator
 	List(context.Context, *k8s.ListVersionsRequest, ...grpc.CallOption) (*k8s.ListVersionsResponse, error)
 }
 

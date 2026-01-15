@@ -16,6 +16,7 @@ import (
 
 // KeyClient provides methods for managing Key resources of Yandex.Cloud IAM.
 type KeyClient interface {
+	KeyClientIterator
 	Get(context.Context, *iam.GetKeyRequest, ...grpc.CallOption) (*iam.Key, error)
 	List(context.Context, *iam.ListKeysRequest, ...grpc.CallOption) (*iam.ListKeysResponse, error)
 	Create(context.Context, *iam.CreateKeyRequest, ...grpc.CallOption) (*iam.CreateKeyResponse, error)

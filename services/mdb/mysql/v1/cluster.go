@@ -17,6 +17,7 @@ import (
 
 // ClusterClient provides methods for managing Cluster resources of Yandex.Cloud MySQL.
 type ClusterClient interface {
+	ClusterClientIterator
 	Get(context.Context, *mysql.GetClusterRequest, ...grpc.CallOption) (*mysql.Cluster, error)
 	List(context.Context, *mysql.ListClustersRequest, ...grpc.CallOption) (*mysql.ListClustersResponse, error)
 	Create(context.Context, *mysql.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)

@@ -15,6 +15,7 @@ import (
 
 // MlModelClient provides methods for managing MlModel resources of Yandex.Cloud Clickhouse.
 type MlModelClient interface {
+	MlModelClientIterator
 	Get(context.Context, *clickhouse.GetMlModelRequest, ...grpc.CallOption) (*clickhouse.MlModel, error)
 	List(context.Context, *clickhouse.ListMlModelsRequest, ...grpc.CallOption) (*clickhouse.ListMlModelsResponse, error)
 	Create(context.Context, *clickhouse.CreateMlModelRequest, ...grpc.CallOption) (*MlModelCreateOperation, error)

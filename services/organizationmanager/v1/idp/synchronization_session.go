@@ -15,6 +15,7 @@ import (
 
 // SynchronizationSessionClient provides methods for managing SynchronizationSession resources of Yandex.Cloud Idp.
 type SynchronizationSessionClient interface {
+	SynchronizationSessionClientIterator
 	OpenSession(context.Context, *idp.OpenSessionRequest, ...grpc.CallOption) (*SynchronizationSessionOpenSessionOperation, error)
 	CloseSession(context.Context, *idp.CloseSessionRequest, ...grpc.CallOption) (*SynchronizationSessionCloseSessionOperation, error)
 	ReportSessionProgress(context.Context, *idp.ReportSessionProgressRequest, ...grpc.CallOption) (*SynchronizationSessionReportSessionProgressOperation, error)

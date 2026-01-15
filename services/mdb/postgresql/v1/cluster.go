@@ -17,6 +17,7 @@ import (
 
 // ClusterClient provides methods for managing Cluster resources of Yandex.Cloud PostgreSQL.
 type ClusterClient interface {
+	ClusterClientIterator
 	Get(context.Context, *postgresql.GetClusterRequest, ...grpc.CallOption) (*postgresql.Cluster, error)
 	List(context.Context, *postgresql.ListClustersRequest, ...grpc.CallOption) (*postgresql.ListClustersResponse, error)
 	Create(context.Context, *postgresql.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)

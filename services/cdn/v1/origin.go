@@ -15,6 +15,7 @@ import (
 
 // OriginClient provides methods for managing Origin resources of Yandex.Cloud Cdn.
 type OriginClient interface {
+	OriginClientIterator
 	Get(context.Context, *cdn.GetOriginRequest, ...grpc.CallOption) (*cdn.Origin, error)
 	List(context.Context, *cdn.ListOriginsRequest, ...grpc.CallOption) (*cdn.ListOriginsResponse, error)
 	Create(context.Context, *cdn.CreateOriginRequest, ...grpc.CallOption) (*OriginCreateOperation, error)

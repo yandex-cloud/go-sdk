@@ -12,6 +12,7 @@ import (
 
 // LocationClient provides methods for managing Location resources of Yandex.Cloud YDB.
 type LocationClient interface {
+	LocationClientIterator
 	Get(context.Context, *ydb.GetLocationRequest, ...grpc.CallOption) (*ydb.Location, error)
 	List(context.Context, *ydb.ListLocationsRequest, ...grpc.CallOption) (*ydb.ListLocationsResponse, error)
 }

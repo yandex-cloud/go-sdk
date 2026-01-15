@@ -12,6 +12,7 @@ import (
 
 // PerformanceDiagnosticsClient provides methods for managing PerformanceDiagnostics resources of Yandex.Cloud PostgreSQL.
 type PerformanceDiagnosticsClient interface {
+	PerformanceDiagnosticsClientIterator
 	ListRawSessionStates(context.Context, *postgresql.ListRawSessionStatesRequest, ...grpc.CallOption) (*postgresql.ListRawSessionStatesResponse, error)
 	ListRawStatements(context.Context, *postgresql.ListRawStatementsRequest, ...grpc.CallOption) (*postgresql.ListRawStatementsResponse, error)
 }

@@ -16,6 +16,7 @@ import (
 
 // NetworkLoadBalancerClient provides methods for managing NetworkLoadBalancer resources of Yandex.Cloud LoadBalancer.
 type NetworkLoadBalancerClient interface {
+	NetworkLoadBalancerClientIterator
 	Get(context.Context, *loadbalancer.GetNetworkLoadBalancerRequest, ...grpc.CallOption) (*loadbalancer.NetworkLoadBalancer, error)
 	List(context.Context, *loadbalancer.ListNetworkLoadBalancersRequest, ...grpc.CallOption) (*loadbalancer.ListNetworkLoadBalancersResponse, error)
 	Create(context.Context, *loadbalancer.CreateNetworkLoadBalancerRequest, ...grpc.CallOption) (*NetworkLoadBalancerCreateOperation, error)

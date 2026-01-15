@@ -12,6 +12,7 @@ import (
 
 // CertificateContentClient provides methods for managing CertificateContent resources of Yandex.Cloud Certificatemanager.
 type CertificateContentClient interface {
+	CertificateContentClientIterator
 	Get(context.Context, *certificatemanager.GetCertificateContentRequest, ...grpc.CallOption) (*certificatemanager.GetCertificateContentResponse, error)
 	GetEx(context.Context, *certificatemanager.GetExCertificateContentRequest, ...grpc.CallOption) (*certificatemanager.GetExCertificateContentResponse, error)
 }

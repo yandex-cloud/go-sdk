@@ -12,6 +12,7 @@ import (
 
 // ResourcePresetClient provides methods for managing ResourcePreset resources of Yandex.Cloud Greenplum.
 type ResourcePresetClient interface {
+	ResourcePresetClientIterator
 	Get(context.Context, *greenplum.GetResourcePresetRequest, ...grpc.CallOption) (*greenplum.ResourcePreset, error)
 	List(context.Context, *greenplum.ListResourcePresetsRequest, ...grpc.CallOption) (*greenplum.ListResourcePresetsResponse, error)
 }

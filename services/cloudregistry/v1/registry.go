@@ -17,6 +17,7 @@ import (
 
 // RegistryClient provides methods for managing Registry resources of Yandex.Cloud Cloudregistry.
 type RegistryClient interface {
+	RegistryClientIterator
 	Get(context.Context, *cloudregistry.GetRegistryRequest, ...grpc.CallOption) (*cloudregistry.Registry, error)
 	List(context.Context, *cloudregistry.ListRegistriesRequest, ...grpc.CallOption) (*cloudregistry.ListRegistriesResponse, error)
 	Create(context.Context, *cloudregistry.CreateRegistryRequest, ...grpc.CallOption) (*RegistryCreateOperation, error)

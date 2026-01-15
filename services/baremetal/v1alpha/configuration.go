@@ -12,6 +12,7 @@ import (
 
 // ConfigurationClient provides methods for managing Configuration resources of Yandex.Cloud Baremetal.
 type ConfigurationClient interface {
+	ConfigurationClientIterator
 	Get(context.Context, *baremetal.GetConfigurationRequest, ...grpc.CallOption) (*baremetal.Configuration, error)
 	List(context.Context, *baremetal.ListConfigurationsRequest, ...grpc.CallOption) (*baremetal.ListConfigurationsResponse, error)
 }

@@ -14,6 +14,7 @@ import (
 
 // TextGenerationBatchClient provides methods for managing TextGenerationBatch resources of Yandex.Cloud FoundationModels.
 type TextGenerationBatchClient interface {
+	TextGenerationBatchClientIterator
 	Completion(context.Context, *text_generation.BatchCompletionRequest, ...grpc.CallOption) (*TextGenerationBatchCompletionOperation, error)
 }
 

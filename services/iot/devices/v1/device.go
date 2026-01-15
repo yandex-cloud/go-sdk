@@ -16,6 +16,7 @@ import (
 
 // DeviceClient provides methods for managing Device resources of Yandex.Cloud Devices.
 type DeviceClient interface {
+	DeviceClientIterator
 	Get(context.Context, *devices.GetDeviceRequest, ...grpc.CallOption) (*devices.Device, error)
 	GetByName(context.Context, *devices.GetByNameDeviceRequest, ...grpc.CallOption) (*devices.Device, error)
 	List(context.Context, *devices.ListDevicesRequest, ...grpc.CallOption) (*devices.ListDevicesResponse, error)

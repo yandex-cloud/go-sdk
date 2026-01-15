@@ -17,6 +17,7 @@ import (
 
 // ApplicationClient provides methods for managing Application resources of Yandex.Cloud Saml.
 type ApplicationClient interface {
+	ApplicationClientIterator
 	Get(context.Context, *saml.GetApplicationRequest, ...grpc.CallOption) (*saml.Application, error)
 	List(context.Context, *saml.ListApplicationsRequest, ...grpc.CallOption) (*saml.ListApplicationsResponse, error)
 	Create(context.Context, *saml.CreateApplicationRequest, ...grpc.CallOption) (*ApplicationCreateOperation, error)

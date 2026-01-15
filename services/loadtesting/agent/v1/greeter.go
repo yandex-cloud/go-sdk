@@ -12,6 +12,7 @@ import (
 
 // GreeterClient provides methods for managing Greeter resources of Yandex.Cloud Agent.
 type GreeterClient interface {
+	GreeterClientIterator
 	SayHello(context.Context, *agent.SayHelloRequest, ...grpc.CallOption) (*agent.SayHelloResponse, error)
 }
 

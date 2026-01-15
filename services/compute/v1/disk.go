@@ -17,6 +17,7 @@ import (
 
 // DiskClient provides methods for managing Disk resources of Yandex.Cloud Compute.
 type DiskClient interface {
+	DiskClientIterator
 	Get(context.Context, *compute.GetDiskRequest, ...grpc.CallOption) (*compute.Disk, error)
 	List(context.Context, *compute.ListDisksRequest, ...grpc.CallOption) (*compute.ListDisksResponse, error)
 	Create(context.Context, *compute.CreateDiskRequest, ...grpc.CallOption) (*DiskCreateOperation, error)

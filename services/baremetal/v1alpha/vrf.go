@@ -16,6 +16,7 @@ import (
 
 // VrfClient provides methods for managing Vrf resources of Yandex.Cloud Baremetal.
 type VrfClient interface {
+	VrfClientIterator
 	Get(context.Context, *baremetal.GetVrfRequest, ...grpc.CallOption) (*baremetal.Vrf, error)
 	List(context.Context, *baremetal.ListVrfRequest, ...grpc.CallOption) (*baremetal.ListVrfResponse, error)
 	Create(context.Context, *baremetal.CreateVrfRequest, ...grpc.CallOption) (*VrfCreateOperation, error)

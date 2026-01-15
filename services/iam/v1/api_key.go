@@ -16,6 +16,7 @@ import (
 
 // ApiKeyClient provides methods for managing ApiKey resources of Yandex.Cloud IAM.
 type ApiKeyClient interface {
+	ApiKeyClientIterator
 	List(context.Context, *iam.ListApiKeysRequest, ...grpc.CallOption) (*iam.ListApiKeysResponse, error)
 	Get(context.Context, *iam.GetApiKeyRequest, ...grpc.CallOption) (*iam.ApiKey, error)
 	Create(context.Context, *iam.CreateApiKeyRequest, ...grpc.CallOption) (*iam.CreateApiKeyResponse, error)

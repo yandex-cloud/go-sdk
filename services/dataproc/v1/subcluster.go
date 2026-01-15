@@ -16,6 +16,7 @@ import (
 
 // SubclusterClient provides methods for managing Subcluster resources of Yandex.Cloud Dataproc.
 type SubclusterClient interface {
+	SubclusterClientIterator
 	Get(context.Context, *dataproc.GetSubclusterRequest, ...grpc.CallOption) (*dataproc.Subcluster, error)
 	List(context.Context, *dataproc.ListSubclustersRequest, ...grpc.CallOption) (*dataproc.ListSubclustersResponse, error)
 	Create(context.Context, *dataproc.CreateSubclusterRequest, ...grpc.CallOption) (*SubclusterCreateOperation, error)

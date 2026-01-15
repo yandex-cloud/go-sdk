@@ -16,6 +16,7 @@ import (
 
 // RegistryClient provides methods for managing Registry resources of Yandex.Cloud Devices.
 type RegistryClient interface {
+	RegistryClientIterator
 	Get(context.Context, *devices.GetRegistryRequest, ...grpc.CallOption) (*devices.Registry, error)
 	GetByName(context.Context, *devices.GetByNameRegistryRequest, ...grpc.CallOption) (*devices.Registry, error)
 	List(context.Context, *devices.ListRegistriesRequest, ...grpc.CallOption) (*devices.ListRegistriesResponse, error)

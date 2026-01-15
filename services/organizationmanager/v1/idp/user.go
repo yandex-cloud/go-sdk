@@ -16,6 +16,7 @@ import (
 
 // UserClient provides methods for managing User resources of Yandex.Cloud Idp.
 type UserClient interface {
+	UserClientIterator
 	Get(context.Context, *idp.GetUserRequest, ...grpc.CallOption) (*idp.User, error)
 	List(context.Context, *idp.ListUsersRequest, ...grpc.CallOption) (*idp.ListUsersResponse, error)
 	Create(context.Context, *idp.CreateUserRequest, ...grpc.CallOption) (*UserCreateOperation, error)

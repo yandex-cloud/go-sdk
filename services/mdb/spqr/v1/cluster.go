@@ -17,6 +17,7 @@ import (
 
 // ClusterClient provides methods for managing Cluster resources of Yandex.Cloud Spqr.
 type ClusterClient interface {
+	ClusterClientIterator
 	Get(context.Context, *spqr.GetClusterRequest, ...grpc.CallOption) (*spqr.Cluster, error)
 	List(context.Context, *spqr.ListClustersRequest, ...grpc.CallOption) (*spqr.ListClustersResponse, error)
 	Create(context.Context, *spqr.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)

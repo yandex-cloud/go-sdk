@@ -17,6 +17,7 @@ import (
 
 // ClusterClient provides methods for managing Cluster resources of Yandex.Cloud Trino.
 type ClusterClient interface {
+	ClusterClientIterator
 	Get(context.Context, *trino.GetClusterRequest, ...grpc.CallOption) (*trino.Cluster, error)
 	List(context.Context, *trino.ListClustersRequest, ...grpc.CallOption) (*trino.ListClustersResponse, error)
 	Create(context.Context, *trino.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)

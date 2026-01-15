@@ -14,6 +14,7 @@ import (
 
 // ServiceControlClient provides methods for managing ServiceControl resources of Yandex.Cloud IAM.
 type ServiceControlClient interface {
+	ServiceControlClientIterator
 	Get(context.Context, *iam.GetServiceRequest, ...grpc.CallOption) (*iam.Service, error)
 	List(context.Context, *iam.ListServicesRequest, ...grpc.CallOption) (*iam.ListServicesResponse, error)
 	Enable(context.Context, *iam.EnableServiceRequest, ...grpc.CallOption) (*ServiceControlEnableOperation, error)

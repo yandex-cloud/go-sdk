@@ -12,6 +12,7 @@ import (
 
 // ZoneClient provides methods for managing Zone resources of Yandex.Cloud Compute.
 type ZoneClient interface {
+	ZoneClientIterator
 	Get(context.Context, *compute.GetZoneRequest, ...grpc.CallOption) (*compute.Zone, error)
 	List(context.Context, *compute.ListZonesRequest, ...grpc.CallOption) (*compute.ListZonesResponse, error)
 }

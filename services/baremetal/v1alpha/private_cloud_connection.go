@@ -16,6 +16,7 @@ import (
 
 // PrivateCloudConnectionClient provides methods for managing PrivateCloudConnection resources of Yandex.Cloud Baremetal.
 type PrivateCloudConnectionClient interface {
+	PrivateCloudConnectionClientIterator
 	Get(context.Context, *baremetal.GetPrivateCloudConnectionRequest, ...grpc.CallOption) (*baremetal.PrivateCloudConnection, error)
 	List(context.Context, *baremetal.ListPrivateCloudConnectionRequest, ...grpc.CallOption) (*baremetal.ListPrivateCloudConnectionResponse, error)
 	Create(context.Context, *baremetal.CreatePrivateCloudConnectionRequest, ...grpc.CallOption) (*PrivateCloudConnectionCreateOperation, error)

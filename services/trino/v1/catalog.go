@@ -16,6 +16,7 @@ import (
 
 // CatalogClient provides methods for managing Catalog resources of Yandex.Cloud Trino.
 type CatalogClient interface {
+	CatalogClientIterator
 	Get(context.Context, *trino.GetCatalogRequest, ...grpc.CallOption) (*trino.Catalog, error)
 	List(context.Context, *trino.ListCatalogsRequest, ...grpc.CallOption) (*trino.ListCatalogsResponse, error)
 	Create(context.Context, *trino.CreateCatalogRequest, ...grpc.CallOption) (*CatalogCreateOperation, error)

@@ -17,6 +17,7 @@ import (
 
 // UserpoolClient provides methods for managing Userpool resources of Yandex.Cloud Idp.
 type UserpoolClient interface {
+	UserpoolClientIterator
 	Get(context.Context, *idp.GetUserpoolRequest, ...grpc.CallOption) (*idp.Userpool, error)
 	List(context.Context, *idp.ListUserpoolsRequest, ...grpc.CallOption) (*idp.ListUserpoolsResponse, error)
 	Create(context.Context, *idp.CreateUserpoolRequest, ...grpc.CallOption) (*UserpoolCreateOperation, error)

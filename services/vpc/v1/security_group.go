@@ -16,6 +16,7 @@ import (
 
 // SecurityGroupClient provides methods for managing SecurityGroup resources of Yandex.Cloud VPC.
 type SecurityGroupClient interface {
+	SecurityGroupClientIterator
 	Get(context.Context, *vpc.GetSecurityGroupRequest, ...grpc.CallOption) (*vpc.SecurityGroup, error)
 	List(context.Context, *vpc.ListSecurityGroupsRequest, ...grpc.CallOption) (*vpc.ListSecurityGroupsResponse, error)
 	Create(context.Context, *vpc.CreateSecurityGroupRequest, ...grpc.CallOption) (*SecurityGroupCreateOperation, error)

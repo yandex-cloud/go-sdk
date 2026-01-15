@@ -16,6 +16,7 @@ import (
 
 // WafProfileClient provides methods for managing WafProfile resources of Yandex.Cloud Waf.
 type WafProfileClient interface {
+	WafProfileClientIterator
 	Get(context.Context, *waf.GetWafProfileRequest, ...grpc.CallOption) (*waf.WafProfile, error)
 	List(context.Context, *waf.ListWafProfilesRequest, ...grpc.CallOption) (*waf.ListWafProfilesResponse, error)
 	Create(context.Context, *waf.CreateWafProfileRequest, ...grpc.CallOption) (*WafProfileCreateOperation, error)

@@ -13,6 +13,7 @@ import (
 
 // EventClient provides methods for managing Event resources of Yandex.Cloud Eventrouter.
 type EventClient interface {
+	EventClientIterator
 	Put(context.Context, *eventrouter.PutEventRequest, ...grpc.CallOption) (*emptypb.Empty, error)
 	Send(context.Context, *eventrouter.SendEventsRequest, ...grpc.CallOption) (*emptypb.Empty, error)
 }

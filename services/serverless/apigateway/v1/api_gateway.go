@@ -17,6 +17,7 @@ import (
 
 // ApiGatewayClient provides methods for managing ApiGateway resources of Yandex.Cloud APIGateway.
 type ApiGatewayClient interface {
+	ApiGatewayClientIterator
 	Get(context.Context, *apigateway.GetApiGatewayRequest, ...grpc.CallOption) (*apigateway.ApiGateway, error)
 	List(context.Context, *apigateway.ListApiGatewayRequest, ...grpc.CallOption) (*apigateway.ListApiGatewayResponse, error)
 	Create(context.Context, *apigateway.CreateApiGatewayRequest, ...grpc.CallOption) (*ApiGatewayCreateOperation, error)

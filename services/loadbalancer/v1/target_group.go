@@ -16,6 +16,7 @@ import (
 
 // TargetGroupClient provides methods for managing TargetGroup resources of Yandex.Cloud LoadBalancer.
 type TargetGroupClient interface {
+	TargetGroupClientIterator
 	Get(context.Context, *loadbalancer.GetTargetGroupRequest, ...grpc.CallOption) (*loadbalancer.TargetGroup, error)
 	List(context.Context, *loadbalancer.ListTargetGroupsRequest, ...grpc.CallOption) (*loadbalancer.ListTargetGroupsResponse, error)
 	Create(context.Context, *loadbalancer.CreateTargetGroupRequest, ...grpc.CallOption) (*TargetGroupCreateOperation, error)

@@ -12,6 +12,7 @@ import (
 
 // NetworkClient provides methods for managing Network resources of Yandex.Cloud Functions.
 type NetworkClient interface {
+	NetworkClientIterator
 	GetUsed(context.Context, *functions.GetUsedNetworkRequest, ...grpc.CallOption) (*functions.UsedNetwork, error)
 	ListUsed(context.Context, *functions.ListUsedNetworksRequest, ...grpc.CallOption) (*functions.ListUsedNetworksResponse, error)
 	ListConnectedResources(context.Context, *functions.ListConnectedResourcesRequest, ...grpc.CallOption) (*functions.ListConnectedResourcesResponse, error)

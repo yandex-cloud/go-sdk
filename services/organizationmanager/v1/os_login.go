@@ -15,6 +15,7 @@ import (
 
 // OsLoginClient provides methods for managing OsLogin resources of Yandex.Cloud OrganizationManager.
 type OsLoginClient interface {
+	OsLoginClientIterator
 	GetSettings(context.Context, *organizationmanager.GetOsLoginSettingsRequest, ...grpc.CallOption) (*organizationmanager.OsLoginSettings, error)
 	UpdateSettings(context.Context, *organizationmanager.UpdateOsLoginSettingsRequest, ...grpc.CallOption) (*OsLoginUpdateSettingsOperation, error)
 	GetProfile(context.Context, *organizationmanager.GetOsLoginProfileRequest, ...grpc.CallOption) (*organizationmanager.OsLoginProfile, error)

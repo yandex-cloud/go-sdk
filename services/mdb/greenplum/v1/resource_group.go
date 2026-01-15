@@ -15,6 +15,7 @@ import (
 
 // ResourceGroupClient provides methods for managing ResourceGroup resources of Yandex.Cloud Greenplum.
 type ResourceGroupClient interface {
+	ResourceGroupClientIterator
 	List(context.Context, *greenplum.ListResourceGroupsRequest, ...grpc.CallOption) (*greenplum.ListResourceGroupsResponse, error)
 	GetAtRevision(context.Context, *greenplum.GetResourceGroupAtRevisionRequest, ...grpc.CallOption) (*greenplum.ResourceGroup, error)
 	Create(context.Context, *greenplum.CreateResourceGroupRequest, ...grpc.CallOption) (*ResourceGroupCreateOperation, error)

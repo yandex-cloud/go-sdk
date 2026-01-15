@@ -16,6 +16,7 @@ import (
 
 // SecurityProfileClient provides methods for managing SecurityProfile resources of Yandex.Cloud Smartwebsecurity.
 type SecurityProfileClient interface {
+	SecurityProfileClientIterator
 	Get(context.Context, *smartwebsecurity.GetSecurityProfileRequest, ...grpc.CallOption) (*smartwebsecurity.SecurityProfile, error)
 	List(context.Context, *smartwebsecurity.ListSecurityProfilesRequest, ...grpc.CallOption) (*smartwebsecurity.ListSecurityProfilesResponse, error)
 	Create(context.Context, *smartwebsecurity.CreateSecurityProfileRequest, ...grpc.CallOption) (*SecurityProfileCreateOperation, error)

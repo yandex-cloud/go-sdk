@@ -17,6 +17,7 @@ import (
 
 // InstanceClient provides methods for managing Instance resources of Yandex.Cloud Compute.
 type InstanceClient interface {
+	InstanceClientIterator
 	Get(context.Context, *compute.GetInstanceRequest, ...grpc.CallOption) (*compute.Instance, error)
 	List(context.Context, *compute.ListInstancesRequest, ...grpc.CallOption) (*compute.ListInstancesResponse, error)
 	Create(context.Context, *compute.CreateInstanceRequest, ...grpc.CallOption) (*InstanceCreateOperation, error)

@@ -15,6 +15,7 @@ import (
 
 // CacheClient provides methods for managing Cache resources of Yandex.Cloud Cdn.
 type CacheClient interface {
+	CacheClientIterator
 	Purge(context.Context, *cdn.PurgeCacheRequest, ...grpc.CallOption) (*CachePurgeOperation, error)
 	Prefetch(context.Context, *cdn.PrefetchCacheRequest, ...grpc.CallOption) (*CachePrefetchOperation, error)
 }

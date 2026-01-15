@@ -16,6 +16,7 @@ import (
 
 // BackupClient provides methods for managing Backup resources of Yandex.Cloud Redis.
 type BackupClient interface {
+	BackupClientIterator
 	Get(context.Context, *redis.GetBackupRequest, ...grpc.CallOption) (*redis.Backup, error)
 	List(context.Context, *redis.ListBackupsRequest, ...grpc.CallOption) (*redis.ListBackupsResponse, error)
 	Delete(context.Context, *redis.DeleteBackupRequest, ...grpc.CallOption) (*BackupDeleteOperation, error)

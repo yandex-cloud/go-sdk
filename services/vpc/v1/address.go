@@ -16,6 +16,7 @@ import (
 
 // AddressClient provides methods for managing Address resources of Yandex.Cloud VPC.
 type AddressClient interface {
+	AddressClientIterator
 	Get(context.Context, *vpc.GetAddressRequest, ...grpc.CallOption) (*vpc.Address, error)
 	GetByValue(context.Context, *vpc.GetAddressByValueRequest, ...grpc.CallOption) (*vpc.Address, error)
 	List(context.Context, *vpc.ListAddressesRequest, ...grpc.CallOption) (*vpc.ListAddressesResponse, error)

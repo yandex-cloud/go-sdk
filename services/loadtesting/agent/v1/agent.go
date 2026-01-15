@@ -12,6 +12,7 @@ import (
 
 // AgentClient provides methods for managing Agent resources of Yandex.Cloud Agent.
 type AgentClient interface {
+	AgentClientIterator
 	ClaimStatus(context.Context, *agent.ClaimAgentStatusRequest, ...grpc.CallOption) (*agent.ClaimAgentStatusResponse, error)
 	ReportEventLogs(context.Context, *agent.ReportEventLogsRequest, ...grpc.CallOption) (*agent.ReportEventLogsResponse, error)
 }

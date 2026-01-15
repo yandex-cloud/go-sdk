@@ -12,6 +12,7 @@ import (
 
 // JobClient provides methods for managing Job resources of Yandex.Cloud Agent.
 type JobClient interface {
+	JobClientIterator
 	ClaimStatus(context.Context, *agent.ClaimJobStatusRequest, ...grpc.CallOption) (*agent.ClaimJobStatusResponse, error)
 	Get(context.Context, *agent.GetJobRequest, ...grpc.CallOption) (*agent.Job, error)
 	GetSignal(context.Context, *agent.JobSignalRequest, ...grpc.CallOption) (*agent.JobSignalResponse, error)

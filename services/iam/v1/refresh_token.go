@@ -14,6 +14,7 @@ import (
 
 // RefreshTokenClient provides methods for managing RefreshToken resources of Yandex.Cloud IAM.
 type RefreshTokenClient interface {
+	RefreshTokenClientIterator
 	List(context.Context, *iam.ListRefreshTokensRequest, ...grpc.CallOption) (*iam.ListRefreshTokensResponse, error)
 	Revoke(context.Context, *iam.RevokeRefreshTokenRequest, ...grpc.CallOption) (*RefreshTokenRevokeOperation, error)
 }

@@ -15,6 +15,7 @@ import (
 
 // TopicClient provides methods for managing Topic resources of Yandex.Cloud Kafka.
 type TopicClient interface {
+	TopicClientIterator
 	Get(context.Context, *kafka.GetTopicRequest, ...grpc.CallOption) (*kafka.Topic, error)
 	List(context.Context, *kafka.ListTopicsRequest, ...grpc.CallOption) (*kafka.ListTopicsResponse, error)
 	Create(context.Context, *kafka.CreateTopicRequest, ...grpc.CallOption) (*TopicCreateOperation, error)

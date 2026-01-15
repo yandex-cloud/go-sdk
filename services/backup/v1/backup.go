@@ -16,6 +16,7 @@ import (
 
 // BackupClient provides methods for managing Backup resources of Yandex.Cloud Backup.
 type BackupClient interface {
+	BackupClientIterator
 	List(context.Context, *backup.ListBackupsRequest, ...grpc.CallOption) (*backup.ListBackupsResponse, error)
 	ListArchives(context.Context, *backup.ListArchivesRequest, ...grpc.CallOption) (*backup.ListArchivesResponse, error)
 	ListFiles(context.Context, *backup.ListFilesRequest, ...grpc.CallOption) (*backup.ListFilesResponse, error)

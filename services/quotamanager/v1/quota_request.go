@@ -15,6 +15,7 @@ import (
 
 // QuotaRequestClient provides methods for managing QuotaRequest resources of Yandex.Cloud QuotaManager.
 type QuotaRequestClient interface {
+	QuotaRequestClientIterator
 	Get(context.Context, *quotamanager.GetQuotaRequestRequest, ...grpc.CallOption) (*quotamanager.QuotaRequest, error)
 	Create(context.Context, *quotamanager.CreateQuotaRequestRequest, ...grpc.CallOption) (*QuotaRequestCreateOperation, error)
 	Cancel(context.Context, *quotamanager.CancelQuotaRequestRequest, ...grpc.CallOption) (*QuotaRequestCancelOperation, error)

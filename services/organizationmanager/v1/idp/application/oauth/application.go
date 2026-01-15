@@ -17,6 +17,7 @@ import (
 
 // ApplicationClient provides methods for managing Application resources of Yandex.Cloud Oauth.
 type ApplicationClient interface {
+	ApplicationClientIterator
 	Get(context.Context, *oauth.GetApplicationRequest, ...grpc.CallOption) (*oauth.Application, error)
 	List(context.Context, *oauth.ListApplicationsRequest, ...grpc.CallOption) (*oauth.ListApplicationsResponse, error)
 	Create(context.Context, *oauth.CreateApplicationRequest, ...grpc.CallOption) (*ApplicationCreateOperation, error)

@@ -12,6 +12,7 @@ import (
 
 // ResourcePresetClient provides methods for managing ResourcePreset resources of Yandex.Cloud Sqlserver.
 type ResourcePresetClient interface {
+	ResourcePresetClientIterator
 	Get(context.Context, *sqlserver.GetResourcePresetRequest, ...grpc.CallOption) (*sqlserver.ResourcePreset, error)
 	List(context.Context, *sqlserver.ListResourcePresetsRequest, ...grpc.CallOption) (*sqlserver.ListResourcePresetsResponse, error)
 }

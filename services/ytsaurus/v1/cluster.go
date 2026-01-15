@@ -16,6 +16,7 @@ import (
 
 // ClusterClient provides methods for managing Cluster resources of Yandex.Cloud Ytsaurus.
 type ClusterClient interface {
+	ClusterClientIterator
 	Get(context.Context, *ytsaurus.GetClusterRequest, ...grpc.CallOption) (*ytsaurus.Cluster, error)
 	List(context.Context, *ytsaurus.ListClustersRequest, ...grpc.CallOption) (*ytsaurus.ListClustersResponse, error)
 	Create(context.Context, *ytsaurus.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)

@@ -17,6 +17,7 @@ import (
 
 // ClusterClient provides methods for managing Cluster resources of Yandex.Cloud Spark.
 type ClusterClient interface {
+	ClusterClientIterator
 	Get(context.Context, *spark.GetClusterRequest, ...grpc.CallOption) (*spark.Cluster, error)
 	List(context.Context, *spark.ListClustersRequest, ...grpc.CallOption) (*spark.ListClustersResponse, error)
 	Create(context.Context, *spark.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)

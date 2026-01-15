@@ -17,6 +17,7 @@ import (
 
 // McpGatewayClient provides methods for managing McpGateway resources of Yandex.Cloud Mcpgateway.
 type McpGatewayClient interface {
+	McpGatewayClientIterator
 	Get(context.Context, *mcpgateway.GetMcpGatewayRequest, ...grpc.CallOption) (*mcpgateway.McpGateway, error)
 	List(context.Context, *mcpgateway.ListMcpGatewayRequest, ...grpc.CallOption) (*mcpgateway.ListMcpGatewayResponse, error)
 	Create(context.Context, *mcpgateway.CreateMcpGatewayRequest, ...grpc.CallOption) (*McpGatewayCreateOperation, error)

@@ -15,6 +15,7 @@ import (
 
 // MaintenanceClient provides methods for managing Maintenance resources of Yandex.Cloud Compute.
 type MaintenanceClient interface {
+	MaintenanceClientIterator
 	List(context.Context, *maintenance.ListMaintenancesRequest, ...grpc.CallOption) (*maintenance.ListMaintenancesResponse, error)
 	Get(context.Context, *maintenance.GetMaintenanceRequest, ...grpc.CallOption) (*maintenance.Maintenance, error)
 	Reschedule(context.Context, *maintenance.RescheduleMaintenanceRequest, ...grpc.CallOption) (*MaintenanceRescheduleOperation, error)

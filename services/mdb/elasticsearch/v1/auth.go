@@ -15,6 +15,7 @@ import (
 
 // AuthClient provides methods for managing Auth resources of Yandex.Cloud Elasticsearch.
 type AuthClient interface {
+	AuthClientIterator
 	ListProviders(context.Context, *elasticsearch.ListAuthProvidersRequest, ...grpc.CallOption) (*elasticsearch.ListAuthProvidersResponse, error)
 	GetProvider(context.Context, *elasticsearch.GetAuthProviderRequest, ...grpc.CallOption) (*elasticsearch.AuthProvider, error)
 	AddProviders(context.Context, *elasticsearch.AddAuthProvidersRequest, ...grpc.CallOption) (*AuthAddProvidersOperation, error)

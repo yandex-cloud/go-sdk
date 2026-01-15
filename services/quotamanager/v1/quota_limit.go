@@ -12,6 +12,7 @@ import (
 
 // QuotaLimitClient provides methods for managing QuotaLimit resources of Yandex.Cloud QuotaManager.
 type QuotaLimitClient interface {
+	QuotaLimitClientIterator
 	Get(context.Context, *quotamanager.GetQuotaLimitRequest, ...grpc.CallOption) (*quotamanager.QuotaLimit, error)
 	List(context.Context, *quotamanager.ListQuotaLimitsRequest, ...grpc.CallOption) (*quotamanager.ListQuotaLimitsResponse, error)
 	ListServices(context.Context, *quotamanager.ListServicesRequest, ...grpc.CallOption) (*quotamanager.ListServicesResponse, error)

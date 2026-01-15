@@ -17,6 +17,7 @@ import (
 
 // CommunityClient provides methods for managing Community resources of Yandex.Cloud Datasphere.
 type CommunityClient interface {
+	CommunityClientIterator
 	Create(context.Context, *datasphere.CreateCommunityRequest, ...grpc.CallOption) (*CommunityCreateOperation, error)
 	Get(context.Context, *datasphere.GetCommunityRequest, ...grpc.CallOption) (*datasphere.Community, error)
 	Update(context.Context, *datasphere.UpdateCommunityRequest, ...grpc.CallOption) (*CommunityUpdateOperation, error)

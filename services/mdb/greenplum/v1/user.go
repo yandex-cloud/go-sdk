@@ -15,6 +15,7 @@ import (
 
 // UserClient provides methods for managing User resources of Yandex.Cloud Greenplum.
 type UserClient interface {
+	UserClientIterator
 	List(context.Context, *greenplum.ListUsersRequest, ...grpc.CallOption) (*greenplum.ListUsersResponse, error)
 	Create(context.Context, *greenplum.CreateUserRequest, ...grpc.CallOption) (*UserCreateOperation, error)
 	Update(context.Context, *greenplum.UpdateUserRequest, ...grpc.CallOption) (*UserUpdateOperation, error)

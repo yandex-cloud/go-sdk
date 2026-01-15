@@ -17,6 +17,7 @@ import (
 
 // ClusterClient provides methods for managing Cluster resources of Yandex.Cloud Clickhouse.
 type ClusterClient interface {
+	ClusterClientIterator
 	Get(context.Context, *clickhouse.GetClusterRequest, ...grpc.CallOption) (*clickhouse.Cluster, error)
 	List(context.Context, *clickhouse.ListClustersRequest, ...grpc.CallOption) (*clickhouse.ListClustersResponse, error)
 	Create(context.Context, *clickhouse.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)

@@ -12,6 +12,7 @@ import (
 
 // ResourcePresetClient provides methods for managing ResourcePreset resources of Yandex.Cloud Spqr.
 type ResourcePresetClient interface {
+	ResourcePresetClientIterator
 	Get(context.Context, *spqr.GetResourcePresetRequest, ...grpc.CallOption) (*spqr.ResourcePreset, error)
 	List(context.Context, *spqr.ListResourcePresetsRequest, ...grpc.CallOption) (*spqr.ListResourcePresetsResponse, error)
 }

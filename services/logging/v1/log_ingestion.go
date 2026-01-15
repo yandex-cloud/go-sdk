@@ -12,6 +12,7 @@ import (
 
 // LogIngestionClient provides methods for managing LogIngestion resources of Yandex.Cloud Logging.
 type LogIngestionClient interface {
+	LogIngestionClientIterator
 	Write(context.Context, *logging.WriteRequest, ...grpc.CallOption) (*logging.WriteResponse, error)
 }
 

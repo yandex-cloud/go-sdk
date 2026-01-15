@@ -12,6 +12,7 @@ import (
 
 // BackupClient provides methods for managing Backup resources of Yandex.Cloud Opensearch.
 type BackupClient interface {
+	BackupClientIterator
 	Get(context.Context, *opensearch.GetBackupRequest, ...grpc.CallOption) (*opensearch.Backup, error)
 	List(context.Context, *opensearch.ListBackupsRequest, ...grpc.CallOption) (*opensearch.ListBackupsResponse, error)
 }

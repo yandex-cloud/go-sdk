@@ -16,6 +16,7 @@ import (
 
 // TriggerClient provides methods for managing Trigger resources of Yandex.Cloud Triggers.
 type TriggerClient interface {
+	TriggerClientIterator
 	Get(context.Context, *triggers.GetTriggerRequest, ...grpc.CallOption) (*triggers.Trigger, error)
 	List(context.Context, *triggers.ListTriggersRequest, ...grpc.CallOption) (*triggers.ListTriggersResponse, error)
 	Create(context.Context, *triggers.CreateTriggerRequest, ...grpc.CallOption) (*TriggerCreateOperation, error)

@@ -16,6 +16,7 @@ import (
 
 // ExtensionClient provides methods for managing Extension resources of Yandex.Cloud Elasticsearch.
 type ExtensionClient interface {
+	ExtensionClientIterator
 	Get(context.Context, *elasticsearch.GetExtensionRequest, ...grpc.CallOption) (*elasticsearch.Extension, error)
 	List(context.Context, *elasticsearch.ListExtensionsRequest, ...grpc.CallOption) (*elasticsearch.ListExtensionsResponse, error)
 	Create(context.Context, *elasticsearch.CreateExtensionRequest, ...grpc.CallOption) (*ExtensionCreateOperation, error)

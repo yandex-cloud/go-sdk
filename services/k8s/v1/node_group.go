@@ -16,6 +16,7 @@ import (
 
 // NodeGroupClient provides methods for managing NodeGroup resources of Yandex.Cloud K8s.
 type NodeGroupClient interface {
+	NodeGroupClientIterator
 	Get(context.Context, *k8s.GetNodeGroupRequest, ...grpc.CallOption) (*k8s.NodeGroup, error)
 	List(context.Context, *k8s.ListNodeGroupsRequest, ...grpc.CallOption) (*k8s.ListNodeGroupsResponse, error)
 	Create(context.Context, *k8s.CreateNodeGroupRequest, ...grpc.CallOption) (*NodeGroupCreateOperation, error)

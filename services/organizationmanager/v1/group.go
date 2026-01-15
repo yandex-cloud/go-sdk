@@ -17,6 +17,7 @@ import (
 
 // GroupClient provides methods for managing Group resources of Yandex.Cloud OrganizationManager.
 type GroupClient interface {
+	GroupClientIterator
 	Get(context.Context, *organizationmanager.GetGroupRequest, ...grpc.CallOption) (*organizationmanager.Group, error)
 	ResolveExternal(context.Context, *organizationmanager.ResolveExternalGroupRequest, ...grpc.CallOption) (*organizationmanager.Group, error)
 	List(context.Context, *organizationmanager.ListGroupsRequest, ...grpc.CallOption) (*organizationmanager.ListGroupsResponse, error)

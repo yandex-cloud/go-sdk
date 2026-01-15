@@ -12,6 +12,7 @@ import (
 
 // DiskTypeClient provides methods for managing DiskType resources of Yandex.Cloud Compute.
 type DiskTypeClient interface {
+	DiskTypeClientIterator
 	Get(context.Context, *compute.GetDiskTypeRequest, ...grpc.CallOption) (*compute.DiskType, error)
 	List(context.Context, *compute.ListDiskTypesRequest, ...grpc.CallOption) (*compute.ListDiskTypesResponse, error)
 }

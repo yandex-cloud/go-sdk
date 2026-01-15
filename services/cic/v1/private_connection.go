@@ -16,6 +16,7 @@ import (
 
 // PrivateConnectionClient provides methods for managing PrivateConnection resources of Yandex.Cloud Cic.
 type PrivateConnectionClient interface {
+	PrivateConnectionClientIterator
 	Get(context.Context, *cic.GetPrivateConnectionRequest, ...grpc.CallOption) (*cic.PrivateConnection, error)
 	List(context.Context, *cic.ListPrivateConnectionsRequest, ...grpc.CallOption) (*cic.ListPrivateConnectionsResponse, error)
 	Create(context.Context, *cic.CreatePrivateConnectionRequest, ...grpc.CallOption) (*PrivateConnectionCreateOperation, error)

@@ -12,6 +12,7 @@ import (
 
 // TemporaryAccessKeyClient provides methods for managing TemporaryAccessKey resources of Yandex.Cloud AWSCompatibility.
 type TemporaryAccessKeyClient interface {
+	TemporaryAccessKeyClientIterator
 	CreateEphemeral(context.Context, *awscompatibility.CreateEphemeralAccessKeyRequest, ...grpc.CallOption) (*awscompatibility.CreateEphemeralAccessKeyResponse, error)
 }
 

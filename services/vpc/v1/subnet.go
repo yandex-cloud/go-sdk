@@ -16,6 +16,7 @@ import (
 
 // SubnetClient provides methods for managing Subnet resources of Yandex.Cloud VPC.
 type SubnetClient interface {
+	SubnetClientIterator
 	Get(context.Context, *vpc.GetSubnetRequest, ...grpc.CallOption) (*vpc.Subnet, error)
 	List(context.Context, *vpc.ListSubnetsRequest, ...grpc.CallOption) (*vpc.ListSubnetsResponse, error)
 	Create(context.Context, *vpc.CreateSubnetRequest, ...grpc.CallOption) (*SubnetCreateOperation, error)

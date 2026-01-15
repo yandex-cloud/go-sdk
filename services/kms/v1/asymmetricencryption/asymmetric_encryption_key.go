@@ -16,6 +16,7 @@ import (
 
 // AsymmetricEncryptionKeyClient provides methods for managing AsymmetricEncryptionKey resources of Yandex.Cloud Asymmetricencryption.
 type AsymmetricEncryptionKeyClient interface {
+	AsymmetricEncryptionKeyClientIterator
 	Create(context.Context, *asymmetricencryption.CreateAsymmetricEncryptionKeyRequest, ...grpc.CallOption) (*AsymmetricEncryptionKeyCreateOperation, error)
 	Get(context.Context, *asymmetricencryption.GetAsymmetricEncryptionKeyRequest, ...grpc.CallOption) (*asymmetricencryption.AsymmetricEncryptionKey, error)
 	List(context.Context, *asymmetricencryption.ListAsymmetricEncryptionKeysRequest, ...grpc.CallOption) (*asymmetricencryption.ListAsymmetricEncryptionKeysResponse, error)

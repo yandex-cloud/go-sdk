@@ -17,6 +17,7 @@ import (
 
 // InstanceGroupClient provides methods for managing InstanceGroup resources of Yandex.Cloud InstanceGroup.
 type InstanceGroupClient interface {
+	InstanceGroupClientIterator
 	Get(context.Context, *instancegroup.GetInstanceGroupRequest, ...grpc.CallOption) (*instancegroup.InstanceGroup, error)
 	List(context.Context, *instancegroup.ListInstanceGroupsRequest, ...grpc.CallOption) (*instancegroup.ListInstanceGroupsResponse, error)
 	Create(context.Context, *instancegroup.CreateInstanceGroupRequest, ...grpc.CallOption) (*InstanceGroupCreateOperation, error)

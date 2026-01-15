@@ -16,6 +16,7 @@ import (
 
 // ImageClient provides methods for managing Image resources of Yandex.Cloud Baremetal.
 type ImageClient interface {
+	ImageClientIterator
 	Get(context.Context, *baremetal.GetImageRequest, ...grpc.CallOption) (*baremetal.Image, error)
 	List(context.Context, *baremetal.ListImagesRequest, ...grpc.CallOption) (*baremetal.ListImagesResponse, error)
 	Create(context.Context, *baremetal.CreateImageRequest, ...grpc.CallOption) (*ImageCreateOperation, error)

@@ -17,6 +17,7 @@ import (
 
 // BusClient provides methods for managing Bus resources of Yandex.Cloud Eventrouter.
 type BusClient interface {
+	BusClientIterator
 	Get(context.Context, *eventrouter.GetBusRequest, ...grpc.CallOption) (*eventrouter.Bus, error)
 	List(context.Context, *eventrouter.ListBusesRequest, ...grpc.CallOption) (*eventrouter.ListBusesResponse, error)
 	Create(context.Context, *eventrouter.CreateBusRequest, ...grpc.CallOption) (*BusCreateOperation, error)

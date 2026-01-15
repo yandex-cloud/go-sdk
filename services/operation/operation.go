@@ -12,6 +12,7 @@ import (
 
 // OperationClient provides methods for managing Operation resources of Yandex.Cloud Operation.
 type OperationClient interface {
+	OperationClientIterator
 	Get(context.Context, *operation.GetOperationRequest, ...grpc.CallOption) (*operation.Operation, error)
 	Cancel(context.Context, *operation.CancelOperationRequest, ...grpc.CallOption) (*operation.Operation, error)
 }

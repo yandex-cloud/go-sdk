@@ -16,6 +16,7 @@ import (
 
 // HttpRouterClient provides methods for managing HttpRouter resources of Yandex.Cloud Apploadbalancer.
 type HttpRouterClient interface {
+	HttpRouterClientIterator
 	Get(context.Context, *apploadbalancer.GetHttpRouterRequest, ...grpc.CallOption) (*apploadbalancer.HttpRouter, error)
 	List(context.Context, *apploadbalancer.ListHttpRoutersRequest, ...grpc.CallOption) (*apploadbalancer.ListHttpRoutersResponse, error)
 	Create(context.Context, *apploadbalancer.CreateHttpRouterRequest, ...grpc.CallOption) (*HttpRouterCreateOperation, error)

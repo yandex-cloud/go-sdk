@@ -16,6 +16,7 @@ import (
 
 // DesktopClient provides methods for managing Desktop resources of Yandex.Cloud Api.
 type DesktopClient interface {
+	DesktopClientIterator
 	Get(context.Context, *clouddesktop.GetDesktopRequest, ...grpc.CallOption) (*clouddesktop.Desktop, error)
 	GetRdpFile(context.Context, *clouddesktop.GetRdpFileRequest, ...grpc.CallOption) (*clouddesktop.RdpFileResponse, error)
 	List(context.Context, *clouddesktop.ListDesktopsRequest, ...grpc.CallOption) (*clouddesktop.ListDesktopsResponse, error)

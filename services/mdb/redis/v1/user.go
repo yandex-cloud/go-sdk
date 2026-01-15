@@ -15,6 +15,7 @@ import (
 
 // UserClient provides methods for managing User resources of Yandex.Cloud Redis.
 type UserClient interface {
+	UserClientIterator
 	Get(context.Context, *redis.GetUserRequest, ...grpc.CallOption) (*redis.User, error)
 	List(context.Context, *redis.ListUsersRequest, ...grpc.CallOption) (*redis.ListUsersResponse, error)
 	Create(context.Context, *redis.CreateUserRequest, ...grpc.CallOption) (*UserCreateOperation, error)

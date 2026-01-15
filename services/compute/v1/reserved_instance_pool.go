@@ -15,6 +15,7 @@ import (
 
 // ReservedInstancePoolClient provides methods for managing ReservedInstancePool resources of Yandex.Cloud Compute.
 type ReservedInstancePoolClient interface {
+	ReservedInstancePoolClientIterator
 	Get(context.Context, *compute.GetReservedInstancePoolRequest, ...grpc.CallOption) (*compute.ReservedInstancePool, error)
 	List(context.Context, *compute.ListReservedInstancePoolsRequest, ...grpc.CallOption) (*compute.ListReservedInstancePoolsResponse, error)
 	Create(context.Context, *compute.CreateReservedInstancePoolRequest, ...grpc.CallOption) (*ReservedInstancePoolCreateOperation, error)

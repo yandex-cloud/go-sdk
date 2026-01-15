@@ -15,6 +15,7 @@ import (
 
 // JobClient provides methods for managing Job resources of Yandex.Cloud Spark.
 type JobClient interface {
+	JobClientIterator
 	List(context.Context, *spark.ListJobsRequest, ...grpc.CallOption) (*spark.ListJobsResponse, error)
 	Create(context.Context, *spark.CreateJobRequest, ...grpc.CallOption) (*JobCreateOperation, error)
 	Get(context.Context, *spark.GetJobRequest, ...grpc.CallOption) (*spark.Job, error)

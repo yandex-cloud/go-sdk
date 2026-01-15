@@ -17,6 +17,7 @@ import (
 
 // ContainerClient provides methods for managing Container resources of Yandex.Cloud Containers.
 type ContainerClient interface {
+	ContainerClientIterator
 	Get(context.Context, *containers.GetContainerRequest, ...grpc.CallOption) (*containers.Container, error)
 	List(context.Context, *containers.ListContainersRequest, ...grpc.CallOption) (*containers.ListContainersResponse, error)
 	Create(context.Context, *containers.CreateContainerRequest, ...grpc.CallOption) (*ContainerCreateOperation, error)

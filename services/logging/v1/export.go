@@ -17,6 +17,7 @@ import (
 
 // ExportClient provides methods for managing Export resources of Yandex.Cloud Logging.
 type ExportClient interface {
+	ExportClientIterator
 	Run(context.Context, *logging.RunExportRequest, ...grpc.CallOption) (*ExportRunOperation, error)
 	Get(context.Context, *logging.GetExportRequest, ...grpc.CallOption) (*logging.Export, error)
 	List(context.Context, *logging.ListExportsRequest, ...grpc.CallOption) (*logging.ListExportsResponse, error)

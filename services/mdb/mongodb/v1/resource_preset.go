@@ -12,6 +12,7 @@ import (
 
 // ResourcePresetClient provides methods for managing ResourcePreset resources of Yandex.Cloud MongoDB.
 type ResourcePresetClient interface {
+	ResourcePresetClientIterator
 	Get(context.Context, *mongodb.GetResourcePresetRequest, ...grpc.CallOption) (*mongodb.ResourcePreset, error)
 	List(context.Context, *mongodb.ListResourcePresetsRequest, ...grpc.CallOption) (*mongodb.ListResourcePresetsResponse, error)
 }

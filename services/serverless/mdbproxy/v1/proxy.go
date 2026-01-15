@@ -17,6 +17,7 @@ import (
 
 // ProxyClient provides methods for managing Proxy resources of Yandex.Cloud Mdbproxy.
 type ProxyClient interface {
+	ProxyClientIterator
 	Get(context.Context, *mdbproxy.GetProxyRequest, ...grpc.CallOption) (*mdbproxy.Proxy, error)
 	List(context.Context, *mdbproxy.ListProxyRequest, ...grpc.CallOption) (*mdbproxy.ListProxyResponse, error)
 	Create(context.Context, *mdbproxy.CreateProxyRequest, ...grpc.CallOption) (*ProxyCreateOperation, error)

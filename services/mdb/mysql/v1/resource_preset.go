@@ -12,6 +12,7 @@ import (
 
 // ResourcePresetClient provides methods for managing ResourcePreset resources of Yandex.Cloud MySQL.
 type ResourcePresetClient interface {
+	ResourcePresetClientIterator
 	Get(context.Context, *mysql.GetResourcePresetRequest, ...grpc.CallOption) (*mysql.ResourcePreset, error)
 	List(context.Context, *mysql.ListResourcePresetsRequest, ...grpc.CallOption) (*mysql.ListResourcePresetsResponse, error)
 }

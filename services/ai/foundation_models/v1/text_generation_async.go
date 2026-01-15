@@ -14,6 +14,7 @@ import (
 
 // TextGenerationAsyncClient provides methods for managing TextGenerationAsync resources of Yandex.Cloud FoundationModels.
 type TextGenerationAsyncClient interface {
+	TextGenerationAsyncClientIterator
 	Completion(context.Context, *text_generation.CompletionRequest, ...grpc.CallOption) (*TextGenerationAsyncCompletionOperation, error)
 }
 

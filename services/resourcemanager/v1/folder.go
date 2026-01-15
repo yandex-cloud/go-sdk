@@ -17,6 +17,7 @@ import (
 
 // FolderClient provides methods for managing Folder resources of Yandex.Cloud ResourceManager.
 type FolderClient interface {
+	FolderClientIterator
 	Get(context.Context, *resourcemanager.GetFolderRequest, ...grpc.CallOption) (*resourcemanager.Folder, error)
 	List(context.Context, *resourcemanager.ListFoldersRequest, ...grpc.CallOption) (*resourcemanager.ListFoldersResponse, error)
 	Create(context.Context, *resourcemanager.CreateFolderRequest, ...grpc.CallOption) (*FolderCreateOperation, error)

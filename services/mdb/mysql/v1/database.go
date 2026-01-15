@@ -15,6 +15,7 @@ import (
 
 // DatabaseClient provides methods for managing Database resources of Yandex.Cloud MySQL.
 type DatabaseClient interface {
+	DatabaseClientIterator
 	Get(context.Context, *mysql.GetDatabaseRequest, ...grpc.CallOption) (*mysql.Database, error)
 	List(context.Context, *mysql.ListDatabasesRequest, ...grpc.CallOption) (*mysql.ListDatabasesResponse, error)
 	Create(context.Context, *mysql.CreateDatabaseRequest, ...grpc.CallOption) (*DatabaseCreateOperation, error)

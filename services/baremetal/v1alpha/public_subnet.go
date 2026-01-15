@@ -16,6 +16,7 @@ import (
 
 // PublicSubnetClient provides methods for managing PublicSubnet resources of Yandex.Cloud Baremetal.
 type PublicSubnetClient interface {
+	PublicSubnetClientIterator
 	Get(context.Context, *baremetal.GetPublicSubnetRequest, ...grpc.CallOption) (*baremetal.PublicSubnet, error)
 	List(context.Context, *baremetal.ListPublicSubnetRequest, ...grpc.CallOption) (*baremetal.ListPublicSubnetResponse, error)
 	Create(context.Context, *baremetal.CreatePublicSubnetRequest, ...grpc.CallOption) (*PublicSubnetCreateOperation, error)

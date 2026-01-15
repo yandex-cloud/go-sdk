@@ -16,6 +16,7 @@ import (
 
 // CaptchaClient provides methods for managing Captcha resources of Yandex.Cloud Smartcaptcha.
 type CaptchaClient interface {
+	CaptchaClientIterator
 	Get(context.Context, *smartcaptcha.GetCaptchaRequest, ...grpc.CallOption) (*smartcaptcha.Captcha, error)
 	GetSecretKey(context.Context, *smartcaptcha.GetCaptchaRequest, ...grpc.CallOption) (*smartcaptcha.CaptchaSecretKey, error)
 	List(context.Context, *smartcaptcha.ListCaptchasRequest, ...grpc.CallOption) (*smartcaptcha.ListCaptchasResponse, error)

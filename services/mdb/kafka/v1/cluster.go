@@ -17,6 +17,7 @@ import (
 
 // ClusterClient provides methods for managing Cluster resources of Yandex.Cloud Kafka.
 type ClusterClient interface {
+	ClusterClientIterator
 	Get(context.Context, *kafka.GetClusterRequest, ...grpc.CallOption) (*kafka.Cluster, error)
 	List(context.Context, *kafka.ListClustersRequest, ...grpc.CallOption) (*kafka.ListClustersResponse, error)
 	Create(context.Context, *kafka.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)

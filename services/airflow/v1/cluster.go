@@ -17,6 +17,7 @@ import (
 
 // ClusterClient provides methods for managing Cluster resources of Yandex.Cloud Airflow.
 type ClusterClient interface {
+	ClusterClientIterator
 	Get(context.Context, *airflow.GetClusterRequest, ...grpc.CallOption) (*airflow.Cluster, error)
 	List(context.Context, *airflow.ListClustersRequest, ...grpc.CallOption) (*airflow.ListClustersResponse, error)
 	Create(context.Context, *airflow.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)

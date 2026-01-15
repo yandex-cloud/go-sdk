@@ -12,6 +12,7 @@ import (
 
 // ApiEndpointClient provides methods for managing ApiEndpoint resources of Yandex.Cloud Endpoint.
 type ApiEndpointClient interface {
+	ApiEndpointClientIterator
 	Get(context.Context, *endpoint.GetApiEndpointRequest, ...grpc.CallOption) (*endpoint.ApiEndpoint, error)
 	List(context.Context, *endpoint.ListApiEndpointsRequest, ...grpc.CallOption) (*endpoint.ListApiEndpointsResponse, error)
 }

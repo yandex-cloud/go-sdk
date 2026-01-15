@@ -16,6 +16,7 @@ import (
 
 // AsymmetricSignatureKeyClient provides methods for managing AsymmetricSignatureKey resources of Yandex.Cloud Asymmetricsignature.
 type AsymmetricSignatureKeyClient interface {
+	AsymmetricSignatureKeyClientIterator
 	Create(context.Context, *asymmetricsignature.CreateAsymmetricSignatureKeyRequest, ...grpc.CallOption) (*AsymmetricSignatureKeyCreateOperation, error)
 	Get(context.Context, *asymmetricsignature.GetAsymmetricSignatureKeyRequest, ...grpc.CallOption) (*asymmetricsignature.AsymmetricSignatureKey, error)
 	List(context.Context, *asymmetricsignature.ListAsymmetricSignatureKeysRequest, ...grpc.CallOption) (*asymmetricsignature.ListAsymmetricSignatureKeysResponse, error)

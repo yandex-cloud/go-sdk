@@ -15,6 +15,7 @@ import (
 
 // DatabaseClient provides methods for managing Database resources of Yandex.Cloud PostgreSQL.
 type DatabaseClient interface {
+	DatabaseClientIterator
 	Get(context.Context, *postgresql.GetDatabaseRequest, ...grpc.CallOption) (*postgresql.Database, error)
 	List(context.Context, *postgresql.ListDatabasesRequest, ...grpc.CallOption) (*postgresql.ListDatabasesResponse, error)
 	Create(context.Context, *postgresql.CreateDatabaseRequest, ...grpc.CallOption) (*DatabaseCreateOperation, error)

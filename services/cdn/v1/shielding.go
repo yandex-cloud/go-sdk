@@ -15,6 +15,7 @@ import (
 
 // ShieldingClient provides methods for managing Shielding resources of Yandex.Cloud Cdn.
 type ShieldingClient interface {
+	ShieldingClientIterator
 	Activate(context.Context, *cdn.ActivateShieldingRequest, ...grpc.CallOption) (*ShieldingActivateOperation, error)
 	Deactivate(context.Context, *cdn.DeactivateShieldingRequest, ...grpc.CallOption) (*ShieldingDeactivateOperation, error)
 	Get(context.Context, *cdn.GetShieldingDetailsRequest, ...grpc.CallOption) (*cdn.ShieldingDetails, error)

@@ -17,6 +17,7 @@ import (
 
 // ServiceAccountClient provides methods for managing ServiceAccount resources of Yandex.Cloud IAM.
 type ServiceAccountClient interface {
+	ServiceAccountClientIterator
 	Get(context.Context, *iam.GetServiceAccountRequest, ...grpc.CallOption) (*iam.ServiceAccount, error)
 	List(context.Context, *iam.ListServiceAccountsRequest, ...grpc.CallOption) (*iam.ListServiceAccountsResponse, error)
 	Create(context.Context, *iam.CreateServiceAccountRequest, ...grpc.CallOption) (*ServiceAccountCreateOperation, error)

@@ -16,6 +16,7 @@ import (
 
 // AdvancedRateLimiterProfileClient provides methods for managing AdvancedRateLimiterProfile resources of Yandex.Cloud AdvancedRateLimiter.
 type AdvancedRateLimiterProfileClient interface {
+	AdvancedRateLimiterProfileClientIterator
 	Get(context.Context, *advanced_rate_limiter.GetAdvancedRateLimiterProfileRequest, ...grpc.CallOption) (*advanced_rate_limiter.AdvancedRateLimiterProfile, error)
 	List(context.Context, *advanced_rate_limiter.ListAdvancedRateLimiterProfilesRequest, ...grpc.CallOption) (*advanced_rate_limiter.ListAdvancedRateLimiterProfilesResponse, error)
 	Create(context.Context, *advanced_rate_limiter.CreateAdvancedRateLimiterProfileRequest, ...grpc.CallOption) (*AdvancedRateLimiterProfileCreateOperation, error)

@@ -12,6 +12,7 @@ import (
 
 // ResourcePresetClient provides methods for managing ResourcePreset resources of Yandex.Cloud Elasticsearch.
 type ResourcePresetClient interface {
+	ResourcePresetClientIterator
 	Get(context.Context, *elasticsearch.GetResourcePresetRequest, ...grpc.CallOption) (*elasticsearch.ResourcePreset, error)
 	List(context.Context, *elasticsearch.ListResourcePresetsRequest, ...grpc.CallOption) (*elasticsearch.ListResourcePresetsResponse, error)
 }

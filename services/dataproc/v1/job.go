@@ -15,6 +15,7 @@ import (
 
 // JobClient provides methods for managing Job resources of Yandex.Cloud Dataproc.
 type JobClient interface {
+	JobClientIterator
 	List(context.Context, *dataproc.ListJobsRequest, ...grpc.CallOption) (*dataproc.ListJobsResponse, error)
 	Create(context.Context, *dataproc.CreateJobRequest, ...grpc.CallOption) (*JobCreateOperation, error)
 	Get(context.Context, *dataproc.GetJobRequest, ...grpc.CallOption) (*dataproc.Job, error)

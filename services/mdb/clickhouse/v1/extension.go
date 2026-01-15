@@ -12,6 +12,7 @@ import (
 
 // ExtensionClient provides methods for managing Extension resources of Yandex.Cloud Clickhouse.
 type ExtensionClient interface {
+	ExtensionClientIterator
 	Get(context.Context, *clickhouse.GetExtensionRequest, ...grpc.CallOption) (*clickhouse.Extension, error)
 	List(context.Context, *clickhouse.ListExtensionsRequest, ...grpc.CallOption) (*clickhouse.ListExtensionsResponse, error)
 }

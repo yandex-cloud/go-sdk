@@ -16,6 +16,7 @@ import (
 
 // LockClient provides methods for managing Lock resources of Yandex.Cloud Saas.
 type LockClient interface {
+	LockClientIterator
 	Ensure(context.Context, *saas.EnsureLockRequest, ...grpc.CallOption) (*LockEnsureOperation, error)
 	Get(context.Context, *saas.GetLockRequest, ...grpc.CallOption) (*licensemanager.Lock, error)
 	GetByResourceID(context.Context, *saas.GetLockByResourceIDRequest, ...grpc.CallOption) (*licensemanager.Lock, error)

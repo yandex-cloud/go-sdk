@@ -17,6 +17,7 @@ import (
 
 // PlacementGroupClient provides methods for managing PlacementGroup resources of Yandex.Cloud Compute.
 type PlacementGroupClient interface {
+	PlacementGroupClientIterator
 	Get(context.Context, *compute.GetPlacementGroupRequest, ...grpc.CallOption) (*compute.PlacementGroup, error)
 	List(context.Context, *compute.ListPlacementGroupsRequest, ...grpc.CallOption) (*compute.ListPlacementGroupsResponse, error)
 	Create(context.Context, *compute.CreatePlacementGroupRequest, ...grpc.CallOption) (*PlacementGroupCreateOperation, error)

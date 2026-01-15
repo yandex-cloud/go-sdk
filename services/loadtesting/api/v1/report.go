@@ -12,6 +12,7 @@ import (
 
 // ReportClient provides methods for managing Report resources of Yandex.Cloud Api.
 type ReportClient interface {
+	ReportClientIterator
 	GetTable(context.Context, *api.GetTableReportRequest, ...grpc.CallOption) (*api.GetTableReportResponse, error)
 	CalculateKpiValues(context.Context, *api.CalculateReportKpiValuesRequest, ...grpc.CallOption) (*api.CalculateReportKpiValuesResponse, error)
 }

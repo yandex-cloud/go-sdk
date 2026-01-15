@@ -15,6 +15,7 @@ import (
 
 // UserClient provides methods for managing User resources of Yandex.Cloud Sqlserver.
 type UserClient interface {
+	UserClientIterator
 	Get(context.Context, *sqlserver.GetUserRequest, ...grpc.CallOption) (*sqlserver.User, error)
 	List(context.Context, *sqlserver.ListUsersRequest, ...grpc.CallOption) (*sqlserver.ListUsersResponse, error)
 	Create(context.Context, *sqlserver.CreateUserRequest, ...grpc.CallOption) (*UserCreateOperation, error)

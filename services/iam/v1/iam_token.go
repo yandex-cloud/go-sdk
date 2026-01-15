@@ -12,6 +12,7 @@ import (
 
 // IamTokenClient provides methods for managing IamToken resources of Yandex.Cloud IAM.
 type IamTokenClient interface {
+	IamTokenClientIterator
 	Create(context.Context, *iam.CreateIamTokenRequest, ...grpc.CallOption) (*iam.CreateIamTokenResponse, error)
 	CreateForServiceAccount(context.Context, *iam.CreateIamTokenForServiceAccountRequest, ...grpc.CallOption) (*iam.CreateIamTokenResponse, error)
 	Revoke(context.Context, *iam.RevokeIamTokenRequest, ...grpc.CallOption) (*iam.RevokeIamTokenResponse, error)

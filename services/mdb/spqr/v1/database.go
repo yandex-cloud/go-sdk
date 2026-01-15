@@ -15,6 +15,7 @@ import (
 
 // DatabaseClient provides methods for managing Database resources of Yandex.Cloud Spqr.
 type DatabaseClient interface {
+	DatabaseClientIterator
 	Get(context.Context, *spqr.GetDatabaseRequest, ...grpc.CallOption) (*spqr.Database, error)
 	List(context.Context, *spqr.ListDatabasesRequest, ...grpc.CallOption) (*spqr.ListDatabasesResponse, error)
 	Create(context.Context, *spqr.CreateDatabaseRequest, ...grpc.CallOption) (*DatabaseCreateOperation, error)

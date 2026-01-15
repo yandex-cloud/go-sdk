@@ -12,6 +12,7 @@ import (
 
 // PointOfPresenceClient provides methods for managing PointOfPresence resources of Yandex.Cloud Cic.
 type PointOfPresenceClient interface {
+	PointOfPresenceClientIterator
 	Get(context.Context, *cic.GetPointOfPresenceRequest, ...grpc.CallOption) (*cic.PointOfPresence, error)
 	List(context.Context, *cic.ListPointOfPresencesRequest, ...grpc.CallOption) (*cic.ListPointOfPresencesResponse, error)
 }

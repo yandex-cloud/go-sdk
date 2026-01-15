@@ -15,6 +15,7 @@ import (
 
 // UserClient provides methods for managing User resources of Yandex.Cloud MongoDB.
 type UserClient interface {
+	UserClientIterator
 	Get(context.Context, *mongodb.GetUserRequest, ...grpc.CallOption) (*mongodb.User, error)
 	List(context.Context, *mongodb.ListUsersRequest, ...grpc.CallOption) (*mongodb.ListUsersResponse, error)
 	Create(context.Context, *mongodb.CreateUserRequest, ...grpc.CallOption) (*UserCreateOperation, error)

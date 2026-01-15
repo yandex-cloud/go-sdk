@@ -12,6 +12,7 @@ import (
 
 // ResourcePresetClient provides methods for managing ResourcePreset resources of Yandex.Cloud Dataproc.
 type ResourcePresetClient interface {
+	ResourcePresetClientIterator
 	Get(context.Context, *dataproc.GetResourcePresetRequest, ...grpc.CallOption) (*dataproc.ResourcePreset, error)
 	List(context.Context, *dataproc.ListResourcePresetsRequest, ...grpc.CallOption) (*dataproc.ListResourcePresetsResponse, error)
 }

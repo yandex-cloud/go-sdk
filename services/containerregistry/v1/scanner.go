@@ -14,6 +14,7 @@ import (
 
 // ScannerClient provides methods for managing Scanner resources of Yandex.Cloud ContainerRegistry.
 type ScannerClient interface {
+	ScannerClientIterator
 	Scan(context.Context, *containerregistry.ScanRequest, ...grpc.CallOption) (*ScannerScanOperation, error)
 	Get(context.Context, *containerregistry.GetScanResultRequest, ...grpc.CallOption) (*containerregistry.ScanResult, error)
 	GetLast(context.Context, *containerregistry.GetLastScanResultRequest, ...grpc.CallOption) (*containerregistry.ScanResult, error)

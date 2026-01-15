@@ -15,6 +15,7 @@ import (
 
 // DockerImageClient provides methods for managing DockerImage resources of Yandex.Cloud Datasphere.
 type DockerImageClient interface {
+	DockerImageClientIterator
 	Activate(context.Context, *datasphere.ActivateDockerImageRequest, ...grpc.CallOption) (*DockerImageActivateOperation, error)
 }
 

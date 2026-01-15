@@ -12,6 +12,7 @@ import (
 
 // VersionsClient provides methods for managing Versions resources of Yandex.Cloud Clickhouse.
 type VersionsClient interface {
+	VersionsClientIterator
 	List(context.Context, *clickhouse.ListVersionsRequest, ...grpc.CallOption) (*clickhouse.ListVersionsResponse, error)
 }
 

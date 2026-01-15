@@ -17,6 +17,7 @@ import (
 
 // FederationClient provides methods for managing Federation resources of Yandex.Cloud Oidc.
 type FederationClient interface {
+	FederationClientIterator
 	Get(context.Context, *oidc.GetFederationRequest, ...grpc.CallOption) (*oidc.Federation, error)
 	List(context.Context, *oidc.ListFederationsRequest, ...grpc.CallOption) (*oidc.ListFederationsResponse, error)
 	Create(context.Context, *oidc.CreateFederationRequest, ...grpc.CallOption) (*FederationCreateOperation, error)

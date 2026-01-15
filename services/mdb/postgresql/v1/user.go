@@ -15,6 +15,7 @@ import (
 
 // UserClient provides methods for managing User resources of Yandex.Cloud PostgreSQL.
 type UserClient interface {
+	UserClientIterator
 	Get(context.Context, *postgresql.GetUserRequest, ...grpc.CallOption) (*postgresql.User, error)
 	List(context.Context, *postgresql.ListUsersRequest, ...grpc.CallOption) (*postgresql.ListUsersResponse, error)
 	Create(context.Context, *postgresql.CreateUserRequest, ...grpc.CallOption) (*UserCreateOperation, error)

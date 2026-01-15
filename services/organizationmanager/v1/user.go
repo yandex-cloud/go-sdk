@@ -14,6 +14,7 @@ import (
 
 // UserClient provides methods for managing User resources of Yandex.Cloud OrganizationManager.
 type UserClient interface {
+	UserClientIterator
 	ListMembers(context.Context, *organizationmanager.ListMembersRequest, ...grpc.CallOption) (*organizationmanager.ListMembersResponse, error)
 	DeleteMembership(context.Context, *organizationmanager.DeleteMembershipRequest, ...grpc.CallOption) (*UserDeleteMembershipOperation, error)
 }

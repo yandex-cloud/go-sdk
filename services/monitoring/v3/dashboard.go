@@ -16,6 +16,7 @@ import (
 
 // DashboardClient provides methods for managing Dashboard resources of Yandex.Cloud Monitoring.
 type DashboardClient interface {
+	DashboardClientIterator
 	Get(context.Context, *monitoring.GetDashboardRequest, ...grpc.CallOption) (*monitoring.Dashboard, error)
 	List(context.Context, *monitoring.ListDashboardsRequest, ...grpc.CallOption) (*monitoring.ListDashboardsResponse, error)
 	Create(context.Context, *monitoring.CreateDashboardRequest, ...grpc.CallOption) (*DashboardCreateOperation, error)

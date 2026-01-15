@@ -16,6 +16,7 @@ import (
 
 // BackupClient provides methods for managing Backup resources of Yandex.Cloud MySQL.
 type BackupClient interface {
+	BackupClientIterator
 	Get(context.Context, *mysql.GetBackupRequest, ...grpc.CallOption) (*mysql.Backup, error)
 	List(context.Context, *mysql.ListBackupsRequest, ...grpc.CallOption) (*mysql.ListBackupsResponse, error)
 	Delete(context.Context, *mysql.DeleteBackupRequest, ...grpc.CallOption) (*BackupDeleteOperation, error)

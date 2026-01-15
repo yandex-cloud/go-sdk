@@ -17,6 +17,7 @@ import (
 
 // SecretClient provides methods for managing Secret resources of Yandex.Cloud Lockbox.
 type SecretClient interface {
+	SecretClientIterator
 	Get(context.Context, *lockbox.GetSecretRequest, ...grpc.CallOption) (*lockbox.Secret, error)
 	List(context.Context, *lockbox.ListSecretsRequest, ...grpc.CallOption) (*lockbox.ListSecretsResponse, error)
 	Create(context.Context, *lockbox.CreateSecretRequest, ...grpc.CallOption) (*SecretCreateOperation, error)

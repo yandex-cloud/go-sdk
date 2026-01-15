@@ -17,6 +17,7 @@ import (
 
 // TestClient provides methods for managing Test resources of Yandex.Cloud Api.
 type TestClient interface {
+	TestClientIterator
 	Create(context.Context, *api.CreateTestRequest, ...grpc.CallOption) (*TestCreateOperation, error)
 	Get(context.Context, *api.GetTestRequest, ...grpc.CallOption) (*test.Test, error)
 	Stop(context.Context, *api.StopTestRequest, ...grpc.CallOption) (*TestStopOperation, error)

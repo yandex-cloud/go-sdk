@@ -12,6 +12,7 @@ import (
 
 // PresignClient provides methods for managing Presign resources of Yandex.Cloud Storage.
 type PresignClient interface {
+	PresignClientIterator
 	Create(context.Context, *storage.PresignURLsRequest, ...grpc.CallOption) (*storage.PresignURLsResponse, error)
 }
 

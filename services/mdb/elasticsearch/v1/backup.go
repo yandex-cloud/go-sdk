@@ -12,6 +12,7 @@ import (
 
 // BackupClient provides methods for managing Backup resources of Yandex.Cloud Elasticsearch.
 type BackupClient interface {
+	BackupClientIterator
 	Get(context.Context, *elasticsearch.GetBackupRequest, ...grpc.CallOption) (*elasticsearch.Backup, error)
 	List(context.Context, *elasticsearch.ListBackupsRequest, ...grpc.CallOption) (*elasticsearch.ListBackupsResponse, error)
 }

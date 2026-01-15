@@ -12,6 +12,7 @@ import (
 
 // ProductUsageClient provides methods for managing ProductUsage resources of Yandex.Cloud Metering.
 type ProductUsageClient interface {
+	ProductUsageClientIterator
 	Write(context.Context, *metering.WriteUsageRequest, ...grpc.CallOption) (*metering.WriteUsageResponse, error)
 }
 

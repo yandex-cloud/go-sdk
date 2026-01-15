@@ -17,6 +17,7 @@ import (
 
 // ClusterClient provides methods for managing Cluster resources of Yandex.Cloud Opensearch.
 type ClusterClient interface {
+	ClusterClientIterator
 	Get(context.Context, *opensearch.GetClusterRequest, ...grpc.CallOption) (*opensearch.Cluster, error)
 	List(context.Context, *opensearch.ListClustersRequest, ...grpc.CallOption) (*opensearch.ListClustersResponse, error)
 	Create(context.Context, *opensearch.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)

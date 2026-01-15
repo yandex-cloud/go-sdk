@@ -204,3 +204,23 @@ func (sdk *SDK) CreateIAMToken(ctx context.Context) (authentication.IamToken, er
 func (sdk *SDK) GetEndpoint(method protoreflect.FullName) (*endpoints.Endpoint, error) {
 	return sdk.endpointResolver.Endpoint(sdk.ctx, method)
 }
+
+func (sdk *SDK) WithEndpoints(endpoints *endpoints.PrefixEndpointsResolver) *SDK {
+	return &SDK{
+		ctx:              sdk.ctx,
+		conn:             sdk.conn,
+		endpointResolver: endpoints,
+		connPool:         sdk.connPool,
+		authenticator:    sdk.authenticator,
+	}
+}
+
+func (sdk *SDK) WithEnpointsResolver(endpointsResolver endpoints.EndpointsResolver) *SDK {
+	return &SDK{
+		ctx:              sdk.ctx,
+		conn:             sdk.conn,
+		endpointResolver: endpointsResolver,
+		connPool:         sdk.connPool,
+		authenticator:    sdk.authenticator,
+	}
+}

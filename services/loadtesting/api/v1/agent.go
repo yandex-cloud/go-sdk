@@ -17,6 +17,7 @@ import (
 
 // AgentClient provides methods for managing Agent resources of Yandex.Cloud Api.
 type AgentClient interface {
+	AgentClientIterator
 	Create(context.Context, *api.CreateAgentRequest, ...grpc.CallOption) (*AgentCreateOperation, error)
 	Get(context.Context, *api.GetAgentRequest, ...grpc.CallOption) (*agent.Agent, error)
 	List(context.Context, *api.ListAgentsRequest, ...grpc.CallOption) (*api.ListAgentsResponse, error)

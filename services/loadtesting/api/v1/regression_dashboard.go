@@ -16,6 +16,7 @@ import (
 
 // RegressionDashboardClient provides methods for managing RegressionDashboard resources of Yandex.Cloud Api.
 type RegressionDashboardClient interface {
+	RegressionDashboardClientIterator
 	Create(context.Context, *api.CreateRegressionDashboardRequest, ...grpc.CallOption) (*RegressionDashboardCreateOperation, error)
 	Get(context.Context, *api.GetRegressionDashboardRequest, ...grpc.CallOption) (*regression.Dashboard, error)
 	List(context.Context, *api.ListRegressionDashboardsRequest, ...grpc.CallOption) (*api.ListRegressionDashboardsResponse, error)

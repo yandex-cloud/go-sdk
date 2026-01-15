@@ -12,6 +12,7 @@ import (
 
 // RentalPeriodClient provides methods for managing RentalPeriod resources of Yandex.Cloud Baremetal.
 type RentalPeriodClient interface {
+	RentalPeriodClientIterator
 	List(context.Context, *baremetal.ListRentalPeriodsRequest, ...grpc.CallOption) (*baremetal.ListRentalPeriodsResponse, error)
 }
 

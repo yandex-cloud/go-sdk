@@ -17,6 +17,7 @@ import (
 
 // ImageClient provides methods for managing Image resources of Yandex.Cloud Compute.
 type ImageClient interface {
+	ImageClientIterator
 	Get(context.Context, *compute.GetImageRequest, ...grpc.CallOption) (*compute.Image, error)
 	GetLatestByFamily(context.Context, *compute.GetImageLatestByFamilyRequest, ...grpc.CallOption) (*compute.Image, error)
 	List(context.Context, *compute.ListImagesRequest, ...grpc.CallOption) (*compute.ListImagesResponse, error)

@@ -16,6 +16,7 @@ import (
 
 // GatewayClient provides methods for managing Gateway resources of Yandex.Cloud VPC.
 type GatewayClient interface {
+	GatewayClientIterator
 	Get(context.Context, *vpc.GetGatewayRequest, ...grpc.CallOption) (*vpc.Gateway, error)
 	List(context.Context, *vpc.ListGatewaysRequest, ...grpc.CallOption) (*vpc.ListGatewaysResponse, error)
 	Create(context.Context, *vpc.CreateGatewayRequest, ...grpc.CallOption) (*GatewayCreateOperation, error)

@@ -15,6 +15,7 @@ import (
 
 // TextRecognitionAsyncClient provides methods for managing TextRecognitionAsync resources of Yandex.Cloud Ocr.
 type TextRecognitionAsyncClient interface {
+	TextRecognitionAsyncClientIterator
 	Recognize(context.Context, *ocr.RecognizeTextRequest, ...grpc.CallOption) (*TextRecognitionAsyncRecognizeOperation, error)
 	GetRecognition(context.Context, *ocr.GetRecognitionRequest, ...grpc.CallOption) (ocr.TextRecognitionAsyncService_GetRecognitionClient, error)
 }

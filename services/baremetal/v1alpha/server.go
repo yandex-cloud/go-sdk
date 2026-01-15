@@ -16,6 +16,7 @@ import (
 
 // ServerClient provides methods for managing Server resources of Yandex.Cloud Baremetal.
 type ServerClient interface {
+	ServerClientIterator
 	Get(context.Context, *baremetal.GetServerRequest, ...grpc.CallOption) (*baremetal.Server, error)
 	List(context.Context, *baremetal.ListServerRequest, ...grpc.CallOption) (*baremetal.ListServerResponse, error)
 	Create(context.Context, *baremetal.CreateServerRequest, ...grpc.CallOption) (*ServerCreateOperation, error)

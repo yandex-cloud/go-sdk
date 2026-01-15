@@ -12,6 +12,7 @@ import (
 
 // AsymmetricSignatureCryptoClient provides methods for managing AsymmetricSignatureCrypto resources of Yandex.Cloud Asymmetricsignature.
 type AsymmetricSignatureCryptoClient interface {
+	AsymmetricSignatureCryptoClientIterator
 	Sign(context.Context, *asymmetricsignature.AsymmetricSignRequest, ...grpc.CallOption) (*asymmetricsignature.AsymmetricSignResponse, error)
 	SignHash(context.Context, *asymmetricsignature.AsymmetricSignHashRequest, ...grpc.CallOption) (*asymmetricsignature.AsymmetricSignHashResponse, error)
 	GetPublicKey(context.Context, *asymmetricsignature.AsymmetricGetPublicKeyRequest, ...grpc.CallOption) (*asymmetricsignature.AsymmetricGetPublicKeyResponse, error)

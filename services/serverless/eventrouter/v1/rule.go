@@ -17,6 +17,7 @@ import (
 
 // RuleClient provides methods for managing Rule resources of Yandex.Cloud Eventrouter.
 type RuleClient interface {
+	RuleClientIterator
 	Get(context.Context, *eventrouter.GetRuleRequest, ...grpc.CallOption) (*eventrouter.Rule, error)
 	List(context.Context, *eventrouter.ListRulesRequest, ...grpc.CallOption) (*eventrouter.ListRulesResponse, error)
 	Create(context.Context, *eventrouter.CreateRuleRequest, ...grpc.CallOption) (*RuleCreateOperation, error)

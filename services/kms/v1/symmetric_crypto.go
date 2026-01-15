@@ -12,6 +12,7 @@ import (
 
 // SymmetricCryptoClient provides methods for managing SymmetricCrypto resources of Yandex.Cloud KMS.
 type SymmetricCryptoClient interface {
+	SymmetricCryptoClientIterator
 	Encrypt(context.Context, *kms.SymmetricEncryptRequest, ...grpc.CallOption) (*kms.SymmetricEncryptResponse, error)
 	Decrypt(context.Context, *kms.SymmetricDecryptRequest, ...grpc.CallOption) (*kms.SymmetricDecryptResponse, error)
 	ReEncrypt(context.Context, *kms.SymmetricReEncryptRequest, ...grpc.CallOption) (*kms.SymmetricReEncryptResponse, error)

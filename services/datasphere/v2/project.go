@@ -17,6 +17,7 @@ import (
 
 // ProjectClient provides methods for managing Project resources of Yandex.Cloud Datasphere.
 type ProjectClient interface {
+	ProjectClientIterator
 	Create(context.Context, *datasphere.CreateProjectRequest, ...grpc.CallOption) (*ProjectCreateOperation, error)
 	Update(context.Context, *datasphere.UpdateProjectRequest, ...grpc.CallOption) (*ProjectUpdateOperation, error)
 	Delete(context.Context, *datasphere.DeleteProjectRequest, ...grpc.CallOption) (*ProjectDeleteOperation, error)

@@ -12,6 +12,7 @@ import (
 
 // ServiceClient provides methods for managing Service resources of Yandex.Cloud Billing.
 type ServiceClient interface {
+	ServiceClientIterator
 	Get(context.Context, *billing.GetServiceRequest, ...grpc.CallOption) (*billing.Service, error)
 	List(context.Context, *billing.ListServicesRequest, ...grpc.CallOption) (*billing.ListServicesResponse, error)
 }

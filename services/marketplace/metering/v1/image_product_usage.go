@@ -12,6 +12,7 @@ import (
 
 // ImageProductUsageClient provides methods for managing ImageProductUsage resources of Yandex.Cloud Metering.
 type ImageProductUsageClient interface {
+	ImageProductUsageClientIterator
 	Write(context.Context, *metering.WriteImageProductUsageRequest, ...grpc.CallOption) (*metering.WriteImageProductUsageResponse, error)
 }
 

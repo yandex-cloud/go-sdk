@@ -16,6 +16,7 @@ import (
 
 // ImageClient provides methods for managing Image resources of Yandex.Cloud ContainerRegistry.
 type ImageClient interface {
+	ImageClientIterator
 	List(context.Context, *containerregistry.ListImagesRequest, ...grpc.CallOption) (*containerregistry.ListImagesResponse, error)
 	Get(context.Context, *containerregistry.GetImageRequest, ...grpc.CallOption) (*containerregistry.Image, error)
 	Delete(context.Context, *containerregistry.DeleteImageRequest, ...grpc.CallOption) (*ImageDeleteOperation, error)

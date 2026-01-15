@@ -16,6 +16,7 @@ import (
 
 // ConnectionClient provides methods for managing Connection resources of Yandex.Cloud Connectionmanager.
 type ConnectionClient interface {
+	ConnectionClientIterator
 	Get(context.Context, *connectionmanager.GetConnectionRequest, ...grpc.CallOption) (*connectionmanager.Connection, error)
 	ResolveCluster(context.Context, *connectionmanager.ResolveClusterRequest, ...grpc.CallOption) (*connectionmanager.Connection, error)
 	List(context.Context, *connectionmanager.ListConnectionRequest, ...grpc.CallOption) (*connectionmanager.ListConnectionResponse, error)

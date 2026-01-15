@@ -12,6 +12,7 @@ import (
 
 // BackupClient provides methods for managing Backup resources of Yandex.Cloud Sqlserver.
 type BackupClient interface {
+	BackupClientIterator
 	Get(context.Context, *sqlserver.GetBackupRequest, ...grpc.CallOption) (*sqlserver.Backup, error)
 	List(context.Context, *sqlserver.ListBackupsRequest, ...grpc.CallOption) (*sqlserver.ListBackupsResponse, error)
 }

@@ -16,6 +16,7 @@ import (
 
 // UserSshKeyClient provides methods for managing UserSshKey resources of Yandex.Cloud OrganizationManager.
 type UserSshKeyClient interface {
+	UserSshKeyClientIterator
 	Get(context.Context, *organizationmanager.GetUserSshKeyRequest, ...grpc.CallOption) (*organizationmanager.UserSshKey, error)
 	List(context.Context, *organizationmanager.ListUserSshKeysRequest, ...grpc.CallOption) (*organizationmanager.ListUserSshKeysResponse, error)
 	Create(context.Context, *organizationmanager.CreateUserSshKeyRequest, ...grpc.CallOption) (*UserSshKeyCreateOperation, error)

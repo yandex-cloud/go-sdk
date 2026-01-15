@@ -16,6 +16,7 @@ import (
 
 // BackupClient provides methods for managing Backup resources of Yandex.Cloud Greenplum.
 type BackupClient interface {
+	BackupClientIterator
 	Get(context.Context, *greenplum.GetBackupRequest, ...grpc.CallOption) (*greenplum.Backup, error)
 	List(context.Context, *greenplum.ListBackupsRequest, ...grpc.CallOption) (*greenplum.ListBackupsResponse, error)
 	Delete(context.Context, *greenplum.DeleteBackupRequest, ...grpc.CallOption) (*BackupDeleteOperation, error)

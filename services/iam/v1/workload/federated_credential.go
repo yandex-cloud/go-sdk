@@ -16,6 +16,7 @@ import (
 
 // FederatedCredentialClient provides methods for managing FederatedCredential resources of Yandex.Cloud Workload.
 type FederatedCredentialClient interface {
+	FederatedCredentialClientIterator
 	Get(context.Context, *workload.GetFederatedCredentialRequest, ...grpc.CallOption) (*workload.FederatedCredential, error)
 	List(context.Context, *workload.ListFederatedCredentialsRequest, ...grpc.CallOption) (*workload.ListFederatedCredentialsResponse, error)
 	Create(context.Context, *workload.CreateFederatedCredentialRequest, ...grpc.CallOption) (*FederatedCredentialCreateOperation, error)

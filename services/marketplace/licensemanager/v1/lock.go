@@ -16,6 +16,7 @@ import (
 
 // LockClient provides methods for managing Lock resources of Yandex.Cloud Licensemanager.
 type LockClient interface {
+	LockClientIterator
 	Get(context.Context, *licensemanager.GetLockRequest, ...grpc.CallOption) (*licensemanager.Lock, error)
 	GetByInstanceAndResource(context.Context, *licensemanager.GetLockByInstanceAndResourceRequest, ...grpc.CallOption) (*licensemanager.Lock, error)
 	List(context.Context, *licensemanager.ListLocksRequest, ...grpc.CallOption) (*licensemanager.ListLocksResponse, error)

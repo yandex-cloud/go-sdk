@@ -17,6 +17,7 @@ import (
 
 // HostGroupClient provides methods for managing HostGroup resources of Yandex.Cloud Compute.
 type HostGroupClient interface {
+	HostGroupClientIterator
 	Get(context.Context, *compute.GetHostGroupRequest, ...grpc.CallOption) (*compute.HostGroup, error)
 	List(context.Context, *compute.ListHostGroupsRequest, ...grpc.CallOption) (*compute.ListHostGroupsResponse, error)
 	Create(context.Context, *compute.CreateHostGroupRequest, ...grpc.CallOption) (*HostGroupCreateOperation, error)

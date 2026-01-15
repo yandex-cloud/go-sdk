@@ -15,6 +15,7 @@ import (
 
 // OAuthClientClient provides methods for managing OAuthClient resources of Yandex.Cloud IAM.
 type OAuthClientClient interface {
+	OAuthClientClientIterator
 	Get(context.Context, *iam.GetOAuthClientRequest, ...grpc.CallOption) (*iam.OAuthClient, error)
 	List(context.Context, *iam.ListOAuthClientsRequest, ...grpc.CallOption) (*iam.ListOAuthClientsResponse, error)
 	Create(context.Context, *iam.CreateOAuthClientRequest, ...grpc.CallOption) (*OAuthClientCreateOperation, error)

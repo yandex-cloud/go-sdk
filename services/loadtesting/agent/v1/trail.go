@@ -12,6 +12,7 @@ import (
 
 // TrailClient provides methods for managing Trail resources of Yandex.Cloud Agent.
 type TrailClient interface {
+	TrailClientIterator
 	Create(context.Context, *agent.CreateTrailRequest, ...grpc.CallOption) (*agent.CreateTrailResponse, error)
 }
 

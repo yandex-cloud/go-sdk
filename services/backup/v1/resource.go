@@ -15,6 +15,7 @@ import (
 
 // ResourceClient provides methods for managing Resource resources of Yandex.Cloud Backup.
 type ResourceClient interface {
+	ResourceClientIterator
 	List(context.Context, *backup.ListResourcesRequest, ...grpc.CallOption) (*backup.ListResourcesResponse, error)
 	Get(context.Context, *backup.GetResourceRequest, ...grpc.CallOption) (*backup.GetResourceResponse, error)
 	Delete(context.Context, *backup.DeleteResourceRequest, ...grpc.CallOption) (*ResourceDeleteOperation, error)

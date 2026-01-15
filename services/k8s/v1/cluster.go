@@ -17,6 +17,7 @@ import (
 
 // ClusterClient provides methods for managing Cluster resources of Yandex.Cloud K8s.
 type ClusterClient interface {
+	ClusterClientIterator
 	Get(context.Context, *k8s.GetClusterRequest, ...grpc.CallOption) (*k8s.Cluster, error)
 	List(context.Context, *k8s.ListClustersRequest, ...grpc.CallOption) (*k8s.ListClustersResponse, error)
 	Create(context.Context, *k8s.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)

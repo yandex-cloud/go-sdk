@@ -16,6 +16,7 @@ import (
 
 // BackupClient provides methods for managing Backup resources of Yandex.Cloud MongoDB.
 type BackupClient interface {
+	BackupClientIterator
 	Get(context.Context, *mongodb.GetBackupRequest, ...grpc.CallOption) (*mongodb.Backup, error)
 	List(context.Context, *mongodb.ListBackupsRequest, ...grpc.CallOption) (*mongodb.ListBackupsResponse, error)
 	Delete(context.Context, *mongodb.DeleteBackupRequest, ...grpc.CallOption) (*BackupDeleteOperation, error)

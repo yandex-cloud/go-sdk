@@ -12,6 +12,7 @@ import (
 
 // DeviceDataClient provides methods for managing DeviceData resources of Yandex.Cloud Devices.
 type DeviceDataClient interface {
+	DeviceDataClientIterator
 	Publish(context.Context, *devices.PublishDeviceDataRequest, ...grpc.CallOption) (*devices.PublishDeviceDataResponse, error)
 }
 

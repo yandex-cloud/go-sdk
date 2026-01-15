@@ -16,6 +16,7 @@ import (
 
 // ScanPolicyClient provides methods for managing ScanPolicy resources of Yandex.Cloud ContainerRegistry.
 type ScanPolicyClient interface {
+	ScanPolicyClientIterator
 	Get(context.Context, *containerregistry.GetScanPolicyRequest, ...grpc.CallOption) (*containerregistry.ScanPolicy, error)
 	GetByRegistry(context.Context, *containerregistry.GetScanPolicyByRegistryRequest, ...grpc.CallOption) (*containerregistry.ScanPolicy, error)
 	Create(context.Context, *containerregistry.CreateScanPolicyRequest, ...grpc.CallOption) (*ScanPolicyCreateOperation, error)

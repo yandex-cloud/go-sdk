@@ -12,6 +12,7 @@ import (
 
 // ZoneClient provides methods for managing Zone resources of Yandex.Cloud Baremetal.
 type ZoneClient interface {
+	ZoneClientIterator
 	Get(context.Context, *baremetal.GetZoneRequest, ...grpc.CallOption) (*baremetal.Zone, error)
 	List(context.Context, *baremetal.ListZonesRequest, ...grpc.CallOption) (*baremetal.ListZonesResponse, error)
 }

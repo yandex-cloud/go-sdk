@@ -12,6 +12,7 @@ import (
 
 // InstanceClient provides methods for managing Instance resources of Yandex.Cloud Licensemanager.
 type InstanceClient interface {
+	InstanceClientIterator
 	Get(context.Context, *licensemanager.GetInstanceRequest, ...grpc.CallOption) (*licensemanager.Instance, error)
 	List(context.Context, *licensemanager.ListInstancesRequest, ...grpc.CallOption) (*licensemanager.ListInstancesResponse, error)
 }

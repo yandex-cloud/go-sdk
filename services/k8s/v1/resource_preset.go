@@ -12,6 +12,7 @@ import (
 
 // ResourcePresetClient provides methods for managing ResourcePreset resources of Yandex.Cloud K8s.
 type ResourcePresetClient interface {
+	ResourcePresetClientIterator
 	Get(context.Context, *k8s.GetResourcePresetRequest, ...grpc.CallOption) (*k8s.ResourcePreset, error)
 	List(context.Context, *k8s.ListResourcePresetsRequest, ...grpc.CallOption) (*k8s.ListResourcePresetsResponse, error)
 }

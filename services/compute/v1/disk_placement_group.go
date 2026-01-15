@@ -17,6 +17,7 @@ import (
 
 // DiskPlacementGroupClient provides methods for managing DiskPlacementGroup resources of Yandex.Cloud Compute.
 type DiskPlacementGroupClient interface {
+	DiskPlacementGroupClientIterator
 	Get(context.Context, *compute.GetDiskPlacementGroupRequest, ...grpc.CallOption) (*compute.DiskPlacementGroup, error)
 	List(context.Context, *compute.ListDiskPlacementGroupsRequest, ...grpc.CallOption) (*compute.ListDiskPlacementGroupsResponse, error)
 	Create(context.Context, *compute.CreateDiskPlacementGroupRequest, ...grpc.CallOption) (*DiskPlacementGroupCreateOperation, error)

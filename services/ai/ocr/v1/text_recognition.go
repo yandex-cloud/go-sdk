@@ -12,6 +12,7 @@ import (
 
 // TextRecognitionClient provides methods for managing TextRecognition resources of Yandex.Cloud Ocr.
 type TextRecognitionClient interface {
+	TextRecognitionClientIterator
 	Recognize(context.Context, *ocr.RecognizeTextRequest, ...grpc.CallOption) (ocr.TextRecognitionService_RecognizeClient, error)
 }
 

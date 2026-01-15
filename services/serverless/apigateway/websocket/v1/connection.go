@@ -12,6 +12,7 @@ import (
 
 // ConnectionClient provides methods for managing Connection resources of Yandex.Cloud Websocket.
 type ConnectionClient interface {
+	ConnectionClientIterator
 	Get(context.Context, *websocket.GetConnectionRequest, ...grpc.CallOption) (*websocket.Connection, error)
 	Send(context.Context, *websocket.SendToConnectionRequest, ...grpc.CallOption) (*websocket.SendToConnectionResponse, error)
 	Disconnect(context.Context, *websocket.DisconnectRequest, ...grpc.CallOption) (*websocket.DisconnectResponse, error)

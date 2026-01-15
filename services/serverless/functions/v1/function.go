@@ -17,6 +17,7 @@ import (
 
 // FunctionClient provides methods for managing Function resources of Yandex.Cloud Functions.
 type FunctionClient interface {
+	FunctionClientIterator
 	Get(context.Context, *functions.GetFunctionRequest, ...grpc.CallOption) (*functions.Function, error)
 	List(context.Context, *functions.ListFunctionsRequest, ...grpc.CallOption) (*functions.ListFunctionsResponse, error)
 	Create(context.Context, *functions.CreateFunctionRequest, ...grpc.CallOption) (*FunctionCreateOperation, error)

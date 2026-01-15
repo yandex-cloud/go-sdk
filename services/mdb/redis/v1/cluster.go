@@ -17,6 +17,7 @@ import (
 
 // ClusterClient provides methods for managing Cluster resources of Yandex.Cloud Redis.
 type ClusterClient interface {
+	ClusterClientIterator
 	Get(context.Context, *redis.GetClusterRequest, ...grpc.CallOption) (*redis.Cluster, error)
 	List(context.Context, *redis.ListClustersRequest, ...grpc.CallOption) (*redis.ListClustersResponse, error)
 	Create(context.Context, *redis.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)

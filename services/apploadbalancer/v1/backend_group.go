@@ -16,6 +16,7 @@ import (
 
 // BackendGroupClient provides methods for managing BackendGroup resources of Yandex.Cloud Apploadbalancer.
 type BackendGroupClient interface {
+	BackendGroupClientIterator
 	Get(context.Context, *apploadbalancer.GetBackendGroupRequest, ...grpc.CallOption) (*apploadbalancer.BackendGroup, error)
 	List(context.Context, *apploadbalancer.ListBackendGroupsRequest, ...grpc.CallOption) (*apploadbalancer.ListBackendGroupsResponse, error)
 	Create(context.Context, *apploadbalancer.CreateBackendGroupRequest, ...grpc.CallOption) (*BackendGroupCreateOperation, error)

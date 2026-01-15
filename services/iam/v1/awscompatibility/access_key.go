@@ -16,6 +16,7 @@ import (
 
 // AccessKeyClient provides methods for managing AccessKey resources of Yandex.Cloud AWSCompatibility.
 type AccessKeyClient interface {
+	AccessKeyClientIterator
 	List(context.Context, *awscompatibility.ListAccessKeysRequest, ...grpc.CallOption) (*awscompatibility.ListAccessKeysResponse, error)
 	Get(context.Context, *awscompatibility.GetAccessKeyRequest, ...grpc.CallOption) (*awscompatibility.AccessKey, error)
 	Create(context.Context, *awscompatibility.CreateAccessKeyRequest, ...grpc.CallOption) (*awscompatibility.CreateAccessKeyResponse, error)

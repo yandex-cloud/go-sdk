@@ -17,6 +17,7 @@ import (
 
 // TrailClient provides methods for managing Trail resources of Yandex.Cloud Audittrails.
 type TrailClient interface {
+	TrailClientIterator
 	Get(context.Context, *audittrails.GetTrailRequest, ...grpc.CallOption) (*audittrails.Trail, error)
 	List(context.Context, *audittrails.ListTrailsRequest, ...grpc.CallOption) (*audittrails.ListTrailsResponse, error)
 	Create(context.Context, *audittrails.CreateTrailRequest, ...grpc.CallOption) (*TrailCreateOperation, error)

@@ -16,6 +16,7 @@ import (
 
 // TrunkConnectionClient provides methods for managing TrunkConnection resources of Yandex.Cloud Cic.
 type TrunkConnectionClient interface {
+	TrunkConnectionClientIterator
 	Get(context.Context, *cic.GetTrunkConnectionRequest, ...grpc.CallOption) (*cic.TrunkConnection, error)
 	List(context.Context, *cic.ListTrunkConnectionsRequest, ...grpc.CallOption) (*cic.ListTrunkConnectionsResponse, error)
 	Create(context.Context, *cic.CreateTrunkConnectionRequest, ...grpc.CallOption) (*TrunkConnectionCreateOperation, error)

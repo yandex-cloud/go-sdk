@@ -16,6 +16,7 @@ import (
 
 // ClusterClient provides methods for managing Cluster resources of Yandex.Cloud Sqlserver.
 type ClusterClient interface {
+	ClusterClientIterator
 	Get(context.Context, *sqlserver.GetClusterRequest, ...grpc.CallOption) (*sqlserver.Cluster, error)
 	List(context.Context, *sqlserver.ListClustersRequest, ...grpc.CallOption) (*sqlserver.ListClustersResponse, error)
 	Create(context.Context, *sqlserver.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)

@@ -15,6 +15,7 @@ import (
 
 // FormatSchemaClient provides methods for managing FormatSchema resources of Yandex.Cloud Clickhouse.
 type FormatSchemaClient interface {
+	FormatSchemaClientIterator
 	Get(context.Context, *clickhouse.GetFormatSchemaRequest, ...grpc.CallOption) (*clickhouse.FormatSchema, error)
 	List(context.Context, *clickhouse.ListFormatSchemasRequest, ...grpc.CallOption) (*clickhouse.ListFormatSchemasResponse, error)
 	Create(context.Context, *clickhouse.CreateFormatSchemaRequest, ...grpc.CallOption) (*FormatSchemaCreateOperation, error)

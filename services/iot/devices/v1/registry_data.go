@@ -12,6 +12,7 @@ import (
 
 // RegistryDataClient provides methods for managing RegistryData resources of Yandex.Cloud Devices.
 type RegistryDataClient interface {
+	RegistryDataClientIterator
 	Publish(context.Context, *devices.PublishRegistryDataRequest, ...grpc.CallOption) (*devices.PublishRegistryDataResponse, error)
 }
 

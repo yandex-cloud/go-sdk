@@ -15,6 +15,7 @@ import (
 
 // BudgetClient provides methods for managing Budget resources of Yandex.Cloud Billing.
 type BudgetClient interface {
+	BudgetClientIterator
 	Get(context.Context, *billing.GetBudgetRequest, ...grpc.CallOption) (*billing.Budget, error)
 	List(context.Context, *billing.ListBudgetsRequest, ...grpc.CallOption) (*billing.ListBudgetsResponse, error)
 	Create(context.Context, *billing.CreateBudgetRequest, ...grpc.CallOption) (*BudgetCreateOperation, error)

@@ -12,6 +12,7 @@ import (
 
 // ExecutionClient provides methods for managing Execution resources of Yandex.Cloud Workflows.
 type ExecutionClient interface {
+	ExecutionClientIterator
 	Start(context.Context, *workflows.StartExecutionRequest, ...grpc.CallOption) (*workflows.StartExecutionResponse, error)
 	Stop(context.Context, *workflows.StopExecutionRequest, ...grpc.CallOption) (*workflows.StopExecutionResponse, error)
 	Terminate(context.Context, *workflows.TerminateExecutionRequest, ...grpc.CallOption) (*workflows.TerminateExecutionResponse, error)

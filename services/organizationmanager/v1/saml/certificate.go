@@ -16,6 +16,7 @@ import (
 
 // CertificateClient provides methods for managing Certificate resources of Yandex.Cloud Saml.
 type CertificateClient interface {
+	CertificateClientIterator
 	Get(context.Context, *saml.GetCertificateRequest, ...grpc.CallOption) (*saml.Certificate, error)
 	List(context.Context, *saml.ListCertificatesRequest, ...grpc.CallOption) (*saml.ListCertificatesResponse, error)
 	Create(context.Context, *saml.CreateCertificateRequest, ...grpc.CallOption) (*CertificateCreateOperation, error)

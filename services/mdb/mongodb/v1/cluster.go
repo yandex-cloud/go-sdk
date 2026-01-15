@@ -17,6 +17,7 @@ import (
 
 // ClusterClient provides methods for managing Cluster resources of Yandex.Cloud MongoDB.
 type ClusterClient interface {
+	ClusterClientIterator
 	Get(context.Context, *mongodb.GetClusterRequest, ...grpc.CallOption) (*mongodb.Cluster, error)
 	List(context.Context, *mongodb.ListClustersRequest, ...grpc.CallOption) (*mongodb.ListClustersResponse, error)
 	Create(context.Context, *mongodb.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)

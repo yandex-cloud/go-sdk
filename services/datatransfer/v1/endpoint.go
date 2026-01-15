@@ -16,6 +16,7 @@ import (
 
 // EndpointClient provides methods for managing Endpoint resources of Yandex.Cloud Datatransfer.
 type EndpointClient interface {
+	EndpointClientIterator
 	Get(context.Context, *datatransfer.GetEndpointRequest, ...grpc.CallOption) (*datatransfer.Endpoint, error)
 	List(context.Context, *datatransfer.ListEndpointsRequest, ...grpc.CallOption) (*datatransfer.ListEndpointsResponse, error)
 	Create(context.Context, *datatransfer.CreateEndpointRequest, ...grpc.CallOption) (*EndpointCreateOperation, error)

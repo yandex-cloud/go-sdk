@@ -17,6 +17,7 @@ import (
 
 // DatabaseClient provides methods for managing Database resources of Yandex.Cloud YDB.
 type DatabaseClient interface {
+	DatabaseClientIterator
 	Get(context.Context, *ydb.GetDatabaseRequest, ...grpc.CallOption) (*ydb.Database, error)
 	List(context.Context, *ydb.ListDatabasesRequest, ...grpc.CallOption) (*ydb.ListDatabasesResponse, error)
 	Create(context.Context, *ydb.CreateDatabaseRequest, ...grpc.CallOption) (*DatabaseCreateOperation, error)

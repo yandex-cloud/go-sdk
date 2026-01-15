@@ -12,6 +12,7 @@ import (
 
 // AccessAnalyzerClient provides methods for managing AccessAnalyzer resources of Yandex.Cloud IAM.
 type AccessAnalyzerClient interface {
+	AccessAnalyzerClientIterator
 	ListSubjectAccessBindings(context.Context, *iam.ListSubjectAccessBindingsRequest, ...grpc.CallOption) (*iam.ListSubjectAccessBindingsResponse, error)
 }
 

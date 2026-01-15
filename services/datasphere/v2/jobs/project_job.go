@@ -15,6 +15,7 @@ import (
 
 // ProjectJobClient provides methods for managing ProjectJob resources of Yandex.Cloud Jobs.
 type ProjectJobClient interface {
+	ProjectJobClientIterator
 	Create(context.Context, *jobs.CreateProjectJobRequest, ...grpc.CallOption) (*ProjectJobCreateOperation, error)
 	Clone(context.Context, *jobs.CloneProjectJobRequest, ...grpc.CallOption) (*ProjectJobCloneOperation, error)
 	Execute(context.Context, *jobs.ExecuteProjectJobRequest, ...grpc.CallOption) (*ProjectJobExecuteOperation, error)

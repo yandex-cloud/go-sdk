@@ -12,6 +12,7 @@ import (
 
 // SshCertificateClient provides methods for managing SshCertificate resources of Yandex.Cloud OrganizationManager.
 type SshCertificateClient interface {
+	SshCertificateClientIterator
 	Generate(context.Context, *organizationmanager.GenerateSshCertificateRequest, ...grpc.CallOption) (*organizationmanager.GenerateSshCertificateResponse, error)
 }
 

@@ -16,6 +16,7 @@ import (
 
 // BucketClient provides methods for managing Bucket resources of Yandex.Cloud Storage.
 type BucketClient interface {
+	BucketClientIterator
 	List(context.Context, *storage.ListBucketsRequest, ...grpc.CallOption) (*storage.ListBucketsResponse, error)
 	Get(context.Context, *storage.GetBucketRequest, ...grpc.CallOption) (*storage.Bucket, error)
 	Create(context.Context, *storage.CreateBucketRequest, ...grpc.CallOption) (*BucketCreateOperation, error)

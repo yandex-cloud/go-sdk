@@ -12,6 +12,7 @@ import (
 
 // YandexPassportUserAccountClient provides methods for managing YandexPassportUserAccount resources of Yandex.Cloud IAM.
 type YandexPassportUserAccountClient interface {
+	YandexPassportUserAccountClientIterator
 	GetByLogin(context.Context, *iam.GetUserAccountByLoginRequest, ...grpc.CallOption) (*iam.UserAccount, error)
 }
 

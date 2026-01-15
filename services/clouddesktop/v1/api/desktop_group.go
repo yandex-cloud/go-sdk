@@ -17,6 +17,7 @@ import (
 
 // DesktopGroupClient provides methods for managing DesktopGroup resources of Yandex.Cloud Api.
 type DesktopGroupClient interface {
+	DesktopGroupClientIterator
 	Get(context.Context, *clouddesktop.GetDesktopGroupRequest, ...grpc.CallOption) (*clouddesktop.DesktopGroup, error)
 	List(context.Context, *clouddesktop.ListDesktopGroupsRequest, ...grpc.CallOption) (*clouddesktop.ListDesktopGroupsResponse, error)
 	ListDesktops(context.Context, *clouddesktop.ListDesktopGroupDesktopsRequest, ...grpc.CallOption) (*clouddesktop.ListDesktopGroupDesktopsResponse, error)

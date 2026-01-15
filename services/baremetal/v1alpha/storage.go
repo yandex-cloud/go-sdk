@@ -12,6 +12,7 @@ import (
 
 // StorageClient provides methods for managing Storage resources of Yandex.Cloud Baremetal.
 type StorageClient interface {
+	StorageClientIterator
 	GetDefault(context.Context, *baremetal.GetDefaultStorageRequest, ...grpc.CallOption) (*baremetal.DefaultStorage, error)
 	BatchGetDefault(context.Context, *baremetal.BatchGetDefaultStoragesRequest, ...grpc.CallOption) (*baremetal.BatchGetDefaultStoragesResponse, error)
 }

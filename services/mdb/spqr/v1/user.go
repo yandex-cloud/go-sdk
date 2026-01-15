@@ -15,6 +15,7 @@ import (
 
 // UserClient provides methods for managing User resources of Yandex.Cloud Spqr.
 type UserClient interface {
+	UserClientIterator
 	Get(context.Context, *spqr.GetUserRequest, ...grpc.CallOption) (*spqr.User, error)
 	List(context.Context, *spqr.ListUsersRequest, ...grpc.CallOption) (*spqr.ListUsersResponse, error)
 	Create(context.Context, *spqr.CreateUserRequest, ...grpc.CallOption) (*UserCreateOperation, error)

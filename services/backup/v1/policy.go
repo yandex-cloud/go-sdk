@@ -16,6 +16,7 @@ import (
 
 // PolicyClient provides methods for managing Policy resources of Yandex.Cloud Backup.
 type PolicyClient interface {
+	PolicyClientIterator
 	List(context.Context, *backup.ListPoliciesRequest, ...grpc.CallOption) (*backup.ListPoliciesResponse, error)
 	Create(context.Context, *backup.CreatePolicyRequest, ...grpc.CallOption) (*PolicyCreateOperation, error)
 	Get(context.Context, *backup.GetPolicyRequest, ...grpc.CallOption) (*backup.Policy, error)

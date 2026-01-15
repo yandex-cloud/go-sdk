@@ -12,6 +12,7 @@ import (
 
 // BackupRetentionPolicyClient provides methods for managing BackupRetentionPolicy resources of Yandex.Cloud PostgreSQL.
 type BackupRetentionPolicyClient interface {
+	BackupRetentionPolicyClientIterator
 	List(context.Context, *postgresql.ListBackupRetentionPoliciesRequest, ...grpc.CallOption) (*postgresql.ListBackupRetentionPoliciesResponse, error)
 	Create(context.Context, *postgresql.CreateBackupRetentionPolicyRequest, ...grpc.CallOption) (*postgresql.CreateBackupRetentionPolicyResponse, error)
 	Delete(context.Context, *postgresql.DeleteBackupRetentionPolicyRequest, ...grpc.CallOption) (*postgresql.DeleteBackupRetentionPolicyResponse, error)

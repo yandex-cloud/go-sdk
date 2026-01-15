@@ -12,6 +12,7 @@ import (
 
 // TextClassificationClient provides methods for managing TextClassification resources of Yandex.Cloud TextClassification.
 type TextClassificationClient interface {
+	TextClassificationClientIterator
 	Classify(context.Context, *text_classification.TextClassificationRequest, ...grpc.CallOption) (*text_classification.TextClassificationResponse, error)
 	FewShotClassify(context.Context, *text_classification.FewShotTextClassificationRequest, ...grpc.CallOption) (*text_classification.FewShotTextClassificationResponse, error)
 }

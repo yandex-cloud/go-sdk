@@ -17,6 +17,7 @@ import (
 
 // WorkflowClient provides methods for managing Workflow resources of Yandex.Cloud Workflows.
 type WorkflowClient interface {
+	WorkflowClientIterator
 	Create(context.Context, *workflows.CreateWorkflowRequest, ...grpc.CallOption) (*WorkflowCreateOperation, error)
 	Update(context.Context, *workflows.UpdateWorkflowRequest, ...grpc.CallOption) (*WorkflowUpdateOperation, error)
 	Get(context.Context, *workflows.GetWorkflowRequest, ...grpc.CallOption) (*workflows.GetWorkflowResponse, error)

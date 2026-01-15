@@ -16,6 +16,7 @@ import (
 
 // BrokerClient provides methods for managing Broker resources of Yandex.Cloud Broker.
 type BrokerClient interface {
+	BrokerClientIterator
 	Get(context.Context, *broker.GetBrokerRequest, ...grpc.CallOption) (*broker.Broker, error)
 	List(context.Context, *broker.ListBrokersRequest, ...grpc.CallOption) (*broker.ListBrokersResponse, error)
 	Create(context.Context, *broker.CreateBrokerRequest, ...grpc.CallOption) (*BrokerCreateOperation, error)

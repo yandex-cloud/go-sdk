@@ -17,6 +17,7 @@ import (
 
 // ClusterClient provides methods for managing Cluster resources of Yandex.Cloud Greenplum.
 type ClusterClient interface {
+	ClusterClientIterator
 	Get(context.Context, *greenplum.GetClusterRequest, ...grpc.CallOption) (*greenplum.Cluster, error)
 	List(context.Context, *greenplum.ListClustersRequest, ...grpc.CallOption) (*greenplum.ListClustersResponse, error)
 	Create(context.Context, *greenplum.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)

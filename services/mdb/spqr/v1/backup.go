@@ -16,6 +16,7 @@ import (
 
 // BackupClient provides methods for managing Backup resources of Yandex.Cloud Spqr.
 type BackupClient interface {
+	BackupClientIterator
 	Get(context.Context, *spqr.GetBackupRequest, ...grpc.CallOption) (*spqr.Backup, error)
 	List(context.Context, *spqr.ListBackupsRequest, ...grpc.CallOption) (*spqr.ListBackupsResponse, error)
 	Delete(context.Context, *spqr.DeleteBackupRequest, ...grpc.CallOption) (*BackupDeleteOperation, error)

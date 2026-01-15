@@ -15,6 +15,7 @@ import (
 
 // UserClient provides methods for managing User resources of Yandex.Cloud Elasticsearch.
 type UserClient interface {
+	UserClientIterator
 	Get(context.Context, *elasticsearch.GetUserRequest, ...grpc.CallOption) (*elasticsearch.User, error)
 	List(context.Context, *elasticsearch.ListUsersRequest, ...grpc.CallOption) (*elasticsearch.ListUsersResponse, error)
 	Create(context.Context, *elasticsearch.CreateUserRequest, ...grpc.CallOption) (*UserCreateOperation, error)

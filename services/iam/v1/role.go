@@ -12,6 +12,7 @@ import (
 
 // RoleClient provides methods for managing Role resources of Yandex.Cloud IAM.
 type RoleClient interface {
+	RoleClientIterator
 	Get(context.Context, *iam.GetRoleRequest, ...grpc.CallOption) (*iam.Role, error)
 	List(context.Context, *iam.ListRolesRequest, ...grpc.CallOption) (*iam.ListRolesResponse, error)
 }

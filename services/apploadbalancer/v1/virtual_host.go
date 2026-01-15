@@ -15,6 +15,7 @@ import (
 
 // VirtualHostClient provides methods for managing VirtualHost resources of Yandex.Cloud Apploadbalancer.
 type VirtualHostClient interface {
+	VirtualHostClientIterator
 	Get(context.Context, *apploadbalancer.GetVirtualHostRequest, ...grpc.CallOption) (*apploadbalancer.VirtualHost, error)
 	List(context.Context, *apploadbalancer.ListVirtualHostsRequest, ...grpc.CallOption) (*apploadbalancer.ListVirtualHostsResponse, error)
 	Create(context.Context, *apploadbalancer.CreateVirtualHostRequest, ...grpc.CallOption) (*VirtualHostCreateOperation, error)

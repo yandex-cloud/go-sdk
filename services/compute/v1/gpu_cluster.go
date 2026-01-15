@@ -17,6 +17,7 @@ import (
 
 // GpuClusterClient provides methods for managing GpuCluster resources of Yandex.Cloud Compute.
 type GpuClusterClient interface {
+	GpuClusterClientIterator
 	Get(context.Context, *compute.GetGpuClusterRequest, ...grpc.CallOption) (*compute.GpuCluster, error)
 	List(context.Context, *compute.ListGpuClustersRequest, ...grpc.CallOption) (*compute.ListGpuClustersResponse, error)
 	Create(context.Context, *compute.CreateGpuClusterRequest, ...grpc.CallOption) (*GpuClusterCreateOperation, error)

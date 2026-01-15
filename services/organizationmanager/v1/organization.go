@@ -17,6 +17,7 @@ import (
 
 // OrganizationClient provides methods for managing Organization resources of Yandex.Cloud OrganizationManager.
 type OrganizationClient interface {
+	OrganizationClientIterator
 	Get(context.Context, *organizationmanager.GetOrganizationRequest, ...grpc.CallOption) (*organizationmanager.Organization, error)
 	List(context.Context, *organizationmanager.ListOrganizationsRequest, ...grpc.CallOption) (*organizationmanager.ListOrganizationsResponse, error)
 	Update(context.Context, *organizationmanager.UpdateOrganizationRequest, ...grpc.CallOption) (*OrganizationUpdateOperation, error)

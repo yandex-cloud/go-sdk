@@ -12,6 +12,7 @@ import (
 
 // HostTypeClient provides methods for managing HostType resources of Yandex.Cloud Compute.
 type HostTypeClient interface {
+	HostTypeClientIterator
 	Get(context.Context, *compute.GetHostTypeRequest, ...grpc.CallOption) (*compute.HostType, error)
 	List(context.Context, *compute.ListHostTypesRequest, ...grpc.CallOption) (*compute.ListHostTypesResponse, error)
 }

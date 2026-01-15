@@ -16,6 +16,7 @@ import (
 
 // RoutingInstanceClient provides methods for managing RoutingInstance resources of Yandex.Cloud Cloudrouter.
 type RoutingInstanceClient interface {
+	RoutingInstanceClientIterator
 	Get(context.Context, *cloudrouter.GetRoutingInstanceRequest, ...grpc.CallOption) (*cloudrouter.RoutingInstance, error)
 	GetByVpcNetworkId(context.Context, *cloudrouter.GetRoutingInstanceByVpcNetworkIdRequest, ...grpc.CallOption) (*cloudrouter.RoutingInstance, error)
 	GetByCicPrivateConnectionId(context.Context, *cloudrouter.GetRoutingInstanceByCicPrivateConnectionIdRequest, ...grpc.CallOption) (*cloudrouter.RoutingInstance, error)

@@ -15,6 +15,7 @@ import (
 
 // PublicConnectionClient provides methods for managing PublicConnection resources of Yandex.Cloud Cic.
 type PublicConnectionClient interface {
+	PublicConnectionClientIterator
 	Get(context.Context, *cic.GetPublicConnectionRequest, ...grpc.CallOption) (*cic.PublicConnection, error)
 	List(context.Context, *cic.ListPublicConnectionsRequest, ...grpc.CallOption) (*cic.ListPublicConnectionsResponse, error)
 	Move(context.Context, *cic.MovePublicConnectionRequest, ...grpc.CallOption) (*PublicConnectionMoveOperation, error)

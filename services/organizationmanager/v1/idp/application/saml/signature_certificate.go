@@ -16,6 +16,7 @@ import (
 
 // SignatureCertificateClient provides methods for managing SignatureCertificate resources of Yandex.Cloud Saml.
 type SignatureCertificateClient interface {
+	SignatureCertificateClientIterator
 	Get(context.Context, *saml.GetSignatureCertificateRequest, ...grpc.CallOption) (*saml.SignatureCertificate, error)
 	List(context.Context, *saml.ListSignatureCertificatesRequest, ...grpc.CallOption) (*saml.ListSignatureCertificatesResponse, error)
 	Create(context.Context, *saml.CreateSignatureCertificateRequest, ...grpc.CallOption) (*SignatureCertificateCreateOperation, error)

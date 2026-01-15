@@ -15,6 +15,7 @@ import (
 
 // OriginGroupClient provides methods for managing OriginGroup resources of Yandex.Cloud Cdn.
 type OriginGroupClient interface {
+	OriginGroupClientIterator
 	Get(context.Context, *cdn.GetOriginGroupRequest, ...grpc.CallOption) (*cdn.OriginGroup, error)
 	List(context.Context, *cdn.ListOriginGroupsRequest, ...grpc.CallOption) (*cdn.ListOriginGroupsResponse, error)
 	Create(context.Context, *cdn.CreateOriginGroupRequest, ...grpc.CallOption) (*OriginGroupCreateOperation, error)

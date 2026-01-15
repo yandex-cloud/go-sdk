@@ -15,6 +15,7 @@ import (
 
 // UserClient provides methods for managing User resources of Yandex.Cloud Kafka.
 type UserClient interface {
+	UserClientIterator
 	Get(context.Context, *kafka.GetUserRequest, ...grpc.CallOption) (*kafka.User, error)
 	List(context.Context, *kafka.ListUsersRequest, ...grpc.CallOption) (*kafka.ListUsersResponse, error)
 	Create(context.Context, *kafka.CreateUserRequest, ...grpc.CallOption) (*UserCreateOperation, error)

@@ -12,6 +12,7 @@ import (
 
 // ResourcePresetClient provides methods for managing ResourcePreset resources of Yandex.Cloud YDB.
 type ResourcePresetClient interface {
+	ResourcePresetClientIterator
 	Get(context.Context, *ydb.GetResourcePresetRequest, ...grpc.CallOption) (*ydb.ResourcePreset, error)
 	List(context.Context, *ydb.ListResourcePresetsRequest, ...grpc.CallOption) (*ydb.ListResourcePresetsResponse, error)
 }

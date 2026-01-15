@@ -12,6 +12,7 @@ import (
 
 // ImageClassifierClient provides methods for managing ImageClassifier resources of Yandex.Cloud Vision.
 type ImageClassifierClient interface {
+	ImageClassifierClientIterator
 	Annotate(context.Context, *vision.AnnotationRequest, ...grpc.CallOption) (*vision.AnnotationResponse, error)
 }
 

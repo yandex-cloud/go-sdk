@@ -12,6 +12,7 @@ import (
 
 // AsymmetricEncryptionCryptoClient provides methods for managing AsymmetricEncryptionCrypto resources of Yandex.Cloud Asymmetricencryption.
 type AsymmetricEncryptionCryptoClient interface {
+	AsymmetricEncryptionCryptoClientIterator
 	Decrypt(context.Context, *asymmetricencryption.AsymmetricDecryptRequest, ...grpc.CallOption) (*asymmetricencryption.AsymmetricDecryptResponse, error)
 	GetPublicKey(context.Context, *asymmetricencryption.AsymmetricGetPublicKeyRequest, ...grpc.CallOption) (*asymmetricencryption.AsymmetricGetPublicKeyResponse, error)
 }

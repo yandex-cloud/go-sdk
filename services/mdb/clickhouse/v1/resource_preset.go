@@ -12,6 +12,7 @@ import (
 
 // ResourcePresetClient provides methods for managing ResourcePreset resources of Yandex.Cloud Clickhouse.
 type ResourcePresetClient interface {
+	ResourcePresetClientIterator
 	Get(context.Context, *clickhouse.GetResourcePresetRequest, ...grpc.CallOption) (*clickhouse.ResourcePreset, error)
 	List(context.Context, *clickhouse.ListResourcePresetsRequest, ...grpc.CallOption) (*clickhouse.ListResourcePresetsResponse, error)
 }

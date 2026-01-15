@@ -17,6 +17,7 @@ import (
 
 // ClusterClient provides methods for managing Cluster resources of Yandex.Cloud Metastore.
 type ClusterClient interface {
+	ClusterClientIterator
 	Get(context.Context, *metastore.GetClusterRequest, ...grpc.CallOption) (*metastore.Cluster, error)
 	List(context.Context, *metastore.ListClustersRequest, ...grpc.CallOption) (*metastore.ListClustersResponse, error)
 	Create(context.Context, *metastore.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)

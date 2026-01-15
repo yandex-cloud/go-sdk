@@ -12,6 +12,7 @@ import (
 
 // TranslationClient provides methods for managing Translation resources of Yandex.Cloud Translate.
 type TranslationClient interface {
+	TranslationClientIterator
 	Translate(context.Context, *translate.TranslateRequest, ...grpc.CallOption) (*translate.TranslateResponse, error)
 	DetectLanguage(context.Context, *translate.DetectLanguageRequest, ...grpc.CallOption) (*translate.DetectLanguageResponse, error)
 	ListLanguages(context.Context, *translate.ListLanguagesRequest, ...grpc.CallOption) (*translate.ListLanguagesResponse, error)

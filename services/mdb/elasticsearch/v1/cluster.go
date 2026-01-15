@@ -16,6 +16,7 @@ import (
 
 // ClusterClient provides methods for managing Cluster resources of Yandex.Cloud Elasticsearch.
 type ClusterClient interface {
+	ClusterClientIterator
 	Get(context.Context, *elasticsearch.GetClusterRequest, ...grpc.CallOption) (*elasticsearch.Cluster, error)
 	List(context.Context, *elasticsearch.ListClustersRequest, ...grpc.CallOption) (*elasticsearch.ListClustersResponse, error)
 	Create(context.Context, *elasticsearch.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)

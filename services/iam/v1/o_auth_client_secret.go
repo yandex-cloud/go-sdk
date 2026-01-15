@@ -15,6 +15,7 @@ import (
 
 // OAuthClientSecretClient provides methods for managing OAuthClientSecret resources of Yandex.Cloud IAM.
 type OAuthClientSecretClient interface {
+	OAuthClientSecretClientIterator
 	Get(context.Context, *iam.GetOAuthClientSecretRequest, ...grpc.CallOption) (*iam.OAuthClientSecret, error)
 	List(context.Context, *iam.ListOAuthClientSecretsRequest, ...grpc.CallOption) (*iam.ListOAuthClientSecretsResponse, error)
 	Create(context.Context, *iam.CreateOAuthClientSecretRequest, ...grpc.CallOption) (*OAuthClientSecretCreateOperation, error)

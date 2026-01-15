@@ -16,6 +16,7 @@ import (
 
 // ArtifactClient provides methods for managing Artifact resources of Yandex.Cloud Cloudregistry.
 type ArtifactClient interface {
+	ArtifactClientIterator
 	Get(context.Context, *cloudregistry.GetArtifactRequest, ...grpc.CallOption) (*cloudregistry.Artifact, error)
 	Delete(context.Context, *cloudregistry.DeleteArtifactRequest, ...grpc.CallOption) (*ArtifactDeleteOperation, error)
 }

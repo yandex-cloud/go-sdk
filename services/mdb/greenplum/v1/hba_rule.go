@@ -15,6 +15,7 @@ import (
 
 // HBARuleClient provides methods for managing HBARule resources of Yandex.Cloud Greenplum.
 type HBARuleClient interface {
+	HBARuleClientIterator
 	List(context.Context, *greenplum.ListHBARulesRequest, ...grpc.CallOption) (*greenplum.ListHBARulesResponse, error)
 	ListAtRevision(context.Context, *greenplum.ListHBARulesAtRevisionRequest, ...grpc.CallOption) (*greenplum.ListHBARulesResponse, error)
 	Create(context.Context, *greenplum.CreateHBARuleRequest, ...grpc.CallOption) (*HBARuleCreateOperation, error)

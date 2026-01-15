@@ -17,6 +17,7 @@ import (
 
 // SnapshotScheduleClient provides methods for managing SnapshotSchedule resources of Yandex.Cloud Compute.
 type SnapshotScheduleClient interface {
+	SnapshotScheduleClientIterator
 	Get(context.Context, *compute.GetSnapshotScheduleRequest, ...grpc.CallOption) (*compute.SnapshotSchedule, error)
 	List(context.Context, *compute.ListSnapshotSchedulesRequest, ...grpc.CallOption) (*compute.ListSnapshotSchedulesResponse, error)
 	Create(context.Context, *compute.CreateSnapshotScheduleRequest, ...grpc.CallOption) (*SnapshotScheduleCreateOperation, error)

@@ -16,6 +16,7 @@ import (
 
 // TransferClient provides methods for managing Transfer resources of Yandex.Cloud Datatransfer.
 type TransferClient interface {
+	TransferClientIterator
 	Create(context.Context, *datatransfer.CreateTransferRequest, ...grpc.CallOption) (*TransferCreateOperation, error)
 	Update(context.Context, *datatransfer.UpdateTransferRequest, ...grpc.CallOption) (*TransferUpdateOperation, error)
 	Delete(context.Context, *datatransfer.DeleteTransferRequest, ...grpc.CallOption) (*TransferDeleteOperation, error)

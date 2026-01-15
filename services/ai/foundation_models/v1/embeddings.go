@@ -12,6 +12,7 @@ import (
 
 // EmbeddingsClient provides methods for managing Embeddings resources of Yandex.Cloud FoundationModels.
 type EmbeddingsClient interface {
+	EmbeddingsClientIterator
 	TextEmbedding(context.Context, *embedding.TextEmbeddingRequest, ...grpc.CallOption) (*embedding.TextEmbeddingResponse, error)
 }
 

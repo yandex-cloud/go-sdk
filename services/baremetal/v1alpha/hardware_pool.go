@@ -12,6 +12,7 @@ import (
 
 // HardwarePoolClient provides methods for managing HardwarePool resources of Yandex.Cloud Baremetal.
 type HardwarePoolClient interface {
+	HardwarePoolClientIterator
 	Get(context.Context, *baremetal.GetHardwarePoolRequest, ...grpc.CallOption) (*baremetal.HardwarePool, error)
 	List(context.Context, *baremetal.ListHardwarePoolsRequest, ...grpc.CallOption) (*baremetal.ListHardwarePoolsResponse, error)
 }

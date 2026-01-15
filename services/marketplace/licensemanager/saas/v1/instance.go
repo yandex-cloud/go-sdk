@@ -13,6 +13,7 @@ import (
 
 // InstanceClient provides methods for managing Instance resources of Yandex.Cloud Saas.
 type InstanceClient interface {
+	InstanceClientIterator
 	Get(context.Context, *saas.GetInstanceRequest, ...grpc.CallOption) (*licensemanager.Instance, error)
 	GetUserInfo(context.Context, *saas.GetUserInfoRequest, ...grpc.CallOption) (*licensemanager.UserInfo, error)
 }

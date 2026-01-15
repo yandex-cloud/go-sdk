@@ -12,6 +12,7 @@ import (
 
 // UserAccountClient provides methods for managing UserAccount resources of Yandex.Cloud IAM.
 type UserAccountClient interface {
+	UserAccountClientIterator
 	Get(context.Context, *iam.GetUserAccountRequest, ...grpc.CallOption) (*iam.UserAccount, error)
 }
 

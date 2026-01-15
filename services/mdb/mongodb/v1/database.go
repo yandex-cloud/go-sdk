@@ -15,6 +15,7 @@ import (
 
 // DatabaseClient provides methods for managing Database resources of Yandex.Cloud MongoDB.
 type DatabaseClient interface {
+	DatabaseClientIterator
 	Get(context.Context, *mongodb.GetDatabaseRequest, ...grpc.CallOption) (*mongodb.Database, error)
 	List(context.Context, *mongodb.ListDatabasesRequest, ...grpc.CallOption) (*mongodb.ListDatabasesResponse, error)
 	Create(context.Context, *mongodb.CreateDatabaseRequest, ...grpc.CallOption) (*DatabaseCreateOperation, error)

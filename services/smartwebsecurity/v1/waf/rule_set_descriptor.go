@@ -12,6 +12,7 @@ import (
 
 // RuleSetDescriptorClient provides methods for managing RuleSetDescriptor resources of Yandex.Cloud Waf.
 type RuleSetDescriptorClient interface {
+	RuleSetDescriptorClientIterator
 	Get(context.Context, *waf.GetRuleSetDescriptorRequest, ...grpc.CallOption) (*waf.RuleSetDescriptor, error)
 }
 

@@ -17,6 +17,7 @@ import (
 
 // SnapshotClient provides methods for managing Snapshot resources of Yandex.Cloud Compute.
 type SnapshotClient interface {
+	SnapshotClientIterator
 	Get(context.Context, *compute.GetSnapshotRequest, ...grpc.CallOption) (*compute.Snapshot, error)
 	List(context.Context, *compute.ListSnapshotsRequest, ...grpc.CallOption) (*compute.ListSnapshotsResponse, error)
 	Create(context.Context, *compute.CreateSnapshotRequest, ...grpc.CallOption) (*SnapshotCreateOperation, error)

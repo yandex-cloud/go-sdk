@@ -12,6 +12,7 @@ import (
 
 // BrokerDataClient provides methods for managing BrokerData resources of Yandex.Cloud Broker.
 type BrokerDataClient interface {
+	BrokerDataClientIterator
 	Publish(context.Context, *broker.PublishBrokerDataRequest, ...grpc.CallOption) (*broker.PublishBrokerDataResponse, error)
 }
 

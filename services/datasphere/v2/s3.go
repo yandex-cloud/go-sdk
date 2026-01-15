@@ -15,6 +15,7 @@ import (
 
 // S3Client provides methods for managing S3 resources of Yandex.Cloud Datasphere.
 type S3Client interface {
+	S3ClientIterator
 	Activate(context.Context, *datasphere.ActivateS3Request, ...grpc.CallOption) (*S3ActivateOperation, error)
 	Deactivate(context.Context, *datasphere.DeactivateS3Request, ...grpc.CallOption) (*S3DeactivateOperation, error)
 }
