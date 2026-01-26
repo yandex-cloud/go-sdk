@@ -47,6 +47,15 @@ func (c *ResourceServiceClient) Get(ctx context.Context, in *cdn.GetResourceRequ
 	return cdn.NewResourceServiceClient(conn).Get(ctx, in, opts...)
 }
 
+// GetAttributes implements cdn.ResourceServiceClient
+func (c *ResourceServiceClient) GetAttributes(ctx context.Context, in *cdn.GetResourceAttributesRequest, opts ...grpc.CallOption) (*cdn.GetResourceAttributesResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cdn.NewResourceServiceClient(conn).GetAttributes(ctx, in, opts...)
+}
+
 // GetProviderCName implements cdn.ResourceServiceClient
 func (c *ResourceServiceClient) GetProviderCName(ctx context.Context, in *cdn.GetProviderCNameRequest, opts ...grpc.CallOption) (*cdn.GetProviderCNameResponse, error) {
 	conn, err := c.getConn(ctx)
