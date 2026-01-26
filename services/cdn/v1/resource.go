@@ -23,6 +23,7 @@ type ResourceClient interface {
 	Update(context.Context, *cdn.UpdateResourceRequest, ...grpc.CallOption) (*ResourceUpdateOperation, error)
 	Delete(context.Context, *cdn.DeleteResourceRequest, ...grpc.CallOption) (*ResourceDeleteOperation, error)
 	GetProviderCName(context.Context, *cdn.GetProviderCNameRequest, ...grpc.CallOption) (*cdn.GetProviderCNameResponse, error)
+	GetAttributes(context.Context, *cdn.GetResourceAttributesRequest, ...grpc.CallOption) (*cdn.GetResourceAttributesResponse, error)
 }
 
 var _ ResourceClient = resourceClient{}
@@ -225,6 +226,15 @@ func (c resourceClient) GetProviderCName(ctx context.Context, in *cdn.GetProvide
 	return cdn.NewResourceServiceClient(connection).GetProviderCName(ctx, in, opts...)
 }
 
+// GetAttributes is an operation of Yandex.Cloud Cdn Resource service.
+func (c resourceClient) GetAttributes(ctx context.Context, in *cdn.GetResourceAttributesRequest, opts ...grpc.CallOption) (*cdn.GetResourceAttributesResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, ResourceGetAttributes, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return cdn.NewResourceServiceClient(connection).GetAttributes(ctx, in, opts...)
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c resourceClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, ResourceOperationPoller, opts...)
@@ -241,5 +251,6 @@ var (
 	ResourceUpdate           = protoreflect.FullName("yandex.cloud.cdn.v1.ResourceService.Update")
 	ResourceDelete           = protoreflect.FullName("yandex.cloud.cdn.v1.ResourceService.Delete")
 	ResourceGetProviderCName = protoreflect.FullName("yandex.cloud.cdn.v1.ResourceService.GetProviderCName")
+	ResourceGetAttributes    = protoreflect.FullName("yandex.cloud.cdn.v1.ResourceService.GetAttributes")
 	ResourceOperationPoller  = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
