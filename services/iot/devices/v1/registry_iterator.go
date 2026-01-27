@@ -12,7 +12,10 @@ import (
 
 type RegistryClientIterator interface {
 	Iterator(context.Context, *devices.ListRegistriesRequest, ...grpc.CallOption) *iterator.Iterator[*devices.ListRegistriesRequest, *devices.Registry]
+	CertificatesIterator(context.Context, *devices.ListRegistryCertificatesRequest, ...grpc.CallOption) *iterator.SimpleIterator[*devices.ListRegistryCertificatesRequest, *devices.RegistryCertificate]
+	PasswordsIterator(context.Context, *devices.ListRegistryPasswordsRequest, ...grpc.CallOption) *iterator.SimpleIterator[*devices.ListRegistryPasswordsRequest, *devices.RegistryPassword]
 	DeviceTopicAliasesIterator(context.Context, *devices.ListDeviceTopicAliasesRequest, ...grpc.CallOption) *iterator.Iterator[*devices.ListDeviceTopicAliasesRequest, *devices.DeviceAlias]
+	DataStreamExportsIterator(context.Context, *devices.ListDataStreamExportsRequest, ...grpc.CallOption) *iterator.SimpleIterator[*devices.ListDataStreamExportsRequest, *devices.DataStreamExport]
 	OperationsIterator(context.Context, *devices.ListRegistryOperationsRequest, ...grpc.CallOption) *iterator.Iterator[*devices.ListRegistryOperationsRequest, *operation.Operation]
 }
 
@@ -35,6 +38,44 @@ func (c registryClient) Iterator(ctx context.Context, req *devices.ListRegistrie
 		})
 }
 
+type registryServiceListCertificatesInternal struct {
+	*devices.ListRegistryCertificatesResponse
+}
+
+func (r registryServiceListCertificatesInternal) Items() []*devices.RegistryCertificate {
+	return r.ListRegistryCertificatesResponse.Certificates
+}
+
+func (c registryClient) CertificatesIterator(ctx context.Context, req *devices.ListRegistryCertificatesRequest, opts ...grpc.CallOption) *iterator.SimpleIterator[*devices.ListRegistryCertificatesRequest, *devices.RegistryCertificate] {
+	return iterator.NewSimpleIterator[*devices.ListRegistryCertificatesRequest, *devices.RegistryCertificate](ctx, req,
+		func(ctx context.Context, req *devices.ListRegistryCertificatesRequest, opts ...grpc.CallOption) (iterator.SimpleResponse[*devices.RegistryCertificate], error) {
+			resp, err := c.ListCertificates(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return registryServiceListCertificatesInternal{resp}, nil
+		})
+}
+
+type registryServiceListPasswordsInternal struct {
+	*devices.ListRegistryPasswordsResponse
+}
+
+func (r registryServiceListPasswordsInternal) Items() []*devices.RegistryPassword {
+	return r.ListRegistryPasswordsResponse.Passwords
+}
+
+func (c registryClient) PasswordsIterator(ctx context.Context, req *devices.ListRegistryPasswordsRequest, opts ...grpc.CallOption) *iterator.SimpleIterator[*devices.ListRegistryPasswordsRequest, *devices.RegistryPassword] {
+	return iterator.NewSimpleIterator[*devices.ListRegistryPasswordsRequest, *devices.RegistryPassword](ctx, req,
+		func(ctx context.Context, req *devices.ListRegistryPasswordsRequest, opts ...grpc.CallOption) (iterator.SimpleResponse[*devices.RegistryPassword], error) {
+			resp, err := c.ListPasswords(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return registryServiceListPasswordsInternal{resp}, nil
+		})
+}
+
 type registryServiceListDeviceTopicAliasesInternal struct {
 	*devices.ListDeviceTopicAliasesResponse
 }
@@ -51,6 +92,25 @@ func (c registryClient) DeviceTopicAliasesIterator(ctx context.Context, req *dev
 				return nil, err
 			}
 			return registryServiceListDeviceTopicAliasesInternal{resp}, nil
+		})
+}
+
+type registryServiceListDataStreamExportsInternal struct {
+	*devices.ListDataStreamExportsResponse
+}
+
+func (r registryServiceListDataStreamExportsInternal) Items() []*devices.DataStreamExport {
+	return r.ListDataStreamExportsResponse.DataStreamExports
+}
+
+func (c registryClient) DataStreamExportsIterator(ctx context.Context, req *devices.ListDataStreamExportsRequest, opts ...grpc.CallOption) *iterator.SimpleIterator[*devices.ListDataStreamExportsRequest, *devices.DataStreamExport] {
+	return iterator.NewSimpleIterator[*devices.ListDataStreamExportsRequest, *devices.DataStreamExport](ctx, req,
+		func(ctx context.Context, req *devices.ListDataStreamExportsRequest, opts ...grpc.CallOption) (iterator.SimpleResponse[*devices.DataStreamExport], error) {
+			resp, err := c.ListDataStreamExports(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return registryServiceListDataStreamExportsInternal{resp}, nil
 		})
 }
 

@@ -15,6 +15,7 @@ type ClusterClientIterator interface {
 	Iterator(context.Context, *dataproc.ListClustersRequest, ...grpc.CallOption) *iterator.Iterator[*dataproc.ListClustersRequest, *dataproc.Cluster]
 	OperationsIterator(context.Context, *dataproc.ListClusterOperationsRequest, ...grpc.CallOption) *iterator.Iterator[*dataproc.ListClusterOperationsRequest, *operation.Operation]
 	HostsIterator(context.Context, *dataproc.ListClusterHostsRequest, ...grpc.CallOption) *iterator.Iterator[*dataproc.ListClusterHostsRequest, *dataproc.Host]
+	UILinksIterator(context.Context, *dataproc.ListUILinksRequest, ...grpc.CallOption) *iterator.SimpleIterator[*dataproc.ListUILinksRequest, *dataproc.UILink]
 	AccessBindingsIterator(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) *iterator.Iterator[*access.ListAccessBindingsRequest, *access.AccessBinding]
 }
 
@@ -72,6 +73,25 @@ func (c clusterClient) HostsIterator(ctx context.Context, req *dataproc.ListClus
 				return nil, err
 			}
 			return clusterServiceListHostsInternal{resp}, nil
+		})
+}
+
+type clusterServiceListUILinksInternal struct {
+	*dataproc.ListUILinksResponse
+}
+
+func (r clusterServiceListUILinksInternal) Items() []*dataproc.UILink {
+	return r.ListUILinksResponse.Links
+}
+
+func (c clusterClient) UILinksIterator(ctx context.Context, req *dataproc.ListUILinksRequest, opts ...grpc.CallOption) *iterator.SimpleIterator[*dataproc.ListUILinksRequest, *dataproc.UILink] {
+	return iterator.NewSimpleIterator[*dataproc.ListUILinksRequest, *dataproc.UILink](ctx, req,
+		func(ctx context.Context, req *dataproc.ListUILinksRequest, opts ...grpc.CallOption) (iterator.SimpleResponse[*dataproc.UILink], error) {
+			resp, err := c.ListUILinks(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return clusterServiceListUILinksInternal{resp}, nil
 		})
 }
 

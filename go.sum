@@ -88,6 +88,8 @@ github.com/yandex-cloud/go-genproto v0.46.0 h1:xD1HeyaBgFGQXys91atNSmBO700zvv1zO
 github.com/yandex-cloud/go-genproto v0.46.0/go.mod h1:0LDD/IZLIUIV4iPH+YcF+jysO3jkSvADFGm4dCAuwQo=
 github.com/yandex-cloud/go-genproto v0.47.0 h1:c2bu/EuCkFiolN6WE17f1Gq0U6A0ZdcUrnux1u2hrbk=
 github.com/yandex-cloud/go-genproto v0.47.0/go.mod h1:0LDD/IZLIUIV4iPH+YcF+jysO3jkSvADFGm4dCAuwQo=
+github.com/yandex-cloud/go-genproto v0.48.0 h1:wp7D7WURii5+lGifAOB65vk3BXpiVcBx+v/koVop07k=
+github.com/yandex-cloud/go-genproto v0.48.0/go.mod h1:0LDD/IZLIUIV4iPH+YcF+jysO3jkSvADFGm4dCAuwQo=
 go.uber.org/goleak v1.3.0 h1:2K3zAYmnTNqV73imy9J1T3WC+gmCePx2hEGkimedGto=
 go.uber.org/goleak v1.3.0/go.mod h1:CoHD4mav9JJNrW/WLlf7HGZPjdw8EucARQHekz1X6bE=
 go.uber.org/multierr v1.10.0 h1:S0h4aNzvfcFsC3dRF1jLoaov7oRaKqRGC/pUEJ2yvPQ=

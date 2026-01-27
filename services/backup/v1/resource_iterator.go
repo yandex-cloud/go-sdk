@@ -13,6 +13,7 @@ import (
 type ResourceClientIterator interface {
 	Iterator(context.Context, *backup.ListResourcesRequest, ...grpc.CallOption) *iterator.Iterator[*backup.ListResourcesRequest, *backup.Resource]
 	TasksIterator(context.Context, *backup.ListTasksRequest, ...grpc.CallOption) *iterator.Iterator[*backup.ListTasksRequest, *backup.Task]
+	DirectoryIterator(context.Context, *backup.ListDirectoryRequest, ...grpc.CallOption) *iterator.SimpleIterator[*backup.ListDirectoryRequest, *backup.ListDirectoryResponse_FilesystemItem]
 	OperationsIterator(context.Context, *backup.ListResourceOperationsRequest, ...grpc.CallOption) *iterator.Iterator[*backup.ListResourceOperationsRequest, *operation.Operation]
 }
 
@@ -49,6 +50,25 @@ func (c resourceClient) TasksIterator(ctx context.Context, req *backup.ListTasks
 				return nil, err
 			}
 			return resourceServiceListTasksInternal{resp}, nil
+		})
+}
+
+type resourceServiceListDirectoryInternal struct {
+	*backup.ListDirectoryResponse
+}
+
+func (r resourceServiceListDirectoryInternal) Items() []*backup.ListDirectoryResponse_FilesystemItem {
+	return r.ListDirectoryResponse.Items
+}
+
+func (c resourceClient) DirectoryIterator(ctx context.Context, req *backup.ListDirectoryRequest, opts ...grpc.CallOption) *iterator.SimpleIterator[*backup.ListDirectoryRequest, *backup.ListDirectoryResponse_FilesystemItem] {
+	return iterator.NewSimpleIterator[*backup.ListDirectoryRequest, *backup.ListDirectoryResponse_FilesystemItem](ctx, req,
+		func(ctx context.Context, req *backup.ListDirectoryRequest, opts ...grpc.CallOption) (iterator.SimpleResponse[*backup.ListDirectoryResponse_FilesystemItem], error) {
+			resp, err := c.ListDirectory(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return resourceServiceListDirectoryInternal{resp}, nil
 		})
 }
 

@@ -12,6 +12,8 @@ import (
 
 type DeviceClientIterator interface {
 	Iterator(context.Context, *devices.ListDevicesRequest, ...grpc.CallOption) *iterator.Iterator[*devices.ListDevicesRequest, *devices.Device]
+	CertificatesIterator(context.Context, *devices.ListDeviceCertificatesRequest, ...grpc.CallOption) *iterator.SimpleIterator[*devices.ListDeviceCertificatesRequest, *devices.DeviceCertificate]
+	PasswordsIterator(context.Context, *devices.ListDevicePasswordsRequest, ...grpc.CallOption) *iterator.SimpleIterator[*devices.ListDevicePasswordsRequest, *devices.DevicePassword]
 	OperationsIterator(context.Context, *devices.ListDeviceOperationsRequest, ...grpc.CallOption) *iterator.Iterator[*devices.ListDeviceOperationsRequest, *operation.Operation]
 }
 
@@ -29,6 +31,44 @@ func (c deviceClient) Iterator(ctx context.Context, req *devices.ListDevicesRequ
 				return nil, err
 			}
 			return deviceServiceListInternal{resp}, nil
+		})
+}
+
+type deviceServiceListCertificatesInternal struct {
+	*devices.ListDeviceCertificatesResponse
+}
+
+func (r deviceServiceListCertificatesInternal) Items() []*devices.DeviceCertificate {
+	return r.ListDeviceCertificatesResponse.Certificates
+}
+
+func (c deviceClient) CertificatesIterator(ctx context.Context, req *devices.ListDeviceCertificatesRequest, opts ...grpc.CallOption) *iterator.SimpleIterator[*devices.ListDeviceCertificatesRequest, *devices.DeviceCertificate] {
+	return iterator.NewSimpleIterator[*devices.ListDeviceCertificatesRequest, *devices.DeviceCertificate](ctx, req,
+		func(ctx context.Context, req *devices.ListDeviceCertificatesRequest, opts ...grpc.CallOption) (iterator.SimpleResponse[*devices.DeviceCertificate], error) {
+			resp, err := c.ListCertificates(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return deviceServiceListCertificatesInternal{resp}, nil
+		})
+}
+
+type deviceServiceListPasswordsInternal struct {
+	*devices.ListDevicePasswordsResponse
+}
+
+func (r deviceServiceListPasswordsInternal) Items() []*devices.DevicePassword {
+	return r.ListDevicePasswordsResponse.Passwords
+}
+
+func (c deviceClient) PasswordsIterator(ctx context.Context, req *devices.ListDevicePasswordsRequest, opts ...grpc.CallOption) *iterator.SimpleIterator[*devices.ListDevicePasswordsRequest, *devices.DevicePassword] {
+	return iterator.NewSimpleIterator[*devices.ListDevicePasswordsRequest, *devices.DevicePassword](ctx, req,
+		func(ctx context.Context, req *devices.ListDevicePasswordsRequest, opts ...grpc.CallOption) (iterator.SimpleResponse[*devices.DevicePassword], error) {
+			resp, err := c.ListPasswords(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return deviceServiceListPasswordsInternal{resp}, nil
 		})
 }
 

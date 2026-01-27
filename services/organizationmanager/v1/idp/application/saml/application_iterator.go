@@ -13,6 +13,7 @@ import (
 
 type ApplicationClientIterator interface {
 	Iterator(context.Context, *saml.ListApplicationsRequest, ...grpc.CallOption) *iterator.Iterator[*saml.ListApplicationsRequest, *saml.Application]
+	SupportedAttributeValuesIterator(context.Context, *saml.ListSupportedAttributeValuesRequest, ...grpc.CallOption) *iterator.SimpleIterator[*saml.ListSupportedAttributeValuesRequest, *saml.SupportedAttributeValue]
 	OperationsIterator(context.Context, *saml.ListApplicationOperationsRequest, ...grpc.CallOption) *iterator.Iterator[*saml.ListApplicationOperationsRequest, *operation.Operation]
 	AccessBindingsIterator(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) *iterator.Iterator[*access.ListAccessBindingsRequest, *access.AccessBinding]
 	AssignmentsIterator(context.Context, *saml.ListAssignmentsRequest, ...grpc.CallOption) *iterator.Iterator[*saml.ListAssignmentsRequest, *saml.Assignment]
@@ -34,6 +35,25 @@ func (c applicationClient) Iterator(ctx context.Context, req *saml.ListApplicati
 				return nil, err
 			}
 			return applicationServiceListInternal{resp}, nil
+		})
+}
+
+type applicationServiceListSupportedAttributeValuesInternal struct {
+	*saml.ListSupportedAttributeValuesResponse
+}
+
+func (r applicationServiceListSupportedAttributeValuesInternal) Items() []*saml.SupportedAttributeValue {
+	return r.ListSupportedAttributeValuesResponse.SupportedAttributeValues
+}
+
+func (c applicationClient) SupportedAttributeValuesIterator(ctx context.Context, req *saml.ListSupportedAttributeValuesRequest, opts ...grpc.CallOption) *iterator.SimpleIterator[*saml.ListSupportedAttributeValuesRequest, *saml.SupportedAttributeValue] {
+	return iterator.NewSimpleIterator[*saml.ListSupportedAttributeValuesRequest, *saml.SupportedAttributeValue](ctx, req,
+		func(ctx context.Context, req *saml.ListSupportedAttributeValuesRequest, opts ...grpc.CallOption) (iterator.SimpleResponse[*saml.SupportedAttributeValue], error) {
+			resp, err := c.ListSupportedAttributeValues(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return applicationServiceListSupportedAttributeValuesInternal{resp}, nil
 		})
 }
 

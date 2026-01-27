@@ -13,6 +13,7 @@ import (
 type RegistryClientIterator interface {
 	Iterator(context.Context, *cloudregistry.ListRegistriesRequest, ...grpc.CallOption) *iterator.Iterator[*cloudregistry.ListRegistriesRequest, *cloudregistry.Registry]
 	AccessBindingsIterator(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) *iterator.Iterator[*access.ListAccessBindingsRequest, *access.AccessBinding]
+	IpPermissionsIterator(context.Context, *cloudregistry.ListIpPermissionsRequest, ...grpc.CallOption) *iterator.SimpleIterator[*cloudregistry.ListIpPermissionsRequest, *cloudregistry.IpPermission]
 	ArtifactsIterator(context.Context, *cloudregistry.ListArtifactsRequest, ...grpc.CallOption) *iterator.Iterator[*cloudregistry.ListArtifactsRequest, *cloudregistry.Artifact]
 }
 
@@ -51,6 +52,25 @@ func (c registryClient) AccessBindingsIterator(ctx context.Context, req *access.
 				return nil, err
 			}
 			return registryServiceListAccessBindingsInternal{resp}, nil
+		})
+}
+
+type registryServiceListIpPermissionsInternal struct {
+	*cloudregistry.ListIpPermissionsResponse
+}
+
+func (r registryServiceListIpPermissionsInternal) Items() []*cloudregistry.IpPermission {
+	return r.ListIpPermissionsResponse.Permissions
+}
+
+func (c registryClient) IpPermissionsIterator(ctx context.Context, req *cloudregistry.ListIpPermissionsRequest, opts ...grpc.CallOption) *iterator.SimpleIterator[*cloudregistry.ListIpPermissionsRequest, *cloudregistry.IpPermission] {
+	return iterator.NewSimpleIterator[*cloudregistry.ListIpPermissionsRequest, *cloudregistry.IpPermission](ctx, req,
+		func(ctx context.Context, req *cloudregistry.ListIpPermissionsRequest, opts ...grpc.CallOption) (iterator.SimpleResponse[*cloudregistry.IpPermission], error) {
+			resp, err := c.ListIpPermissions(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return registryServiceListIpPermissionsInternal{resp}, nil
 		})
 }
 

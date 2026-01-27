@@ -13,6 +13,7 @@ import (
 
 type LogGroupClientIterator interface {
 	Iterator(context.Context, *logging.ListLogGroupsRequest, ...grpc.CallOption) *iterator.Iterator[*logging.ListLogGroupsRequest, *logging.LogGroup]
+	ResourcesIterator(context.Context, *logging.ListResourcesRequest, ...grpc.CallOption) *iterator.SimpleIterator[*logging.ListResourcesRequest, *logging.LogGroupResource]
 	OperationsIterator(context.Context, *logging.ListOperationsRequest, ...grpc.CallOption) *iterator.Iterator[*logging.ListOperationsRequest, *operation.Operation]
 	AccessBindingsIterator(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) *iterator.Iterator[*access.ListAccessBindingsRequest, *access.AccessBinding]
 }
@@ -33,6 +34,25 @@ func (c logGroupClient) Iterator(ctx context.Context, req *logging.ListLogGroups
 				return nil, err
 			}
 			return logGroupServiceListInternal{resp}, nil
+		})
+}
+
+type logGroupServiceListResourcesInternal struct {
+	*logging.ListResourcesResponse
+}
+
+func (r logGroupServiceListResourcesInternal) Items() []*logging.LogGroupResource {
+	return r.ListResourcesResponse.Resources
+}
+
+func (c logGroupClient) ResourcesIterator(ctx context.Context, req *logging.ListResourcesRequest, opts ...grpc.CallOption) *iterator.SimpleIterator[*logging.ListResourcesRequest, *logging.LogGroupResource] {
+	return iterator.NewSimpleIterator[*logging.ListResourcesRequest, *logging.LogGroupResource](ctx, req,
+		func(ctx context.Context, req *logging.ListResourcesRequest, opts ...grpc.CallOption) (iterator.SimpleResponse[*logging.LogGroupResource], error) {
+			resp, err := c.ListResources(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return logGroupServiceListResourcesInternal{resp}, nil
 		})
 }
 

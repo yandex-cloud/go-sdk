@@ -12,6 +12,8 @@ import (
 
 type BrokerClientIterator interface {
 	Iterator(context.Context, *broker.ListBrokersRequest, ...grpc.CallOption) *iterator.Iterator[*broker.ListBrokersRequest, *broker.Broker]
+	CertificatesIterator(context.Context, *broker.ListBrokerCertificatesRequest, ...grpc.CallOption) *iterator.SimpleIterator[*broker.ListBrokerCertificatesRequest, *broker.BrokerCertificate]
+	PasswordsIterator(context.Context, *broker.ListBrokerPasswordsRequest, ...grpc.CallOption) *iterator.SimpleIterator[*broker.ListBrokerPasswordsRequest, *broker.BrokerPassword]
 	OperationsIterator(context.Context, *broker.ListBrokerOperationsRequest, ...grpc.CallOption) *iterator.Iterator[*broker.ListBrokerOperationsRequest, *operation.Operation]
 }
 
@@ -29,6 +31,44 @@ func (c brokerClient) Iterator(ctx context.Context, req *broker.ListBrokersReque
 				return nil, err
 			}
 			return brokerServiceListInternal{resp}, nil
+		})
+}
+
+type brokerServiceListCertificatesInternal struct {
+	*broker.ListBrokerCertificatesResponse
+}
+
+func (r brokerServiceListCertificatesInternal) Items() []*broker.BrokerCertificate {
+	return r.ListBrokerCertificatesResponse.Certificates
+}
+
+func (c brokerClient) CertificatesIterator(ctx context.Context, req *broker.ListBrokerCertificatesRequest, opts ...grpc.CallOption) *iterator.SimpleIterator[*broker.ListBrokerCertificatesRequest, *broker.BrokerCertificate] {
+	return iterator.NewSimpleIterator[*broker.ListBrokerCertificatesRequest, *broker.BrokerCertificate](ctx, req,
+		func(ctx context.Context, req *broker.ListBrokerCertificatesRequest, opts ...grpc.CallOption) (iterator.SimpleResponse[*broker.BrokerCertificate], error) {
+			resp, err := c.ListCertificates(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return brokerServiceListCertificatesInternal{resp}, nil
+		})
+}
+
+type brokerServiceListPasswordsInternal struct {
+	*broker.ListBrokerPasswordsResponse
+}
+
+func (r brokerServiceListPasswordsInternal) Items() []*broker.BrokerPassword {
+	return r.ListBrokerPasswordsResponse.Passwords
+}
+
+func (c brokerClient) PasswordsIterator(ctx context.Context, req *broker.ListBrokerPasswordsRequest, opts ...grpc.CallOption) *iterator.SimpleIterator[*broker.ListBrokerPasswordsRequest, *broker.BrokerPassword] {
+	return iterator.NewSimpleIterator[*broker.ListBrokerPasswordsRequest, *broker.BrokerPassword](ctx, req,
+		func(ctx context.Context, req *broker.ListBrokerPasswordsRequest, opts ...grpc.CallOption) (iterator.SimpleResponse[*broker.BrokerPassword], error) {
+			resp, err := c.ListPasswords(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return brokerServiceListPasswordsInternal{resp}, nil
 		})
 }
 

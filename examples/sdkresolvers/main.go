@@ -11,7 +11,7 @@ import (
 	"github.com/yandex-cloud/go-sdk/v2/credentials"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/options"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/sdkresolvers"
-	computesdk "github.com/yandex-cloud/go-sdk/v2/sdkresolvers/compute/v1"
+	computesdk "github.com/yandex-cloud/go-sdk/services/compute/v1"
 )
 
 func main() {
@@ -27,8 +27,8 @@ func main() {
 	}
 
 	name := "test_name"
-	r := computesdk.DiskResolver(name, sdkresolvers.FolderID(*folderID))
-	if err = r.Run(ctx, sdk); err != nil {
+	r := computesdk.DiskResolver(name, computesdk.NewDiskClient(sdk), sdkresolvers.FolderID(*folderID))
+	if err = r.Run(ctx); err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("id of object %s is %s", name, r.ID())

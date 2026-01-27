@@ -13,6 +13,7 @@ import (
 type RegistryClientIterator interface {
 	Iterator(context.Context, *containerregistry.ListRegistriesRequest, ...grpc.CallOption) *iterator.Iterator[*containerregistry.ListRegistriesRequest, *containerregistry.Registry]
 	AccessBindingsIterator(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) *iterator.Iterator[*access.ListAccessBindingsRequest, *access.AccessBinding]
+	IpPermissionIterator(context.Context, *containerregistry.ListIpPermissionRequest, ...grpc.CallOption) *iterator.SimpleIterator[*containerregistry.ListIpPermissionRequest, *containerregistry.IpPermission]
 }
 
 type registryServiceListInternal struct {
@@ -50,5 +51,24 @@ func (c registryClient) AccessBindingsIterator(ctx context.Context, req *access.
 				return nil, err
 			}
 			return registryServiceListAccessBindingsInternal{resp}, nil
+		})
+}
+
+type registryServiceListIpPermissionInternal struct {
+	*containerregistry.ListIpPermissionsResponse
+}
+
+func (r registryServiceListIpPermissionInternal) Items() []*containerregistry.IpPermission {
+	return r.ListIpPermissionsResponse.Permissions
+}
+
+func (c registryClient) IpPermissionIterator(ctx context.Context, req *containerregistry.ListIpPermissionRequest, opts ...grpc.CallOption) *iterator.SimpleIterator[*containerregistry.ListIpPermissionRequest, *containerregistry.IpPermission] {
+	return iterator.NewSimpleIterator[*containerregistry.ListIpPermissionRequest, *containerregistry.IpPermission](ctx, req,
+		func(ctx context.Context, req *containerregistry.ListIpPermissionRequest, opts ...grpc.CallOption) (iterator.SimpleResponse[*containerregistry.IpPermission], error) {
+			resp, err := c.ListIpPermission(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return registryServiceListIpPermissionInternal{resp}, nil
 		})
 }
