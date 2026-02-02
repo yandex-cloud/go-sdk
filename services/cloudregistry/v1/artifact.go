@@ -4,6 +4,7 @@ package cloudregistrysdk
 import (
 	"context"
 
+	access "github.com/yandex-cloud/go-genproto/yandex/cloud/access"
 	cloudregistry "github.com/yandex-cloud/go-genproto/yandex/cloud/cloudregistry/v1"
 	operation "github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 	sdkop "github.com/yandex-cloud/go-sdk/v2/pkg/operation"
@@ -19,6 +20,9 @@ type ArtifactClient interface {
 	ArtifactClientIterator
 	Get(context.Context, *cloudregistry.GetArtifactRequest, ...grpc.CallOption) (*cloudregistry.Artifact, error)
 	Delete(context.Context, *cloudregistry.DeleteArtifactRequest, ...grpc.CallOption) (*ArtifactDeleteOperation, error)
+	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
+	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*ArtifactSetAccessBindingsOperation, error)
+	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*ArtifactUpdateAccessBindingsOperation, error)
 }
 
 var _ ArtifactClient = artifactClient{}
@@ -95,6 +99,117 @@ func (c artifactClient) Delete(ctx context.Context, in *cloudregistry.DeleteArti
 	return &ArtifactDeleteOperation{*op}, nil
 }
 
+// ListAccessBindings is an operation of Yandex.Cloud Cloudregistry Artifact service.
+func (c artifactClient) ListAccessBindings(ctx context.Context, in *access.ListAccessBindingsRequest, opts ...grpc.CallOption) (*access.ListAccessBindingsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, ArtifactListAccessBindings, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return cloudregistry.NewArtifactServiceClient(connection).ListAccessBindings(ctx, in, opts...)
+}
+
+// ArtifactSetAccessBindingsOperation is used to monitor the state of SetAccessBindings operations.
+type ArtifactSetAccessBindingsOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ArtifactSetAccessBindingsOperation) Metadata() *access.SetAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.SetAccessBindingsMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ArtifactSetAccessBindingsOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *ArtifactSetAccessBindingsOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ArtifactSetAccessBindingsOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// SetAccessBindings is an operation of Yandex.Cloud Cloudregistry Artifact service.
+// It returns an object which should be used to monitor the operation state.
+func (c artifactClient) SetAccessBindings(ctx context.Context, in *access.SetAccessBindingsRequest, opts ...grpc.CallOption) (*ArtifactSetAccessBindingsOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ArtifactSetAccessBindings, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := cloudregistry.NewArtifactServiceClient(connection).SetAccessBindings(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*access.SetAccessBindingsMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ArtifactSetAccessBindingsOperation{*op}, nil
+}
+
+// ArtifactUpdateAccessBindingsOperation is used to monitor the state of UpdateAccessBindings operations.
+type ArtifactUpdateAccessBindingsOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ArtifactUpdateAccessBindingsOperation) Metadata() *access.UpdateAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.UpdateAccessBindingsMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ArtifactUpdateAccessBindingsOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *ArtifactUpdateAccessBindingsOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ArtifactUpdateAccessBindingsOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// UpdateAccessBindings is an operation of Yandex.Cloud Cloudregistry Artifact service.
+// It returns an object which should be used to monitor the operation state.
+func (c artifactClient) UpdateAccessBindings(ctx context.Context, in *access.UpdateAccessBindingsRequest, opts ...grpc.CallOption) (*ArtifactUpdateAccessBindingsOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ArtifactUpdateAccessBindings, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := cloudregistry.NewArtifactServiceClient(connection).UpdateAccessBindings(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*access.UpdateAccessBindingsMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ArtifactUpdateAccessBindingsOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c artifactClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, ArtifactOperationPoller, opts...)
@@ -105,7 +220,10 @@ func (c artifactClient) pollOperation(ctx context.Context, operationId string, o
 }
 
 var (
-	ArtifactGet             = protoreflect.FullName("yandex.cloud.cloudregistry.v1.ArtifactService.Get")
-	ArtifactDelete          = protoreflect.FullName("yandex.cloud.cloudregistry.v1.ArtifactService.Delete")
-	ArtifactOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
+	ArtifactGet                  = protoreflect.FullName("yandex.cloud.cloudregistry.v1.ArtifactService.Get")
+	ArtifactDelete               = protoreflect.FullName("yandex.cloud.cloudregistry.v1.ArtifactService.Delete")
+	ArtifactListAccessBindings   = protoreflect.FullName("yandex.cloud.cloudregistry.v1.ArtifactService.ListAccessBindings")
+	ArtifactSetAccessBindings    = protoreflect.FullName("yandex.cloud.cloudregistry.v1.ArtifactService.SetAccessBindings")
+	ArtifactUpdateAccessBindings = protoreflect.FullName("yandex.cloud.cloudregistry.v1.ArtifactService.UpdateAccessBindings")
+	ArtifactOperationPoller      = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
