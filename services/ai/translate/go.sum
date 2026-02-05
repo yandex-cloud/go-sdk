@@ -14,10 +14,10 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOfJA=
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
-github.com/yandex-cloud/go-genproto v0.50.0 h1:l0jzFw1dXNwmmhrpv19GhCvFdatgIu/4MTkBcoPHzKo=
-github.com/yandex-cloud/go-genproto v0.50.0/go.mod h1:0LDD/IZLIUIV4iPH+YcF+jysO3jkSvADFGm4dCAuwQo=
-github.com/yandex-cloud/go-sdk/v2 v2.47.0 h1:Vegbyq4AjQpJ2vlvjN4SNzg0xZFPDPAFZ3EC6OsRv5c=
-github.com/yandex-cloud/go-sdk/v2 v2.47.0/go.mod h1:yPmYWXc+GXp8ReQ2yHTW0ciEwVmqoAagdw05EbSZHT4=
+github.com/yandex-cloud/go-genproto v0.51.0 h1:snGjY+VVvXtTnIwVwdwXybRaQ7c3z2M/oPFBv3Wf5Ss=
+github.com/yandex-cloud/go-genproto v0.51.0/go.mod h1:0LDD/IZLIUIV4iPH+YcF+jysO3jkSvADFGm4dCAuwQo=
+github.com/yandex-cloud/go-sdk/v2 v2.49.0 h1:KVovIy0WPHPRb67JnrgsdiNkfbb1/5IdXOdWzhORMTk=
+github.com/yandex-cloud/go-sdk/v2 v2.49.0/go.mod h1:HtPMklnMKuP/58zyMrfl4VXmx7zlxxBog4dNp8GJXdE=
 go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJySYA=
 go.opentelemetry.io/auto/sdk v1.1.0/go.mod h1:3wSPjt5PWp2RhlCcmmOial7AvC4DQqZb7a7wCow3W8A=
 go.opentelemetry.io/otel v1.35.0 h1:xKWKPxrxB6OtMCbmMY021CqC45J+3Onta9MqjhnusiQ=
