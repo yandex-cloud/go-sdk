@@ -162,12 +162,3 @@ func (it *DatabaseIterator) Value() *mysql.Database {
 func (it *DatabaseIterator) Error() error {
 	return it.err
 }
-
-// Update implements mysql.DatabaseServiceClient
-func (c *DatabaseServiceClient) Update(ctx context.Context, in *mysql.UpdateDatabaseRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
-	conn, err := c.getConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return mysql.NewDatabaseServiceClient(conn).Update(ctx, in, opts...)
-}
