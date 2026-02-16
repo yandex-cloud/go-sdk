@@ -69,7 +69,7 @@ func (a *AuthenticatorImpl) createTokenFromExchangeable(ctx context.Context, cre
 		return nil, &errors.AuthError{Err: err}
 	}
 
-	tokenReq := createIamTokenRequestFromCredential(req)
+	tokenReq := a.createIamTokenRequestFromCredential(req)
 	if tokenReq == nil {
 		err := fmt.Errorf("invalid identity type")
 		a.logger.Error("Failed to create token request from credentials", zap.Error(err))
@@ -127,9 +127,10 @@ func (a *AuthenticatorImpl) CreateIAMTokenForServiceAccount(ctx context.Context,
 }
 
 // createIamTokenRequestFromCredential converts a CredentialsTokenRequest into an iampb.CreateIamTokenRequest.
-func createIamTokenRequestFromCredential(req *credentials.CredentialsTokenRequest) *iampb.CreateIamTokenRequest {
+func (a *AuthenticatorImpl) createIamTokenRequestFromCredential(req *credentials.CredentialsTokenRequest) *iampb.CreateIamTokenRequest {
 	switch req.Identity {
 	case credentials.CredentialsIdentityYandexPassportOauthToken:
+		a.logger.Warn("OAuthToken credetial provider is deprecated. Please consider to use another credential provider.")
 		return &iampb.CreateIamTokenRequest{
 			Identity: &iampb.CreateIamTokenRequest_YandexPassportOauthToken{
 				YandexPassportOauthToken: req.Token},

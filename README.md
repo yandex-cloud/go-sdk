@@ -60,17 +60,6 @@ if err != nil {
 }
 ```
 
-#### OAuth-token
-https://yandex.cloud/ru/docs/iam/concepts/authorization/oauth-token
-```go
-sdk, err := ycsdk.Build(ctx,
-    options..WithCredentials(credentials.OAuthToken(os.Getenv("YC_IAM_OAUTH"))),
-)
-if err != nil {
-    log.Fatal(err)
-}
-```
-
 ####  IAM Authorized Key (Service Account)
 https://yandex.cloud/ru/docs/iam/concepts/authorization/key
 ```go

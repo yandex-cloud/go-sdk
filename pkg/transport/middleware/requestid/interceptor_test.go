@@ -2,6 +2,7 @@ package requestid
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 
@@ -13,19 +14,18 @@ import (
 )
 
 const (
-	clientTraceID   = "client-trace-id"
-	clientRequestID = "client-request-id"
-	serverRequestID = "server-request-id"
-	serverTraceID   = "server-trace-id"
+	clientTraceID = "x-client-trace-id"
+	requestID     = "x-request-id"
+	traceID       = "x-trace-id"
 )
 
 type StatusError interface {
 	GRPCStatus() *status.Status
 }
 
-func clientRequestIDFromError(err error) string {
+func requestIDFromError(err error) string {
 	if info, ok := RequestIDsFromError(err); ok {
-		return info.ClientRequestID
+		return info.RequestID
 	}
 
 	return ""
@@ -41,8 +41,8 @@ func clientTraceIDFromError(err error) string {
 
 func responseHeader(serverRequestID, serverTraceID string) metadata.MD {
 	return metadata.New(map[string]string{
-		serverRequestIDHeader: serverRequestID,
-		serverTraceIDHeader:   serverTraceID,
+		requestIDHeader:     serverRequestID,
+		serverTraceIDHeader: serverTraceID,
 	})
 }
 
@@ -59,126 +59,164 @@ func TestWrappedRequestIDs(t *testing.T) {
 		assert.Nil(t, errorInfo)
 	})
 	t.Run("wrap nil error", func(t *testing.T) {
-		actual := wrapError(nil, clientTraceID, clientRequestID, nil)
+		actual := wrapError(nil, clientTraceID, requestID, nil, nil)
 		assert.Nil(t, actual)
 	})
 	t.Run("wrap err with client request id and nil header", func(t *testing.T) {
 		err := fmt.Errorf("some error")
-		actual := wrapError(err, clientTraceID, clientRequestID, nil)
-		assert.Equal(t, &ErrorWithRequestIDs{err, RequestIDs{clientTraceID, clientRequestID, "", ""}}, actual)
+		actual := wrapError(err, clientTraceID, requestID, nil, nil)
+		assert.Equal(t, &ErrorWithRequestIDs{err, RequestIDs{ClientTraceID: clientTraceID, RequestID: requestID, ServerTraceID: ""}}, actual)
 
 		errorInfo, ok := RequestIDsFromError(actual)
 		assert.True(t, ok)
-		assert.Equal(t, clientRequestID, clientRequestIDFromError(actual))
+		assert.Equal(t, requestID, requestIDFromError(actual))
 		assert.Equal(t, clientTraceID, clientTraceIDFromError(actual))
-		assert.Equal(t, "", errorInfo.ServerRequestID)
+		assert.Equal(t, requestID, errorInfo.RequestID)
 		assert.Equal(t, "", errorInfo.ServerTraceID)
 	})
 	t.Run("wrap err with client and server request id", func(t *testing.T) {
 		err := fmt.Errorf("some error")
-		actual := wrapError(err, clientTraceID, clientRequestID, responseHeader(serverRequestID, serverTraceID))
-		assert.Equal(t, &ErrorWithRequestIDs{err, RequestIDs{clientTraceID, clientRequestID, serverRequestID, serverTraceID}}, actual)
+		actual := wrapError(err, clientTraceID, requestID, responseHeader(requestID, traceID), nil)
+		assert.Equal(t, &ErrorWithRequestIDs{err, RequestIDs{ClientTraceID: clientTraceID, RequestID: requestID, ServerTraceID: traceID}}, actual)
 
 		errorInfo, ok := RequestIDsFromError(actual)
 		assert.True(t, ok)
-		assert.Equal(t, clientRequestID, errorInfo.ClientRequestID)
-		assert.Equal(t, serverRequestID, errorInfo.ServerRequestID)
-		assert.Equal(t, serverTraceID, errorInfo.ServerTraceID)
+		assert.Equal(t, requestID, errorInfo.RequestID)
+		assert.Equal(t, clientTraceID, errorInfo.ClientTraceID)
+		assert.Equal(t, traceID, errorInfo.ServerTraceID)
 	})
 	t.Run("wrap err with empty header", func(t *testing.T) {
 		err := fmt.Errorf("some error")
-		actual := wrapError(err, clientTraceID, clientRequestID, metadata.New(map[string]string{}))
-		assert.Equal(t, &ErrorWithRequestIDs{err, RequestIDs{clientTraceID, clientRequestID, "", ""}}, actual)
+		actual := wrapError(err, clientTraceID, requestID, metadata.New(map[string]string{}), nil)
+		assert.Equal(t, &ErrorWithRequestIDs{err, RequestIDs{ClientTraceID: clientTraceID, RequestID: requestID, ServerTraceID: ""}}, actual)
 
 		errorInfo, ok := RequestIDsFromError(actual)
 		assert.True(t, ok)
-		assert.Equal(t, clientRequestID, errorInfo.ClientRequestID)
-		assert.Equal(t, "", errorInfo.ServerRequestID)
+		assert.Equal(t, requestID, errorInfo.RequestID)
+		assert.Equal(t, clientTraceID, errorInfo.ClientTraceID)
 		assert.Equal(t, "", errorInfo.ServerTraceID)
 	})
 	t.Run("wrap wrapped", func(t *testing.T) {
 		err := fmt.Errorf("some error")
-		wrap1 := wrapError(err, "trace1", "id1", nil)
-		wrap2 := wrapError(wrap1, "trace1", "id2", nil)
-		// Should keep first clientRequestID set
-		assert.Equal(t, "id1", clientRequestIDFromError(wrap1))
+		wrap1 := wrapError(err, "trace1", "id1", nil, nil)
+		wrap2 := wrapError(wrap1, "trace1", "id2", nil, nil)
+		// Should keep first requestID set
+		assert.Equal(t, "id1", requestIDFromError(wrap1))
 		assert.Equal(t, "trace1", clientTraceIDFromError(wrap1))
-		assert.Equal(t, "id1", clientRequestIDFromError(wrap2))
+		assert.Equal(t, "id1", requestIDFromError(wrap2))
 		assert.Equal(t, "trace1", clientTraceIDFromError(wrap2))
+	})
+	t.Run("server request id takes precedence over client", func(t *testing.T) {
+		err := fmt.Errorf("some error")
+		serverReqID := "server-generated-id"
+		actual := wrapError(err, clientTraceID, requestID, responseHeader(serverReqID, traceID), nil)
+		errorInfo, ok := RequestIDsFromError(actual)
+		assert.True(t, ok)
+		assert.Equal(t, serverReqID, errorInfo.RequestID)
+		assert.Equal(t, traceID, errorInfo.ServerTraceID)
+	})
+	t.Run("RequestIDsFromError returns copy", func(t *testing.T) {
+		err := fmt.Errorf("some error")
+		actual := wrapError(err, clientTraceID, requestID, nil, nil)
+		errorInfo, ok := RequestIDsFromError(actual)
+		require.True(t, ok)
+		errorInfo.RequestID = "mutated"
+		// Original error should be unchanged
+		errorInfo2, ok := RequestIDsFromError(actual)
+		require.True(t, ok)
+		assert.Equal(t, requestID, errorInfo2.RequestID)
 	})
 }
 
-func TestAddClientRequestID(t *testing.T) {
+func TestErrorUnwrap(t *testing.T) {
+	t.Run("errors.Unwrap returns original error", func(t *testing.T) {
+		origErr := fmt.Errorf("original error")
+		wrapped := wrapError(origErr, clientTraceID, requestID, nil, nil)
+		assert.True(t, errors.Is(wrapped, origErr))
+		unwrapped := errors.Unwrap(wrapped)
+		assert.Equal(t, origErr, unwrapped)
+	})
+	t.Run("errors.As extracts ErrorWithRequestIDs", func(t *testing.T) {
+		origErr := fmt.Errorf("original")
+		wrapped := wrapError(origErr, clientTraceID, requestID, nil, nil)
+		var withIDs *ErrorWithRequestIDs
+		assert.True(t, errors.As(wrapped, &withIDs))
+		assert.Equal(t, requestID, withIDs.IDs.RequestID)
+		assert.Equal(t, origErr, withIDs.OrigErr)
+	})
+}
+
+func TestAddRequestID(t *testing.T) {
 	t.Run("no outgoing context", func(t *testing.T) {
 		ctx := withMetadata(context.Background(), map[string]string{
-			clientRequestIDHeader: clientRequestID,
-			clientTraceIDHeader:   clientTraceID,
+			requestIDHeader:     requestID,
+			clientTraceIDHeader: clientTraceID,
 		})
 		md, ok := metadata.FromOutgoingContext(ctx)
 		require.True(t, ok)
 		assert.Equal(t, metadata.New(map[string]string{
-			clientTraceIDHeader:   clientTraceID,
-			clientRequestIDHeader: clientRequestID,
+			clientTraceIDHeader: clientTraceID,
+			requestIDHeader:     requestID,
 		}), md)
 	})
 	t.Run("with outgoing context", func(t *testing.T) {
 		ctx := context.Background()
 		ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("it-very-long-header", "foobar"))
 		ctx = withMetadata(ctx, map[string]string{
-			clientRequestIDHeader: clientRequestID,
-			clientTraceIDHeader:   clientTraceID,
+			requestIDHeader:     requestID,
+			clientTraceIDHeader: clientTraceID,
 		})
 		md, ok := metadata.FromOutgoingContext(ctx)
 		require.True(t, ok)
 		assert.Equal(t, metadata.New(map[string]string{
 			clientTraceIDHeader:   clientTraceID,
-			clientRequestIDHeader: clientRequestID,
+			requestIDHeader:       requestID,
 			"it-very-long-header": "foobar",
 		}), md)
 	})
 	t.Run("with old request-id", func(t *testing.T) {
 		ctx := context.Background()
-		ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(clientRequestIDHeader, "old"))
+		ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(requestIDHeader, "old"))
 		ctx = withMetadata(ctx, map[string]string{
-			clientRequestIDHeader: clientRequestID,
-			clientTraceIDHeader:   clientTraceID,
+			requestIDHeader:     requestID,
+			clientTraceIDHeader: clientTraceID,
 		})
 		md, ok := metadata.FromOutgoingContext(ctx)
 		require.True(t, ok)
 		assert.Equal(t, metadata.New(map[string]string{
-			clientTraceIDHeader:   clientTraceID,
-			clientRequestIDHeader: clientRequestID,
+			clientTraceIDHeader: clientTraceID,
+			requestIDHeader:     requestID,
 		}), md)
 	})
 	t.Run("several ids", func(t *testing.T) {
 		ctx := context.Background()
 		ctx1 := withMetadata(ctx, map[string]string{
-			clientRequestIDHeader: "id1",
-			clientTraceIDHeader:   "trace1",
+			requestIDHeader:     "id1",
+			clientTraceIDHeader: "trace1",
 		})
 		md, ok := metadata.FromOutgoingContext(ctx1)
 		require.True(t, ok)
 		assert.Equal(t, metadata.New(map[string]string{
-			clientTraceIDHeader:   "trace1",
-			clientRequestIDHeader: "id1",
+			clientTraceIDHeader: "trace1",
+			requestIDHeader:     "id1",
 		}), md)
 
 		ctx2 := withMetadata(ctx1, map[string]string{
-			clientRequestIDHeader: "id2",
-			clientTraceIDHeader:   "trace1",
+			requestIDHeader:     "id2",
+			clientTraceIDHeader: "trace1",
 		})
 		md, ok = metadata.FromOutgoingContext(ctx2)
 		require.True(t, ok)
 		assert.Equal(t, metadata.New(map[string]string{
-			clientTraceIDHeader:   "trace1",
-			clientRequestIDHeader: "id2",
+			clientTraceIDHeader: "trace1",
+			requestIDHeader:     "id2",
 		}), md)
 		// Original context not damaged
 		md, ok = metadata.FromOutgoingContext(ctx1)
 		require.True(t, ok)
 		assert.Equal(t, metadata.New(map[string]string{
-			clientTraceIDHeader:   "trace1",
-			clientRequestIDHeader: "id1",
+			clientTraceIDHeader: "trace1",
+			requestIDHeader:     "id1",
 		}), md)
 	})
 }
@@ -186,20 +224,20 @@ func TestAddClientRequestID(t *testing.T) {
 func TestWrappedErrorImplGRPCStatus(t *testing.T) {
 	t.Run("wrapped error impl StatusError interface", func(t *testing.T) {
 		err := fmt.Errorf("some error")
-		actual := wrapError(err, clientTraceID, clientRequestID, nil)
-		assert.Equal(t, &ErrorWithRequestIDs{err, RequestIDs{clientTraceID, clientRequestID, "", ""}}, actual)
+		actual := wrapError(err, clientTraceID, requestID, nil, nil)
+		assert.Equal(t, &ErrorWithRequestIDs{err, RequestIDs{ClientTraceID: clientTraceID, RequestID: requestID, ServerTraceID: ""}}, actual)
 		assert.Implements(t, (*StatusError)(nil), actual)
 	})
 	t.Run("get status by status.FromError method", func(t *testing.T) {
 		err := fmt.Errorf("some error")
-		actual := wrapError(err, clientTraceID, clientRequestID, nil)
+		actual := wrapError(err, clientTraceID, requestID, nil, nil)
 		st, ok := status.FromError(actual)
 		assert.True(t, ok)
 		assert.Equal(t, codes.Unknown, st.Code())
 	})
 	t.Run("wrap status error", func(t *testing.T) {
 		sErr := status.Error(codes.Aborted, "request aborted")
-		actual := wrapError(sErr, clientTraceID, clientRequestID, nil)
+		actual := wrapError(sErr, clientTraceID, requestID, nil, nil)
 		st, ok := status.FromError(actual)
 		assert.True(t, ok)
 		assert.Equal(t, "request aborted", st.Message())
