@@ -1,4 +1,4 @@
-module github.com/yandex-cloud/go-sdk/services/resourcemanager
+module github.com/yandex-cloud/go-sdk/services/marketplace/stacklandlicenseapi
 
 go 1.24.0
 
