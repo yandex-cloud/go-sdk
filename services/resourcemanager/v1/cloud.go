@@ -30,6 +30,7 @@ type CloudClient interface {
 	ListAccessPolicyBindings(context.Context, *access.ListAccessPolicyBindingsRequest, ...grpc.CallOption) (*access.ListAccessPolicyBindingsResponse, error)
 	BindAccessPolicy(context.Context, *access.BindAccessPolicyRequest, ...grpc.CallOption) (*CloudBindAccessPolicyOperation, error)
 	UnbindAccessPolicy(context.Context, *access.UnbindAccessPolicyRequest, ...grpc.CallOption) (*CloudUnbindAccessPolicyOperation, error)
+	UpdateAccessPolicyBindingParameters(context.Context, *access.UpdateAccessPolicyBindingParametersRequest, ...grpc.CallOption) (*CloudUpdateAccessPolicyBindingParametersOperation, error)
 }
 
 var _ CloudClient = cloudClient{}
@@ -454,6 +455,57 @@ func (c cloudClient) UnbindAccessPolicy(ctx context.Context, in *access.UnbindAc
 	return &CloudUnbindAccessPolicyOperation{*op}, nil
 }
 
+// CloudUpdateAccessPolicyBindingParametersOperation is used to monitor the state of UpdateAccessPolicyBindingParameters operations.
+type CloudUpdateAccessPolicyBindingParametersOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *CloudUpdateAccessPolicyBindingParametersOperation) Metadata() *access.UpdateAccessPolicyBindingParametersMetadata {
+	return o.Operation.Metadata().(*access.UpdateAccessPolicyBindingParametersMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *CloudUpdateAccessPolicyBindingParametersOperation) Response() *access.UpdateAccessPolicyBindingParametersResponse {
+	return o.Operation.Response().(*access.UpdateAccessPolicyBindingParametersResponse)
+}
+
+// Wait polls the operation until it's done.
+func (o *CloudUpdateAccessPolicyBindingParametersOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*access.UpdateAccessPolicyBindingParametersResponse, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*access.UpdateAccessPolicyBindingParametersResponse)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *CloudUpdateAccessPolicyBindingParametersOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*access.UpdateAccessPolicyBindingParametersResponse, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*access.UpdateAccessPolicyBindingParametersResponse)
+	return response, err
+}
+
+// UpdateAccessPolicyBindingParameters is an operation of Yandex.Cloud ResourceManager Cloud service.
+// It returns an object which should be used to monitor the operation state.
+func (c cloudClient) UpdateAccessPolicyBindingParameters(ctx context.Context, in *access.UpdateAccessPolicyBindingParametersRequest, opts ...grpc.CallOption) (*CloudUpdateAccessPolicyBindingParametersOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, CloudUpdateAccessPolicyBindingParameters, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := resourcemanager.NewCloudServiceClient(connection).UpdateAccessPolicyBindingParameters(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*access.UpdateAccessPolicyBindingParametersMetadata)(nil),
+		ResponseType: (*access.UpdateAccessPolicyBindingParametersResponse)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &CloudUpdateAccessPolicyBindingParametersOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c cloudClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, CloudOperationPoller, opts...)
@@ -464,17 +516,18 @@ func (c cloudClient) pollOperation(ctx context.Context, operationId string, opts
 }
 
 var (
-	CloudGet                      = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.Get")
-	CloudList                     = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.List")
-	CloudCreate                   = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.Create")
-	CloudUpdate                   = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.Update")
-	CloudDelete                   = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.Delete")
-	CloudListOperations           = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.ListOperations")
-	CloudListAccessBindings       = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.ListAccessBindings")
-	CloudSetAccessBindings        = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.SetAccessBindings")
-	CloudUpdateAccessBindings     = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.UpdateAccessBindings")
-	CloudListAccessPolicyBindings = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.ListAccessPolicyBindings")
-	CloudBindAccessPolicy         = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.BindAccessPolicy")
-	CloudUnbindAccessPolicy       = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.UnbindAccessPolicy")
-	CloudOperationPoller          = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
+	CloudGet                                 = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.Get")
+	CloudList                                = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.List")
+	CloudCreate                              = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.Create")
+	CloudUpdate                              = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.Update")
+	CloudDelete                              = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.Delete")
+	CloudListOperations                      = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.ListOperations")
+	CloudListAccessBindings                  = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.ListAccessBindings")
+	CloudSetAccessBindings                   = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.SetAccessBindings")
+	CloudUpdateAccessBindings                = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.UpdateAccessBindings")
+	CloudListAccessPolicyBindings            = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.ListAccessPolicyBindings")
+	CloudBindAccessPolicy                    = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.BindAccessPolicy")
+	CloudUnbindAccessPolicy                  = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.UnbindAccessPolicy")
+	CloudUpdateAccessPolicyBindingParameters = protoreflect.FullName("yandex.cloud.resourcemanager.v1.CloudService.UpdateAccessPolicyBindingParameters")
+	CloudOperationPoller                     = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

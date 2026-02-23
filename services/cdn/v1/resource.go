@@ -24,6 +24,7 @@ type ResourceClient interface {
 	Delete(context.Context, *cdn.DeleteResourceRequest, ...grpc.CallOption) (*ResourceDeleteOperation, error)
 	GetProviderCName(context.Context, *cdn.GetProviderCNameRequest, ...grpc.CallOption) (*cdn.GetProviderCNameResponse, error)
 	GetAttributes(context.Context, *cdn.GetResourceAttributesRequest, ...grpc.CallOption) (*cdn.GetResourceAttributesResponse, error)
+	ListAttributes(context.Context, *cdn.ListResourceAttributesRequest, ...grpc.CallOption) (*cdn.ListResourceAttributesResponse, error)
 }
 
 var _ ResourceClient = resourceClient{}
@@ -235,6 +236,15 @@ func (c resourceClient) GetAttributes(ctx context.Context, in *cdn.GetResourceAt
 	return cdn.NewResourceServiceClient(connection).GetAttributes(ctx, in, opts...)
 }
 
+// ListAttributes is an operation of Yandex.Cloud Cdn Resource service.
+func (c resourceClient) ListAttributes(ctx context.Context, in *cdn.ListResourceAttributesRequest, opts ...grpc.CallOption) (*cdn.ListResourceAttributesResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, ResourceListAttributes, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return cdn.NewResourceServiceClient(connection).ListAttributes(ctx, in, opts...)
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c resourceClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, ResourceOperationPoller, opts...)
@@ -252,5 +262,6 @@ var (
 	ResourceDelete           = protoreflect.FullName("yandex.cloud.cdn.v1.ResourceService.Delete")
 	ResourceGetProviderCName = protoreflect.FullName("yandex.cloud.cdn.v1.ResourceService.GetProviderCName")
 	ResourceGetAttributes    = protoreflect.FullName("yandex.cloud.cdn.v1.ResourceService.GetAttributes")
+	ResourceListAttributes   = protoreflect.FullName("yandex.cloud.cdn.v1.ResourceService.ListAttributes")
 	ResourceOperationPoller  = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

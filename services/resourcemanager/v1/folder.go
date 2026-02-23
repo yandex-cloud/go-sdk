@@ -30,6 +30,7 @@ type FolderClient interface {
 	ListAccessPolicyBindings(context.Context, *access.ListAccessPolicyBindingsRequest, ...grpc.CallOption) (*access.ListAccessPolicyBindingsResponse, error)
 	BindAccessPolicy(context.Context, *access.BindAccessPolicyRequest, ...grpc.CallOption) (*FolderBindAccessPolicyOperation, error)
 	UnbindAccessPolicy(context.Context, *access.UnbindAccessPolicyRequest, ...grpc.CallOption) (*FolderUnbindAccessPolicyOperation, error)
+	UpdateAccessPolicyBindingParameters(context.Context, *access.UpdateAccessPolicyBindingParametersRequest, ...grpc.CallOption) (*FolderUpdateAccessPolicyBindingParametersOperation, error)
 }
 
 var _ FolderClient = folderClient{}
@@ -454,6 +455,57 @@ func (c folderClient) UnbindAccessPolicy(ctx context.Context, in *access.UnbindA
 	return &FolderUnbindAccessPolicyOperation{*op}, nil
 }
 
+// FolderUpdateAccessPolicyBindingParametersOperation is used to monitor the state of UpdateAccessPolicyBindingParameters operations.
+type FolderUpdateAccessPolicyBindingParametersOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *FolderUpdateAccessPolicyBindingParametersOperation) Metadata() *access.UpdateAccessPolicyBindingParametersMetadata {
+	return o.Operation.Metadata().(*access.UpdateAccessPolicyBindingParametersMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *FolderUpdateAccessPolicyBindingParametersOperation) Response() *access.UpdateAccessPolicyBindingParametersResponse {
+	return o.Operation.Response().(*access.UpdateAccessPolicyBindingParametersResponse)
+}
+
+// Wait polls the operation until it's done.
+func (o *FolderUpdateAccessPolicyBindingParametersOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*access.UpdateAccessPolicyBindingParametersResponse, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*access.UpdateAccessPolicyBindingParametersResponse)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *FolderUpdateAccessPolicyBindingParametersOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*access.UpdateAccessPolicyBindingParametersResponse, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*access.UpdateAccessPolicyBindingParametersResponse)
+	return response, err
+}
+
+// UpdateAccessPolicyBindingParameters is an operation of Yandex.Cloud ResourceManager Folder service.
+// It returns an object which should be used to monitor the operation state.
+func (c folderClient) UpdateAccessPolicyBindingParameters(ctx context.Context, in *access.UpdateAccessPolicyBindingParametersRequest, opts ...grpc.CallOption) (*FolderUpdateAccessPolicyBindingParametersOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, FolderUpdateAccessPolicyBindingParameters, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := resourcemanager.NewFolderServiceClient(connection).UpdateAccessPolicyBindingParameters(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*access.UpdateAccessPolicyBindingParametersMetadata)(nil),
+		ResponseType: (*access.UpdateAccessPolicyBindingParametersResponse)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &FolderUpdateAccessPolicyBindingParametersOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c folderClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, FolderOperationPoller, opts...)
@@ -464,17 +516,18 @@ func (c folderClient) pollOperation(ctx context.Context, operationId string, opt
 }
 
 var (
-	FolderGet                      = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.Get")
-	FolderList                     = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.List")
-	FolderCreate                   = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.Create")
-	FolderUpdate                   = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.Update")
-	FolderDelete                   = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.Delete")
-	FolderListOperations           = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.ListOperations")
-	FolderListAccessBindings       = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.ListAccessBindings")
-	FolderSetAccessBindings        = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.SetAccessBindings")
-	FolderUpdateAccessBindings     = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.UpdateAccessBindings")
-	FolderListAccessPolicyBindings = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.ListAccessPolicyBindings")
-	FolderBindAccessPolicy         = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.BindAccessPolicy")
-	FolderUnbindAccessPolicy       = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.UnbindAccessPolicy")
-	FolderOperationPoller          = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
+	FolderGet                                 = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.Get")
+	FolderList                                = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.List")
+	FolderCreate                              = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.Create")
+	FolderUpdate                              = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.Update")
+	FolderDelete                              = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.Delete")
+	FolderListOperations                      = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.ListOperations")
+	FolderListAccessBindings                  = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.ListAccessBindings")
+	FolderSetAccessBindings                   = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.SetAccessBindings")
+	FolderUpdateAccessBindings                = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.UpdateAccessBindings")
+	FolderListAccessPolicyBindings            = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.ListAccessPolicyBindings")
+	FolderBindAccessPolicy                    = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.BindAccessPolicy")
+	FolderUnbindAccessPolicy                  = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.UnbindAccessPolicy")
+	FolderUpdateAccessPolicyBindingParameters = protoreflect.FullName("yandex.cloud.resourcemanager.v1.FolderService.UpdateAccessPolicyBindingParameters")
+	FolderOperationPoller                     = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

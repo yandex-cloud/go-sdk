@@ -28,6 +28,7 @@ type OrganizationClient interface {
 	ListAccessPolicyBindings(context.Context, *access.ListAccessPolicyBindingsRequest, ...grpc.CallOption) (*access.ListAccessPolicyBindingsResponse, error)
 	BindAccessPolicy(context.Context, *access.BindAccessPolicyRequest, ...grpc.CallOption) (*OrganizationBindAccessPolicyOperation, error)
 	UnbindAccessPolicy(context.Context, *access.UnbindAccessPolicyRequest, ...grpc.CallOption) (*OrganizationUnbindAccessPolicyOperation, error)
+	UpdateAccessPolicyBindingParameters(context.Context, *access.UpdateAccessPolicyBindingParametersRequest, ...grpc.CallOption) (*OrganizationUpdateAccessPolicyBindingParametersOperation, error)
 }
 
 var _ OrganizationClient = organizationClient{}
@@ -344,6 +345,57 @@ func (c organizationClient) UnbindAccessPolicy(ctx context.Context, in *access.U
 	return &OrganizationUnbindAccessPolicyOperation{*op}, nil
 }
 
+// OrganizationUpdateAccessPolicyBindingParametersOperation is used to monitor the state of UpdateAccessPolicyBindingParameters operations.
+type OrganizationUpdateAccessPolicyBindingParametersOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *OrganizationUpdateAccessPolicyBindingParametersOperation) Metadata() *access.UpdateAccessPolicyBindingParametersMetadata {
+	return o.Operation.Metadata().(*access.UpdateAccessPolicyBindingParametersMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *OrganizationUpdateAccessPolicyBindingParametersOperation) Response() *access.UpdateAccessPolicyBindingParametersResponse {
+	return o.Operation.Response().(*access.UpdateAccessPolicyBindingParametersResponse)
+}
+
+// Wait polls the operation until it's done.
+func (o *OrganizationUpdateAccessPolicyBindingParametersOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*access.UpdateAccessPolicyBindingParametersResponse, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*access.UpdateAccessPolicyBindingParametersResponse)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *OrganizationUpdateAccessPolicyBindingParametersOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*access.UpdateAccessPolicyBindingParametersResponse, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*access.UpdateAccessPolicyBindingParametersResponse)
+	return response, err
+}
+
+// UpdateAccessPolicyBindingParameters is an operation of Yandex.Cloud OrganizationManager Organization service.
+// It returns an object which should be used to monitor the operation state.
+func (c organizationClient) UpdateAccessPolicyBindingParameters(ctx context.Context, in *access.UpdateAccessPolicyBindingParametersRequest, opts ...grpc.CallOption) (*OrganizationUpdateAccessPolicyBindingParametersOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, OrganizationUpdateAccessPolicyBindingParameters, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := organizationmanager.NewOrganizationServiceClient(connection).UpdateAccessPolicyBindingParameters(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*access.UpdateAccessPolicyBindingParametersMetadata)(nil),
+		ResponseType: (*access.UpdateAccessPolicyBindingParametersResponse)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &OrganizationUpdateAccessPolicyBindingParametersOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c organizationClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, OrganizationOperationPoller, opts...)
@@ -354,15 +406,16 @@ func (c organizationClient) pollOperation(ctx context.Context, operationId strin
 }
 
 var (
-	OrganizationGet                      = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.Get")
-	OrganizationList                     = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.List")
-	OrganizationUpdate                   = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.Update")
-	OrganizationListOperations           = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.ListOperations")
-	OrganizationListAccessBindings       = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.ListAccessBindings")
-	OrganizationSetAccessBindings        = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.SetAccessBindings")
-	OrganizationUpdateAccessBindings     = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.UpdateAccessBindings")
-	OrganizationListAccessPolicyBindings = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.ListAccessPolicyBindings")
-	OrganizationBindAccessPolicy         = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.BindAccessPolicy")
-	OrganizationUnbindAccessPolicy       = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.UnbindAccessPolicy")
-	OrganizationOperationPoller          = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
+	OrganizationGet                                 = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.Get")
+	OrganizationList                                = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.List")
+	OrganizationUpdate                              = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.Update")
+	OrganizationListOperations                      = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.ListOperations")
+	OrganizationListAccessBindings                  = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.ListAccessBindings")
+	OrganizationSetAccessBindings                   = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.SetAccessBindings")
+	OrganizationUpdateAccessBindings                = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.UpdateAccessBindings")
+	OrganizationListAccessPolicyBindings            = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.ListAccessPolicyBindings")
+	OrganizationBindAccessPolicy                    = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.BindAccessPolicy")
+	OrganizationUnbindAccessPolicy                  = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.UnbindAccessPolicy")
+	OrganizationUpdateAccessPolicyBindingParameters = protoreflect.FullName("yandex.cloud.organizationmanager.v1.OrganizationService.UpdateAccessPolicyBindingParameters")
+	OrganizationOperationPoller                     = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
