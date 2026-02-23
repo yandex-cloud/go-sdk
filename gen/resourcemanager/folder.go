@@ -556,3 +556,12 @@ func (c *FolderServiceClient) UpdateAccessBindings(ctx context.Context, in *acce
 	}
 	return resourcemanager.NewFolderServiceClient(conn).UpdateAccessBindings(ctx, in, opts...)
 }
+
+// UpdateAccessPolicyBindingParameters implements resourcemanager.FolderServiceClient
+func (c *FolderServiceClient) UpdateAccessPolicyBindingParameters(ctx context.Context, in *access.UpdateAccessPolicyBindingParametersRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return resourcemanager.NewFolderServiceClient(conn).UpdateAccessPolicyBindingParameters(ctx, in, opts...)
+}

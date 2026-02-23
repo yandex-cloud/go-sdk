@@ -538,3 +538,12 @@ func (c *OrganizationServiceClient) UpdateAccessBindings(ctx context.Context, in
 	}
 	return organizationmanager.NewOrganizationServiceClient(conn).UpdateAccessBindings(ctx, in, opts...)
 }
+
+// UpdateAccessPolicyBindingParameters implements organizationmanager.OrganizationServiceClient
+func (c *OrganizationServiceClient) UpdateAccessPolicyBindingParameters(ctx context.Context, in *access.UpdateAccessPolicyBindingParametersRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return organizationmanager.NewOrganizationServiceClient(conn).UpdateAccessPolicyBindingParameters(ctx, in, opts...)
+}

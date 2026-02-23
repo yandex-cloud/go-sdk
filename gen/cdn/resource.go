@@ -181,6 +181,15 @@ func (it *ResourceIterator) Error() error {
 	return it.err
 }
 
+// ListAttributes implements cdn.ResourceServiceClient
+func (c *ResourceServiceClient) ListAttributes(ctx context.Context, in *cdn.ListResourceAttributesRequest, opts ...grpc.CallOption) (*cdn.ListResourceAttributesResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cdn.NewResourceServiceClient(conn).ListAttributes(ctx, in, opts...)
+}
+
 // Update implements cdn.ResourceServiceClient
 func (c *ResourceServiceClient) Update(ctx context.Context, in *cdn.UpdateResourceRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)

@@ -556,3 +556,12 @@ func (c *CloudServiceClient) UpdateAccessBindings(ctx context.Context, in *acces
 	}
 	return resourcemanager.NewCloudServiceClient(conn).UpdateAccessBindings(ctx, in, opts...)
 }
+
+// UpdateAccessPolicyBindingParameters implements resourcemanager.CloudServiceClient
+func (c *CloudServiceClient) UpdateAccessPolicyBindingParameters(ctx context.Context, in *access.UpdateAccessPolicyBindingParametersRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return resourcemanager.NewCloudServiceClient(conn).UpdateAccessPolicyBindingParameters(ctx, in, opts...)
+}
