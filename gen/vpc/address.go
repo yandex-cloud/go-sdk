@@ -172,6 +172,122 @@ func (it *AddressIterator) Error() error {
 	return it.err
 }
 
+// ListBySubnet implements vpc.AddressServiceClient
+func (c *AddressServiceClient) ListBySubnet(ctx context.Context, in *vpc.ListAddressesBySubnetRequest, opts ...grpc.CallOption) (*vpc.ListAddressesBySubnetResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return vpc.NewAddressServiceClient(conn).ListBySubnet(ctx, in, opts...)
+}
+
+type AddressBySubnetIterator struct {
+	ctx  context.Context
+	opts []grpc.CallOption
+
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
+
+	client  *AddressServiceClient
+	request *vpc.ListAddressesBySubnetRequest
+
+	items []*vpc.Address
+}
+
+func (c *AddressServiceClient) AddressBySubnetIterator(ctx context.Context, req *vpc.ListAddressesBySubnetRequest, opts ...grpc.CallOption) *AddressBySubnetIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
+	return &AddressBySubnetIterator{
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
+	}
+}
+
+func (it *AddressBySubnetIterator) Next() bool {
+	if it.err != nil {
+		return false
+	}
+	if len(it.items) > 1 {
+		it.items[0] = nil
+		it.items = it.items[1:]
+		return true
+	}
+	it.items = nil // consume last item, if any
+
+	if it.started && it.request.PageToken == "" {
+		return false
+	}
+	it.started = true
+
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
+	response, err := it.client.ListBySubnet(it.ctx, it.request, it.opts...)
+	it.err = err
+	if err != nil {
+		return false
+	}
+
+	it.items = response.Addresses
+	it.request.PageToken = response.NextPageToken
+	return len(it.items) > 0
+}
+
+func (it *AddressBySubnetIterator) Take(size int64) ([]*vpc.Address, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*vpc.Address
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *AddressBySubnetIterator) TakeAll() ([]*vpc.Address, error) {
+	return it.Take(0)
+}
+
+func (it *AddressBySubnetIterator) Value() *vpc.Address {
+	if len(it.items) == 0 {
+		panic("calling Value on empty iterator")
+	}
+	return it.items[0]
+}
+
+func (it *AddressBySubnetIterator) Error() error {
+	return it.err
+}
+
 // ListOperations implements vpc.AddressServiceClient
 func (c *AddressServiceClient) ListOperations(ctx context.Context, in *vpc.ListAddressOperationsRequest, opts ...grpc.CallOption) (*vpc.ListAddressOperationsResponse, error) {
 	conn, err := c.getConn(ctx)
