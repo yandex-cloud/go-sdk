@@ -20,6 +20,7 @@ type AddressClient interface {
 	Get(context.Context, *vpc.GetAddressRequest, ...grpc.CallOption) (*vpc.Address, error)
 	GetByValue(context.Context, *vpc.GetAddressByValueRequest, ...grpc.CallOption) (*vpc.Address, error)
 	List(context.Context, *vpc.ListAddressesRequest, ...grpc.CallOption) (*vpc.ListAddressesResponse, error)
+	ListBySubnet(context.Context, *vpc.ListAddressesBySubnetRequest, ...grpc.CallOption) (*vpc.ListAddressesBySubnetResponse, error)
 	Create(context.Context, *vpc.CreateAddressRequest, ...grpc.CallOption) (*AddressCreateOperation, error)
 	Update(context.Context, *vpc.UpdateAddressRequest, ...grpc.CallOption) (*AddressUpdateOperation, error)
 	Delete(context.Context, *vpc.DeleteAddressRequest, ...grpc.CallOption) (*AddressDeleteOperation, error)
@@ -63,6 +64,15 @@ func (c addressClient) List(ctx context.Context, in *vpc.ListAddressesRequest, o
 		return nil, err
 	}
 	return vpc.NewAddressServiceClient(connection).List(ctx, in, opts...)
+}
+
+// ListBySubnet is an operation of Yandex.Cloud VPC Address service.
+func (c addressClient) ListBySubnet(ctx context.Context, in *vpc.ListAddressesBySubnetRequest, opts ...grpc.CallOption) (*vpc.ListAddressesBySubnetResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, AddressListBySubnet, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return vpc.NewAddressServiceClient(connection).ListBySubnet(ctx, in, opts...)
 }
 
 // AddressCreateOperation is used to monitor the state of Create operations.
@@ -303,6 +313,7 @@ var (
 	AddressGet             = protoreflect.FullName("yandex.cloud.vpc.v1.AddressService.Get")
 	AddressGetByValue      = protoreflect.FullName("yandex.cloud.vpc.v1.AddressService.GetByValue")
 	AddressList            = protoreflect.FullName("yandex.cloud.vpc.v1.AddressService.List")
+	AddressListBySubnet    = protoreflect.FullName("yandex.cloud.vpc.v1.AddressService.ListBySubnet")
 	AddressCreate          = protoreflect.FullName("yandex.cloud.vpc.v1.AddressService.Create")
 	AddressUpdate          = protoreflect.FullName("yandex.cloud.vpc.v1.AddressService.Update")
 	AddressDelete          = protoreflect.FullName("yandex.cloud.vpc.v1.AddressService.Delete")

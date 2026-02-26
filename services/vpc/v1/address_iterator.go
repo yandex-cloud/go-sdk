@@ -12,6 +12,7 @@ import (
 
 type AddressClientIterator interface {
 	Iterator(context.Context, *vpc.ListAddressesRequest, ...grpc.CallOption) *iterator.Iterator[*vpc.ListAddressesRequest, *vpc.Address]
+	BySubnetIterator(context.Context, *vpc.ListAddressesBySubnetRequest, ...grpc.CallOption) *iterator.Iterator[*vpc.ListAddressesBySubnetRequest, *vpc.Address]
 	OperationsIterator(context.Context, *vpc.ListAddressOperationsRequest, ...grpc.CallOption) *iterator.Iterator[*vpc.ListAddressOperationsRequest, *operation.Operation]
 }
 
@@ -29,6 +30,25 @@ func (c addressClient) Iterator(ctx context.Context, req *vpc.ListAddressesReque
 				return nil, err
 			}
 			return addressServiceListInternal{resp}, nil
+		})
+}
+
+type addressServiceListBySubnetInternal struct {
+	*vpc.ListAddressesBySubnetResponse
+}
+
+func (r addressServiceListBySubnetInternal) Items() []*vpc.Address {
+	return r.ListAddressesBySubnetResponse.Addresses
+}
+
+func (c addressClient) BySubnetIterator(ctx context.Context, req *vpc.ListAddressesBySubnetRequest, opts ...grpc.CallOption) *iterator.Iterator[*vpc.ListAddressesBySubnetRequest, *vpc.Address] {
+	return iterator.NewIterator[*vpc.ListAddressesBySubnetRequest, *vpc.Address](ctx, req,
+		func(ctx context.Context, req *vpc.ListAddressesBySubnetRequest, opts ...grpc.CallOption) (iterator.PageResponse[*vpc.Address], error) {
+			resp, err := c.ListBySubnet(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return addressServiceListBySubnetInternal{resp}, nil
 		})
 }
 
