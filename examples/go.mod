@@ -4,15 +4,15 @@ go 1.24.0
 
 require (
 	github.com/c2h5oh/datasize v0.0.0-20231215233829-aa82cc1e6500
-	github.com/yandex-cloud/go-genproto v0.58.0
-	github.com/yandex-cloud/go-sdk/services/compute v1.0.44
-	github.com/yandex-cloud/go-sdk/services/lockbox v0.0.39
-	github.com/yandex-cloud/go-sdk/services/marketplace/licensemanager v0.0.29
-	github.com/yandex-cloud/go-sdk/services/mdb/clickhouse v0.0.29
-	github.com/yandex-cloud/go-sdk/services/mdb/mongodb v0.0.29
-	github.com/yandex-cloud/go-sdk/services/mdb/postgresql v0.0.29
-	github.com/yandex-cloud/go-sdk/services/vpc v0.0.39
-	github.com/yandex-cloud/go-sdk/v2 v2.62.0
+	github.com/yandex-cloud/go-genproto v0.59.0
+	github.com/yandex-cloud/go-sdk/services/compute v1.0.45
+	github.com/yandex-cloud/go-sdk/services/lockbox v0.0.40
+	github.com/yandex-cloud/go-sdk/services/marketplace/licensemanager v0.0.30
+	github.com/yandex-cloud/go-sdk/services/mdb/clickhouse v0.0.30
+	github.com/yandex-cloud/go-sdk/services/mdb/mongodb v0.0.30
+	github.com/yandex-cloud/go-sdk/services/mdb/postgresql v0.0.30
+	github.com/yandex-cloud/go-sdk/services/vpc v0.0.40
+	github.com/yandex-cloud/go-sdk/v2 v2.64.0
 	google.golang.org/grpc v1.74.0-dev
 	google.golang.org/protobuf v1.36.6
 )
