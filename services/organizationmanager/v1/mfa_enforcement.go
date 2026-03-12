@@ -26,6 +26,8 @@ type MfaEnforcementClient interface {
 	List(context.Context, *organizationmanager.ListMfaEnforcementsRequest, ...grpc.CallOption) (*organizationmanager.ListMfaEnforcementsResponse, error)
 	UpdateAudience(context.Context, *organizationmanager.UpdateAudienceRequest, ...grpc.CallOption) (*MfaEnforcementUpdateAudienceOperation, error)
 	ListAudience(context.Context, *organizationmanager.ListAudienceRequest, ...grpc.CallOption) (*organizationmanager.ListAudienceResponse, error)
+	UpdateExcludedAudience(context.Context, *organizationmanager.UpdateExcludedAudienceRequest, ...grpc.CallOption) (*MfaEnforcementUpdateExcludedAudienceOperation, error)
+	ListExcludedAudience(context.Context, *organizationmanager.ListExcludedAudienceRequest, ...grpc.CallOption) (*organizationmanager.ListExcludedAudienceResponse, error)
 }
 
 var _ MfaEnforcementClient = mfaEnforcementClient{}
@@ -390,6 +392,69 @@ func (c mfaEnforcementClient) ListAudience(ctx context.Context, in *organization
 	return organizationmanager.NewMfaEnforcementServiceClient(connection).ListAudience(ctx, in, opts...)
 }
 
+// MfaEnforcementUpdateExcludedAudienceOperation is used to monitor the state of UpdateExcludedAudience operations.
+type MfaEnforcementUpdateExcludedAudienceOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *MfaEnforcementUpdateExcludedAudienceOperation) Metadata() *organizationmanager.UpdateExcludedAudienceMetadata {
+	return o.Operation.Metadata().(*organizationmanager.UpdateExcludedAudienceMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *MfaEnforcementUpdateExcludedAudienceOperation) Response() *organizationmanager.UpdateExcludedAudienceResponse {
+	return o.Operation.Response().(*organizationmanager.UpdateExcludedAudienceResponse)
+}
+
+// Wait polls the operation until it's done.
+func (o *MfaEnforcementUpdateExcludedAudienceOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*organizationmanager.UpdateExcludedAudienceResponse, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*organizationmanager.UpdateExcludedAudienceResponse)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *MfaEnforcementUpdateExcludedAudienceOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*organizationmanager.UpdateExcludedAudienceResponse, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*organizationmanager.UpdateExcludedAudienceResponse)
+	return response, err
+}
+
+// UpdateExcludedAudience is an operation of Yandex.Cloud OrganizationManager MfaEnforcement service.
+// It returns an object which should be used to monitor the operation state.
+func (c mfaEnforcementClient) UpdateExcludedAudience(ctx context.Context, in *organizationmanager.UpdateExcludedAudienceRequest, opts ...grpc.CallOption) (*MfaEnforcementUpdateExcludedAudienceOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, MfaEnforcementUpdateExcludedAudience, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := organizationmanager.NewMfaEnforcementServiceClient(connection).UpdateExcludedAudience(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*organizationmanager.UpdateExcludedAudienceMetadata).GetMfaEnforcementId()
+		},
+		MetadataType: (*organizationmanager.UpdateExcludedAudienceMetadata)(nil),
+		ResponseType: (*organizationmanager.UpdateExcludedAudienceResponse)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &MfaEnforcementUpdateExcludedAudienceOperation{*op}, nil
+}
+
+// ListExcludedAudience is an operation of Yandex.Cloud OrganizationManager MfaEnforcement service.
+func (c mfaEnforcementClient) ListExcludedAudience(ctx context.Context, in *organizationmanager.ListExcludedAudienceRequest, opts ...grpc.CallOption) (*organizationmanager.ListExcludedAudienceResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, MfaEnforcementListExcludedAudience, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return organizationmanager.NewMfaEnforcementServiceClient(connection).ListExcludedAudience(ctx, in, opts...)
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c mfaEnforcementClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, MfaEnforcementOperationPoller, opts...)
@@ -400,14 +465,16 @@ func (c mfaEnforcementClient) pollOperation(ctx context.Context, operationId str
 }
 
 var (
-	MfaEnforcementCreate          = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.Create")
-	MfaEnforcementUpdate          = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.Update")
-	MfaEnforcementActivate        = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.Activate")
-	MfaEnforcementDeactivate      = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.Deactivate")
-	MfaEnforcementDelete          = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.Delete")
-	MfaEnforcementGet             = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.Get")
-	MfaEnforcementList            = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.List")
-	MfaEnforcementUpdateAudience  = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.UpdateAudience")
-	MfaEnforcementListAudience    = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.ListAudience")
-	MfaEnforcementOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
+	MfaEnforcementCreate                 = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.Create")
+	MfaEnforcementUpdate                 = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.Update")
+	MfaEnforcementActivate               = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.Activate")
+	MfaEnforcementDeactivate             = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.Deactivate")
+	MfaEnforcementDelete                 = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.Delete")
+	MfaEnforcementGet                    = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.Get")
+	MfaEnforcementList                   = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.List")
+	MfaEnforcementUpdateAudience         = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.UpdateAudience")
+	MfaEnforcementListAudience           = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.ListAudience")
+	MfaEnforcementUpdateExcludedAudience = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.UpdateExcludedAudience")
+	MfaEnforcementListExcludedAudience   = protoreflect.FullName("yandex.cloud.organizationmanager.v1.MfaEnforcementService.ListExcludedAudience")
+	MfaEnforcementOperationPoller        = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

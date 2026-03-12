@@ -12,6 +12,7 @@ import (
 type MfaEnforcementClientIterator interface {
 	Iterator(context.Context, *organizationmanager.ListMfaEnforcementsRequest, ...grpc.CallOption) *iterator.Iterator[*organizationmanager.ListMfaEnforcementsRequest, *organizationmanager.MfaEnforcement]
 	AudienceIterator(context.Context, *organizationmanager.ListAudienceRequest, ...grpc.CallOption) *iterator.Iterator[*organizationmanager.ListAudienceRequest, *organizationmanager.ListAudienceResponse_Subject]
+	ExcludedAudienceIterator(context.Context, *organizationmanager.ListExcludedAudienceRequest, ...grpc.CallOption) *iterator.Iterator[*organizationmanager.ListExcludedAudienceRequest, *organizationmanager.ListExcludedAudienceResponse_Subject]
 }
 
 type mfaEnforcementServiceListInternal struct {
@@ -49,5 +50,24 @@ func (c mfaEnforcementClient) AudienceIterator(ctx context.Context, req *organiz
 				return nil, err
 			}
 			return mfaEnforcementServiceListAudienceInternal{resp}, nil
+		})
+}
+
+type mfaEnforcementServiceListExcludedAudienceInternal struct {
+	*organizationmanager.ListExcludedAudienceResponse
+}
+
+func (r mfaEnforcementServiceListExcludedAudienceInternal) Items() []*organizationmanager.ListExcludedAudienceResponse_Subject {
+	return r.ListExcludedAudienceResponse.Subjects
+}
+
+func (c mfaEnforcementClient) ExcludedAudienceIterator(ctx context.Context, req *organizationmanager.ListExcludedAudienceRequest, opts ...grpc.CallOption) *iterator.Iterator[*organizationmanager.ListExcludedAudienceRequest, *organizationmanager.ListExcludedAudienceResponse_Subject] {
+	return iterator.NewIterator[*organizationmanager.ListExcludedAudienceRequest, *organizationmanager.ListExcludedAudienceResponse_Subject](ctx, req,
+		func(ctx context.Context, req *organizationmanager.ListExcludedAudienceRequest, opts ...grpc.CallOption) (iterator.PageResponse[*organizationmanager.ListExcludedAudienceResponse_Subject], error) {
+			resp, err := c.ListExcludedAudience(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return mfaEnforcementServiceListExcludedAudienceInternal{resp}, nil
 		})
 }

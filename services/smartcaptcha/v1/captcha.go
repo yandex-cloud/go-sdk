@@ -11,7 +11,6 @@ import (
 	"google.golang.org/grpc"
 	proto "google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // CaptchaClient provides methods for managing Captcha resources of Yandex.Cloud Smartcaptcha.
@@ -19,10 +18,10 @@ type CaptchaClient interface {
 	CaptchaClientIterator
 	Get(context.Context, *smartcaptcha.GetCaptchaRequest, ...grpc.CallOption) (*smartcaptcha.Captcha, error)
 	GetSecretKey(context.Context, *smartcaptcha.GetCaptchaRequest, ...grpc.CallOption) (*smartcaptcha.CaptchaSecretKey, error)
-	List(context.Context, *smartcaptcha.ListCaptchasRequest, ...grpc.CallOption) (*smartcaptcha.ListCaptchasResponse, error)
 	Create(context.Context, *smartcaptcha.CreateCaptchaRequest, ...grpc.CallOption) (*CaptchaCreateOperation, error)
-	Update(context.Context, *smartcaptcha.UpdateCaptchaRequest, ...grpc.CallOption) (*CaptchaUpdateOperation, error)
 	Delete(context.Context, *smartcaptcha.DeleteCaptchaRequest, ...grpc.CallOption) (*CaptchaDeleteOperation, error)
+	Update(context.Context, *smartcaptcha.UpdateCaptchaRequest, ...grpc.CallOption) (*CaptchaUpdateOperation, error)
+	List(context.Context, *smartcaptcha.ListCaptchasRequest, ...grpc.CallOption) (*smartcaptcha.ListCaptchasResponse, error)
 }
 
 var _ CaptchaClient = captchaClient{}
@@ -52,15 +51,6 @@ func (c captchaClient) GetSecretKey(ctx context.Context, in *smartcaptcha.GetCap
 		return nil, err
 	}
 	return smartcaptcha.NewCaptchaServiceClient(connection).GetSecretKey(ctx, in, opts...)
-}
-
-// List is an operation of Yandex.Cloud Smartcaptcha Captcha service.
-func (c captchaClient) List(ctx context.Context, in *smartcaptcha.ListCaptchasRequest, opts ...grpc.CallOption) (*smartcaptcha.ListCaptchasResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, CaptchaList, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return smartcaptcha.NewCaptchaServiceClient(connection).List(ctx, in, opts...)
 }
 
 // CaptchaCreateOperation is used to monitor the state of Create operations.
@@ -117,6 +107,60 @@ func (c captchaClient) Create(ctx context.Context, in *smartcaptcha.CreateCaptch
 	return &CaptchaCreateOperation{*op}, nil
 }
 
+// CaptchaDeleteOperation is used to monitor the state of Delete operations.
+type CaptchaDeleteOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *CaptchaDeleteOperation) Metadata() *smartcaptcha.DeleteCaptchaMetadata {
+	return o.Operation.Metadata().(*smartcaptcha.DeleteCaptchaMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *CaptchaDeleteOperation) Response() *smartcaptcha.Captcha {
+	return o.Operation.Response().(*smartcaptcha.Captcha)
+}
+
+// Wait polls the operation until it's done.
+func (o *CaptchaDeleteOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*smartcaptcha.Captcha, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*smartcaptcha.Captcha)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *CaptchaDeleteOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*smartcaptcha.Captcha, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*smartcaptcha.Captcha)
+	return response, err
+}
+
+// Delete is an operation of Yandex.Cloud Smartcaptcha Captcha service.
+// It returns an object which should be used to monitor the operation state.
+func (c captchaClient) Delete(ctx context.Context, in *smartcaptcha.DeleteCaptchaRequest, opts ...grpc.CallOption) (*CaptchaDeleteOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, CaptchaDelete, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := smartcaptcha.NewCaptchaServiceClient(connection).Delete(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*smartcaptcha.DeleteCaptchaMetadata).GetCaptchaId()
+		},
+		MetadataType: (*smartcaptcha.DeleteCaptchaMetadata)(nil),
+		ResponseType: (*smartcaptcha.Captcha)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &CaptchaDeleteOperation{*op}, nil
+}
+
 // CaptchaUpdateOperation is used to monitor the state of Update operations.
 type CaptchaUpdateOperation struct {
 	sdkop.Operation
@@ -171,58 +215,13 @@ func (c captchaClient) Update(ctx context.Context, in *smartcaptcha.UpdateCaptch
 	return &CaptchaUpdateOperation{*op}, nil
 }
 
-// CaptchaDeleteOperation is used to monitor the state of Delete operations.
-type CaptchaDeleteOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *CaptchaDeleteOperation) Metadata() *smartcaptcha.DeleteCaptchaMetadata {
-	return o.Operation.Metadata().(*smartcaptcha.DeleteCaptchaMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *CaptchaDeleteOperation) Response() *emptypb.Empty {
-	return o.Operation.Response().(*emptypb.Empty)
-}
-
-// Wait polls the operation until it's done.
-func (o *CaptchaDeleteOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*emptypb.Empty)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *CaptchaDeleteOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*emptypb.Empty)
-	return response, err
-}
-
-// Delete is an operation of Yandex.Cloud Smartcaptcha Captcha service.
-// It returns an object which should be used to monitor the operation state.
-func (c captchaClient) Delete(ctx context.Context, in *smartcaptcha.DeleteCaptchaRequest, opts ...grpc.CallOption) (*CaptchaDeleteOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, CaptchaDelete, opts...)
+// List is an operation of Yandex.Cloud Smartcaptcha Captcha service.
+func (c captchaClient) List(ctx context.Context, in *smartcaptcha.ListCaptchasRequest, opts ...grpc.CallOption) (*smartcaptcha.ListCaptchasResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, CaptchaList, opts...)
 	if err != nil {
 		return nil, err
 	}
-	pb, err := smartcaptcha.NewCaptchaServiceClient(connection).Delete(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*smartcaptcha.DeleteCaptchaMetadata).GetCaptchaId()
-		},
-		MetadataType: (*smartcaptcha.DeleteCaptchaMetadata)(nil),
-		ResponseType: (*emptypb.Empty)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &CaptchaDeleteOperation{*op}, nil
+	return smartcaptcha.NewCaptchaServiceClient(connection).List(ctx, in, opts...)
 }
 
 // pollOperation returns the current state of the polled operation.
@@ -237,9 +236,9 @@ func (c captchaClient) pollOperation(ctx context.Context, operationId string, op
 var (
 	CaptchaGet             = protoreflect.FullName("yandex.cloud.smartcaptcha.v1.CaptchaService.Get")
 	CaptchaGetSecretKey    = protoreflect.FullName("yandex.cloud.smartcaptcha.v1.CaptchaService.GetSecretKey")
-	CaptchaList            = protoreflect.FullName("yandex.cloud.smartcaptcha.v1.CaptchaService.List")
 	CaptchaCreate          = protoreflect.FullName("yandex.cloud.smartcaptcha.v1.CaptchaService.Create")
-	CaptchaUpdate          = protoreflect.FullName("yandex.cloud.smartcaptcha.v1.CaptchaService.Update")
 	CaptchaDelete          = protoreflect.FullName("yandex.cloud.smartcaptcha.v1.CaptchaService.Delete")
+	CaptchaUpdate          = protoreflect.FullName("yandex.cloud.smartcaptcha.v1.CaptchaService.Update")
+	CaptchaList            = protoreflect.FullName("yandex.cloud.smartcaptcha.v1.CaptchaService.List")
 	CaptchaOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
