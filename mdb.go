@@ -13,7 +13,6 @@ import (
 	"github.com/yandex-cloud/go-sdk/gen/mdb/postgresql"
 	"github.com/yandex-cloud/go-sdk/gen/mdb/redis"
 	"github.com/yandex-cloud/go-sdk/gen/mdb/spqr"
-	"github.com/yandex-cloud/go-sdk/gen/mdb/sqlserver"
 )
 
 const (
@@ -23,7 +22,6 @@ const (
 	MDBRedisServiceID      Endpoint = "managed-redis"
 	MDBMySQLServiceID      Endpoint = "managed-mysql"
 	MDBKafkaServiceID      Endpoint = "managed-kafka"
-	MDBSQLServerServiceID  Endpoint = "managed-sqlserver"
 	MDBGreenplumServiceID  Endpoint = "managed-greenplum"
 	MDBOpenSearchID        Endpoint = "managed-opensearch"
 	MDBSPQRID              Endpoint = "managed-spqr"
@@ -55,10 +53,6 @@ func (m *MDB) Kafka() *kafka.Kafka {
 
 func (m *MDB) MySQL() *mysql.MySQL {
 	return mysql.NewMySQL(m.sdk.getConn(MDBMySQLServiceID))
-}
-
-func (m *MDB) SQLServer() *sqlserver.SQLServer {
-	return sqlserver.NewSQLServer(m.sdk.getConn(MDBSQLServerServiceID))
 }
 
 func (m *MDB) Greenplum() *greenplum.Greenplum {
