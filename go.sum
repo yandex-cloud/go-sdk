@@ -96,8 +96,8 @@ github.com/yandex-cloud/go-genproto v0.58.0 h1:z5Z3TTEhSV40Y2SUrYjdwOzVzpMvJ2dhQ
 github.com/yandex-cloud/go-genproto v0.58.0/go.mod h1:0LDD/IZLIUIV4iPH+YcF+jysO3jkSvADFGm4dCAuwQo=
 github.com/yandex-cloud/go-genproto v0.59.0 h1:usifPI+Yk4c93LtzzRMfYr9a95Xz7sNdB5epLAjYHcs=
 github.com/yandex-cloud/go-genproto v0.59.0/go.mod h1:0LDD/IZLIUIV4iPH+YcF+jysO3jkSvADFGm4dCAuwQo=
-github.com/yandex-cloud/go-genproto v0.61.0 h1:mBjonOXwK/pafqLjDvcUhHZ62dFoNjv8375cbkYj/+w=
-github.com/yandex-cloud/go-genproto v0.61.0/go.mod h1:0LDD/IZLIUIV4iPH+YcF+jysO3jkSvADFGm4dCAuwQo=
+github.com/yandex-cloud/go-genproto v0.62.0 h1:1hQX6MutKzJ/p0Gwa+sAD9shWuEmk7aWttLN6FmWooM=
+github.com/yandex-cloud/go-genproto v0.62.0/go.mod h1:0LDD/IZLIUIV4iPH+YcF+jysO3jkSvADFGm4dCAuwQo=
 golang.org/x/net v0.28.0 h1:a9JDOJc5GMUJ0+UDqmLT86WiEy7iWyIhz8gz8E4e5hE=
 golang.org/x/net v0.28.0/go.mod h1:yqtgsTWOOnlGLG9GFRrK3++bGOUEkNBoHZc8MEDWPNg=
 golang.org/x/sys v0.24.0 h1:Twjiwq9dn6R1fQcyiK+wQyHWfaz/BJB+YIpzU/Cv3Xg=
