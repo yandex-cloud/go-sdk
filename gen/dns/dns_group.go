@@ -22,3 +22,8 @@ func NewDNS(g func(ctx context.Context) (*grpc.ClientConn, error)) *DNS {
 func (d *DNS) DnsZone() *DnsZoneServiceClient {
 	return &DnsZoneServiceClient{getConn: d.getConn}
 }
+
+// DnsFirewall gets DnsFirewallService client
+func (d *DNS) DnsFirewall() *DnsFirewallServiceClient {
+	return &DnsFirewallServiceClient{getConn: d.getConn}
+}

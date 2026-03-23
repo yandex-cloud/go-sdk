@@ -37,3 +37,8 @@ func (b *Backup) Policy() *PolicyServiceClient {
 func (b *Backup) Provider() *ProviderServiceClient {
 	return &ProviderServiceClient{getConn: b.getConn}
 }
+
+// Setup gets SetupService client
+func (b *Backup) Setup() *SetupServiceClient {
+	return &SetupServiceClient{getConn: b.getConn}
+}

@@ -77,3 +77,8 @@ func (b *Baremetal) StandardImage() *StandardImageServiceClient {
 func (b *Baremetal) PrivateCloudConnection() *PrivateCloudConnectionServiceClient {
 	return &PrivateCloudConnectionServiceClient{getConn: b.getConn}
 }
+
+// PublicPrefixPool gets PublicPrefixPoolService client
+func (b *Baremetal) PublicPrefixPool() *PublicPrefixPoolServiceClient {
+	return &PublicPrefixPoolServiceClient{getConn: b.getConn}
+}

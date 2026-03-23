@@ -279,6 +279,238 @@ func (it *TrunkConnectionOperationsIterator) Error() error {
 	return it.err
 }
 
+// ListPrivateConnections implements cic.TrunkConnectionServiceClient
+func (c *TrunkConnectionServiceClient) ListPrivateConnections(ctx context.Context, in *cic.ListTrunkConnectionPrivateConnectionsRequest, opts ...grpc.CallOption) (*cic.ListTrunkConnectionPrivateConnectionsResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cic.NewTrunkConnectionServiceClient(conn).ListPrivateConnections(ctx, in, opts...)
+}
+
+type TrunkConnectionPrivateConnectionsIterator struct {
+	ctx  context.Context
+	opts []grpc.CallOption
+
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
+
+	client  *TrunkConnectionServiceClient
+	request *cic.ListTrunkConnectionPrivateConnectionsRequest
+
+	items []*cic.PrivateConnection
+}
+
+func (c *TrunkConnectionServiceClient) TrunkConnectionPrivateConnectionsIterator(ctx context.Context, req *cic.ListTrunkConnectionPrivateConnectionsRequest, opts ...grpc.CallOption) *TrunkConnectionPrivateConnectionsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
+	return &TrunkConnectionPrivateConnectionsIterator{
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
+	}
+}
+
+func (it *TrunkConnectionPrivateConnectionsIterator) Next() bool {
+	if it.err != nil {
+		return false
+	}
+	if len(it.items) > 1 {
+		it.items[0] = nil
+		it.items = it.items[1:]
+		return true
+	}
+	it.items = nil // consume last item, if any
+
+	if it.started && it.request.PageToken == "" {
+		return false
+	}
+	it.started = true
+
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
+	response, err := it.client.ListPrivateConnections(it.ctx, it.request, it.opts...)
+	it.err = err
+	if err != nil {
+		return false
+	}
+
+	it.items = response.PrivateConnections
+	it.request.PageToken = response.NextPageToken
+	return len(it.items) > 0
+}
+
+func (it *TrunkConnectionPrivateConnectionsIterator) Take(size int64) ([]*cic.PrivateConnection, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*cic.PrivateConnection
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *TrunkConnectionPrivateConnectionsIterator) TakeAll() ([]*cic.PrivateConnection, error) {
+	return it.Take(0)
+}
+
+func (it *TrunkConnectionPrivateConnectionsIterator) Value() *cic.PrivateConnection {
+	if len(it.items) == 0 {
+		panic("calling Value on empty iterator")
+	}
+	return it.items[0]
+}
+
+func (it *TrunkConnectionPrivateConnectionsIterator) Error() error {
+	return it.err
+}
+
+// ListPublicConnections implements cic.TrunkConnectionServiceClient
+func (c *TrunkConnectionServiceClient) ListPublicConnections(ctx context.Context, in *cic.ListTrunkConnectionPublicConnectionsRequest, opts ...grpc.CallOption) (*cic.ListTrunkConnectionPublicConnectionsResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cic.NewTrunkConnectionServiceClient(conn).ListPublicConnections(ctx, in, opts...)
+}
+
+type TrunkConnectionPublicConnectionsIterator struct {
+	ctx  context.Context
+	opts []grpc.CallOption
+
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
+
+	client  *TrunkConnectionServiceClient
+	request *cic.ListTrunkConnectionPublicConnectionsRequest
+
+	items []*cic.PublicConnection
+}
+
+func (c *TrunkConnectionServiceClient) TrunkConnectionPublicConnectionsIterator(ctx context.Context, req *cic.ListTrunkConnectionPublicConnectionsRequest, opts ...grpc.CallOption) *TrunkConnectionPublicConnectionsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
+	return &TrunkConnectionPublicConnectionsIterator{
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
+	}
+}
+
+func (it *TrunkConnectionPublicConnectionsIterator) Next() bool {
+	if it.err != nil {
+		return false
+	}
+	if len(it.items) > 1 {
+		it.items[0] = nil
+		it.items = it.items[1:]
+		return true
+	}
+	it.items = nil // consume last item, if any
+
+	if it.started && it.request.PageToken == "" {
+		return false
+	}
+	it.started = true
+
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
+	response, err := it.client.ListPublicConnections(it.ctx, it.request, it.opts...)
+	it.err = err
+	if err != nil {
+		return false
+	}
+
+	it.items = response.PublicConnections
+	it.request.PageToken = response.NextPageToken
+	return len(it.items) > 0
+}
+
+func (it *TrunkConnectionPublicConnectionsIterator) Take(size int64) ([]*cic.PublicConnection, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*cic.PublicConnection
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *TrunkConnectionPublicConnectionsIterator) TakeAll() ([]*cic.PublicConnection, error) {
+	return it.Take(0)
+}
+
+func (it *TrunkConnectionPublicConnectionsIterator) Value() *cic.PublicConnection {
+	if len(it.items) == 0 {
+		panic("calling Value on empty iterator")
+	}
+	return it.items[0]
+}
+
+func (it *TrunkConnectionPublicConnectionsIterator) Error() error {
+	return it.err
+}
+
 // Move implements cic.TrunkConnectionServiceClient
 func (c *TrunkConnectionServiceClient) Move(ctx context.Context, in *cic.MoveTrunkConnectionRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
