@@ -23,6 +23,8 @@ type TrunkConnectionClient interface {
 	Update(context.Context, *cic.UpdateTrunkConnectionRequest, ...grpc.CallOption) (*TrunkConnectionUpdateOperation, error)
 	Delete(context.Context, *cic.DeleteTrunkConnectionRequest, ...grpc.CallOption) (*TrunkConnectionDeleteOperation, error)
 	Move(context.Context, *cic.MoveTrunkConnectionRequest, ...grpc.CallOption) (*TrunkConnectionMoveOperation, error)
+	ListPrivateConnections(context.Context, *cic.ListTrunkConnectionPrivateConnectionsRequest, ...grpc.CallOption) (*cic.ListTrunkConnectionPrivateConnectionsResponse, error)
+	ListPublicConnections(context.Context, *cic.ListTrunkConnectionPublicConnectionsRequest, ...grpc.CallOption) (*cic.ListTrunkConnectionPublicConnectionsResponse, error)
 	ListOperations(context.Context, *cic.ListTrunkConnectionOperationsRequest, ...grpc.CallOption) (*cic.ListTrunkConnectionOperationsResponse, error)
 }
 
@@ -271,6 +273,24 @@ func (c trunkConnectionClient) Move(ctx context.Context, in *cic.MoveTrunkConnec
 	return &TrunkConnectionMoveOperation{*op}, nil
 }
 
+// ListPrivateConnections is an operation of Yandex.Cloud Cic TrunkConnection service.
+func (c trunkConnectionClient) ListPrivateConnections(ctx context.Context, in *cic.ListTrunkConnectionPrivateConnectionsRequest, opts ...grpc.CallOption) (*cic.ListTrunkConnectionPrivateConnectionsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, TrunkConnectionListPrivateConnections, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return cic.NewTrunkConnectionServiceClient(connection).ListPrivateConnections(ctx, in, opts...)
+}
+
+// ListPublicConnections is an operation of Yandex.Cloud Cic TrunkConnection service.
+func (c trunkConnectionClient) ListPublicConnections(ctx context.Context, in *cic.ListTrunkConnectionPublicConnectionsRequest, opts ...grpc.CallOption) (*cic.ListTrunkConnectionPublicConnectionsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, TrunkConnectionListPublicConnections, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return cic.NewTrunkConnectionServiceClient(connection).ListPublicConnections(ctx, in, opts...)
+}
+
 // ListOperations is an operation of Yandex.Cloud Cic TrunkConnection service.
 func (c trunkConnectionClient) ListOperations(ctx context.Context, in *cic.ListTrunkConnectionOperationsRequest, opts ...grpc.CallOption) (*cic.ListTrunkConnectionOperationsResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, TrunkConnectionListOperations, opts...)
@@ -290,12 +310,14 @@ func (c trunkConnectionClient) pollOperation(ctx context.Context, operationId st
 }
 
 var (
-	TrunkConnectionGet             = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Get")
-	TrunkConnectionList            = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.List")
-	TrunkConnectionCreate          = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Create")
-	TrunkConnectionUpdate          = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Update")
-	TrunkConnectionDelete          = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Delete")
-	TrunkConnectionMove            = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Move")
-	TrunkConnectionListOperations  = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.ListOperations")
-	TrunkConnectionOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
+	TrunkConnectionGet                    = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Get")
+	TrunkConnectionList                   = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.List")
+	TrunkConnectionCreate                 = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Create")
+	TrunkConnectionUpdate                 = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Update")
+	TrunkConnectionDelete                 = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Delete")
+	TrunkConnectionMove                   = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Move")
+	TrunkConnectionListPrivateConnections = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.ListPrivateConnections")
+	TrunkConnectionListPublicConnections  = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.ListPublicConnections")
+	TrunkConnectionListOperations         = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.ListOperations")
+	TrunkConnectionOperationPoller        = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

@@ -12,6 +12,8 @@ import (
 
 type TrunkConnectionClientIterator interface {
 	Iterator(context.Context, *cic.ListTrunkConnectionsRequest, ...grpc.CallOption) *iterator.Iterator[*cic.ListTrunkConnectionsRequest, *cic.TrunkConnection]
+	PrivateConnectionsIterator(context.Context, *cic.ListTrunkConnectionPrivateConnectionsRequest, ...grpc.CallOption) *iterator.Iterator[*cic.ListTrunkConnectionPrivateConnectionsRequest, *cic.PrivateConnection]
+	PublicConnectionsIterator(context.Context, *cic.ListTrunkConnectionPublicConnectionsRequest, ...grpc.CallOption) *iterator.Iterator[*cic.ListTrunkConnectionPublicConnectionsRequest, *cic.PublicConnection]
 	OperationsIterator(context.Context, *cic.ListTrunkConnectionOperationsRequest, ...grpc.CallOption) *iterator.Iterator[*cic.ListTrunkConnectionOperationsRequest, *operation.Operation]
 }
 
@@ -31,6 +33,44 @@ func (c trunkConnectionClient) Iterator(ctx context.Context, req *cic.ListTrunkC
 				return nil, err
 			}
 			return trunkConnectionServiceListInternal{resp}, nil
+		})
+}
+
+type trunkConnectionServiceListPrivateConnectionsInternal struct {
+	*cic.ListTrunkConnectionPrivateConnectionsResponse
+}
+
+func (r trunkConnectionServiceListPrivateConnectionsInternal) Items() []*cic.PrivateConnection {
+	return r.ListTrunkConnectionPrivateConnectionsResponse.PrivateConnections
+}
+
+func (c trunkConnectionClient) PrivateConnectionsIterator(ctx context.Context, req *cic.ListTrunkConnectionPrivateConnectionsRequest, opts ...grpc.CallOption) *iterator.Iterator[*cic.ListTrunkConnectionPrivateConnectionsRequest, *cic.PrivateConnection] {
+	return iterator.NewIterator[*cic.ListTrunkConnectionPrivateConnectionsRequest, *cic.PrivateConnection](ctx, req,
+		func(ctx context.Context, req *cic.ListTrunkConnectionPrivateConnectionsRequest, opts ...grpc.CallOption) (iterator.PageResponse[*cic.PrivateConnection], error) {
+			resp, err := c.ListPrivateConnections(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return trunkConnectionServiceListPrivateConnectionsInternal{resp}, nil
+		})
+}
+
+type trunkConnectionServiceListPublicConnectionsInternal struct {
+	*cic.ListTrunkConnectionPublicConnectionsResponse
+}
+
+func (r trunkConnectionServiceListPublicConnectionsInternal) Items() []*cic.PublicConnection {
+	return r.ListTrunkConnectionPublicConnectionsResponse.PublicConnections
+}
+
+func (c trunkConnectionClient) PublicConnectionsIterator(ctx context.Context, req *cic.ListTrunkConnectionPublicConnectionsRequest, opts ...grpc.CallOption) *iterator.Iterator[*cic.ListTrunkConnectionPublicConnectionsRequest, *cic.PublicConnection] {
+	return iterator.NewIterator[*cic.ListTrunkConnectionPublicConnectionsRequest, *cic.PublicConnection](ctx, req,
+		func(ctx context.Context, req *cic.ListTrunkConnectionPublicConnectionsRequest, opts ...grpc.CallOption) (iterator.PageResponse[*cic.PublicConnection], error) {
+			resp, err := c.ListPublicConnections(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return trunkConnectionServiceListPublicConnectionsInternal{resp}, nil
 		})
 }
 
