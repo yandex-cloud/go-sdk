@@ -10,26 +10,9 @@ import (
 )
 
 type BackupClientIterator interface {
-	Iterator(context.Context, *backup.ListBackupsRequest, ...grpc.CallOption) *iterator.Iterator[*backup.ListBackupsRequest, *backup.Backup]
 	ArchivesIterator(context.Context, *backup.ListArchivesRequest, ...grpc.CallOption) *iterator.SimpleIterator[*backup.ListArchivesRequest, *backup.Archive]
+	Iterator(context.Context, *backup.ListBackupsRequest, ...grpc.CallOption) *iterator.Iterator[*backup.ListBackupsRequest, *backup.Backup]
 	FilesIterator(context.Context, *backup.ListFilesRequest, ...grpc.CallOption) *iterator.SimpleIterator[*backup.ListFilesRequest, *backup.BackupFile]
-}
-
-type backupServiceListInternal struct {
-	*backup.ListBackupsResponse
-}
-
-func (r backupServiceListInternal) Items() []*backup.Backup { return r.ListBackupsResponse.Backups }
-
-func (c backupClient) Iterator(ctx context.Context, req *backup.ListBackupsRequest, opts ...grpc.CallOption) *iterator.Iterator[*backup.ListBackupsRequest, *backup.Backup] {
-	return iterator.NewIterator[*backup.ListBackupsRequest, *backup.Backup](ctx, req,
-		func(ctx context.Context, req *backup.ListBackupsRequest, opts ...grpc.CallOption) (iterator.PageResponse[*backup.Backup], error) {
-			resp, err := c.List(ctx, req, opts...)
-			if err != nil {
-				return nil, err
-			}
-			return backupServiceListInternal{resp}, nil
-		})
 }
 
 type backupServiceListArchivesInternal struct {
@@ -48,6 +31,23 @@ func (c backupClient) ArchivesIterator(ctx context.Context, req *backup.ListArch
 				return nil, err
 			}
 			return backupServiceListArchivesInternal{resp}, nil
+		})
+}
+
+type backupServiceListInternal struct {
+	*backup.ListBackupsResponse
+}
+
+func (r backupServiceListInternal) Items() []*backup.Backup { return r.ListBackupsResponse.Backups }
+
+func (c backupClient) Iterator(ctx context.Context, req *backup.ListBackupsRequest, opts ...grpc.CallOption) *iterator.Iterator[*backup.ListBackupsRequest, *backup.Backup] {
+	return iterator.NewIterator[*backup.ListBackupsRequest, *backup.Backup](ctx, req,
+		func(ctx context.Context, req *backup.ListBackupsRequest, opts ...grpc.CallOption) (iterator.PageResponse[*backup.Backup], error) {
+			resp, err := c.List(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return backupServiceListInternal{resp}, nil
 		})
 }
 

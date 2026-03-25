@@ -45,6 +45,7 @@ var DynamicEndpoints = map[protoreflect.FullName]string{
 	protoreflect.FullName("yandex.cloud.compute.v1.instancegroup"):                                           "compute",
 	protoreflect.FullName("yandex.cloud.connectionmanager.v1"):                                               "connection-manager",
 	protoreflect.FullName("yandex.cloud.containerregistry.v1"):                                               "container-registry",
+	protoreflect.FullName("yandex.cloud.datacatalog.v1"):                                                     "datacatalog",
 	protoreflect.FullName("yandex.cloud.dataproc.manager.v1"):                                                "dataproc",
 	protoreflect.FullName("yandex.cloud.dataproc.v1"):                                                        "dataproc",
 	protoreflect.FullName("yandex.cloud.datasphere.v1"):                                                      "datasphere",

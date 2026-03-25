@@ -17,8 +17,8 @@ import (
 // BackupClient provides methods for managing Backup resources of Yandex.Cloud Backup.
 type BackupClient interface {
 	BackupClientIterator
-	List(context.Context, *backup.ListBackupsRequest, ...grpc.CallOption) (*backup.ListBackupsResponse, error)
 	ListArchives(context.Context, *backup.ListArchivesRequest, ...grpc.CallOption) (*backup.ListArchivesResponse, error)
+	List(context.Context, *backup.ListBackupsRequest, ...grpc.CallOption) (*backup.ListBackupsResponse, error)
 	ListFiles(context.Context, *backup.ListFilesRequest, ...grpc.CallOption) (*backup.ListFilesResponse, error)
 	Get(context.Context, *backup.GetBackupRequest, ...grpc.CallOption) (*backup.Backup, error)
 	StartRecovery(context.Context, *backup.StartRecoveryRequest, ...grpc.CallOption) (*BackupStartRecoveryOperation, error)
@@ -38,15 +38,6 @@ func NewBackupClient(connector transport.Connector) BackupClient {
 	return backupClient{connector}
 }
 
-// List is an operation of Yandex.Cloud Backup Backup service.
-func (c backupClient) List(ctx context.Context, in *backup.ListBackupsRequest, opts ...grpc.CallOption) (*backup.ListBackupsResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, BackupList, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return backup.NewBackupServiceClient(connection).List(ctx, in, opts...)
-}
-
 // ListArchives is an operation of Yandex.Cloud Backup Backup service.
 func (c backupClient) ListArchives(ctx context.Context, in *backup.ListArchivesRequest, opts ...grpc.CallOption) (*backup.ListArchivesResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, BackupListArchives, opts...)
@@ -54,6 +45,15 @@ func (c backupClient) ListArchives(ctx context.Context, in *backup.ListArchivesR
 		return nil, err
 	}
 	return backup.NewBackupServiceClient(connection).ListArchives(ctx, in, opts...)
+}
+
+// List is an operation of Yandex.Cloud Backup Backup service.
+func (c backupClient) List(ctx context.Context, in *backup.ListBackupsRequest, opts ...grpc.CallOption) (*backup.ListBackupsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, BackupList, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return backup.NewBackupServiceClient(connection).List(ctx, in, opts...)
 }
 
 // ListFiles is an operation of Yandex.Cloud Backup Backup service.
@@ -294,8 +294,8 @@ func (c backupClient) pollOperation(ctx context.Context, operationId string, opt
 }
 
 var (
-	BackupList               = protoreflect.FullName("yandex.cloud.backup.v1.BackupService.List")
 	BackupListArchives       = protoreflect.FullName("yandex.cloud.backup.v1.BackupService.ListArchives")
+	BackupList               = protoreflect.FullName("yandex.cloud.backup.v1.BackupService.List")
 	BackupListFiles          = protoreflect.FullName("yandex.cloud.backup.v1.BackupService.ListFiles")
 	BackupGet                = protoreflect.FullName("yandex.cloud.backup.v1.BackupService.Get")
 	BackupStartRecovery      = protoreflect.FullName("yandex.cloud.backup.v1.BackupService.StartRecovery")
