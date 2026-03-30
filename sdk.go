@@ -88,8 +88,8 @@ func Build(ctx context.Context, opts ...options.Option) (*SDK, error) {
 	if _, ok := buildOptions.Credentials.(*credentials.NoCredentials); !ok {
 		tokenMiddleware := transportauth.NewIAMTokenMiddleware(buildOptions.Authenticator, transportauth.WithLogger(logger))
 		dialOpts = append(dialOpts,
-			grpc.WithUnaryInterceptor(tokenMiddleware.InterceptUnary),
-			grpc.WithStreamInterceptor(tokenMiddleware.InterceptStream),
+			grpc.WithChainUnaryInterceptor(tokenMiddleware.InterceptUnary),
+			grpc.WithChainStreamInterceptor(tokenMiddleware.InterceptStream),
 		)
 	}
 
