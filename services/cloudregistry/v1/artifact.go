@@ -19,6 +19,7 @@ import (
 type ArtifactClient interface {
 	ArtifactClientIterator
 	Get(context.Context, *cloudregistry.GetArtifactRequest, ...grpc.CallOption) (*cloudregistry.Artifact, error)
+	GetByPath(context.Context, *cloudregistry.GetArtifactByPathRequest, ...grpc.CallOption) (*cloudregistry.Artifact, error)
 	Delete(context.Context, *cloudregistry.DeleteArtifactRequest, ...grpc.CallOption) (*ArtifactDeleteOperation, error)
 	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
 	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*ArtifactSetAccessBindingsOperation, error)
@@ -43,6 +44,15 @@ func (c artifactClient) Get(ctx context.Context, in *cloudregistry.GetArtifactRe
 		return nil, err
 	}
 	return cloudregistry.NewArtifactServiceClient(connection).Get(ctx, in, opts...)
+}
+
+// GetByPath is an operation of Yandex.Cloud Cloudregistry Artifact service.
+func (c artifactClient) GetByPath(ctx context.Context, in *cloudregistry.GetArtifactByPathRequest, opts ...grpc.CallOption) (*cloudregistry.Artifact, error) {
+	connection, err := c.connector.GetConnection(ctx, ArtifactGetByPath, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return cloudregistry.NewArtifactServiceClient(connection).GetByPath(ctx, in, opts...)
 }
 
 // ArtifactDeleteOperation is used to monitor the state of Delete operations.
@@ -221,6 +231,7 @@ func (c artifactClient) pollOperation(ctx context.Context, operationId string, o
 
 var (
 	ArtifactGet                  = protoreflect.FullName("yandex.cloud.cloudregistry.v1.ArtifactService.Get")
+	ArtifactGetByPath            = protoreflect.FullName("yandex.cloud.cloudregistry.v1.ArtifactService.GetByPath")
 	ArtifactDelete               = protoreflect.FullName("yandex.cloud.cloudregistry.v1.ArtifactService.Delete")
 	ArtifactListAccessBindings   = protoreflect.FullName("yandex.cloud.cloudregistry.v1.ArtifactService.ListAccessBindings")
 	ArtifactSetAccessBindings    = protoreflect.FullName("yandex.cloud.cloudregistry.v1.ArtifactService.SetAccessBindings")
