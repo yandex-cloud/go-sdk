@@ -39,6 +39,15 @@ func (c *ArtifactServiceClient) Get(ctx context.Context, in *cloudregistry.GetAr
 	return cloudregistry.NewArtifactServiceClient(conn).Get(ctx, in, opts...)
 }
 
+// GetByPath implements cloudregistry.ArtifactServiceClient
+func (c *ArtifactServiceClient) GetByPath(ctx context.Context, in *cloudregistry.GetArtifactByPathRequest, opts ...grpc.CallOption) (*cloudregistry.Artifact, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudregistry.NewArtifactServiceClient(conn).GetByPath(ctx, in, opts...)
+}
+
 // ListAccessBindings implements cloudregistry.ArtifactServiceClient
 func (c *ArtifactServiceClient) ListAccessBindings(ctx context.Context, in *access.ListAccessBindingsRequest, opts ...grpc.CallOption) (*access.ListAccessBindingsResponse, error) {
 	conn, err := c.getConn(ctx)
