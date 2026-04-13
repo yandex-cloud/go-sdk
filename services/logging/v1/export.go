@@ -18,12 +18,12 @@ import (
 // ExportClient provides methods for managing Export resources of Yandex.Cloud Logging.
 type ExportClient interface {
 	ExportClientIterator
-	Run(context.Context, *logging.RunExportRequest, ...grpc.CallOption) (*ExportRunOperation, error)
 	Get(context.Context, *logging.GetExportRequest, ...grpc.CallOption) (*logging.Export, error)
 	List(context.Context, *logging.ListExportsRequest, ...grpc.CallOption) (*logging.ListExportsResponse, error)
 	Create(context.Context, *logging.CreateExportRequest, ...grpc.CallOption) (*ExportCreateOperation, error)
 	Update(context.Context, *logging.UpdateExportRequest, ...grpc.CallOption) (*ExportUpdateOperation, error)
 	Delete(context.Context, *logging.DeleteExportRequest, ...grpc.CallOption) (*ExportDeleteOperation, error)
+	Run(context.Context, *logging.RunExportRequest, ...grpc.CallOption) (*ExportRunOperation, error)
 	ListOperations(context.Context, *logging.ListExportOperationsRequest, ...grpc.CallOption) (*logging.ListExportOperationsResponse, error)
 	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
 	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*ExportSetAccessBindingsOperation, error)
@@ -39,57 +39,6 @@ type exportClient struct {
 // NewExportClient returns ExportClient implementation.
 func NewExportClient(connector transport.Connector) ExportClient {
 	return exportClient{connector}
-}
-
-// ExportRunOperation is used to monitor the state of Run operations.
-type ExportRunOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *ExportRunOperation) Metadata() *logging.RunExportMetadata {
-	return o.Operation.Metadata().(*logging.RunExportMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *ExportRunOperation) Response() *logging.RunExportDetails {
-	return o.Operation.Response().(*logging.RunExportDetails)
-}
-
-// Wait polls the operation until it's done.
-func (o *ExportRunOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*logging.RunExportDetails, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*logging.RunExportDetails)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *ExportRunOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*logging.RunExportDetails, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*logging.RunExportDetails)
-	return response, err
-}
-
-// Run is an operation of Yandex.Cloud Logging Export service.
-// It returns an object which should be used to monitor the operation state.
-func (c exportClient) Run(ctx context.Context, in *logging.RunExportRequest, opts ...grpc.CallOption) (*ExportRunOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, ExportRun, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := logging.NewExportServiceClient(connection).Run(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll:         c.pollOperation,
-		MetadataType: (*logging.RunExportMetadata)(nil),
-		ResponseType: (*logging.RunExportDetails)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &ExportRunOperation{*op}, nil
 }
 
 // Get is an operation of Yandex.Cloud Logging Export service.
@@ -272,6 +221,57 @@ func (c exportClient) Delete(ctx context.Context, in *logging.DeleteExportReques
 	return &ExportDeleteOperation{*op}, nil
 }
 
+// ExportRunOperation is used to monitor the state of Run operations.
+type ExportRunOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ExportRunOperation) Metadata() *logging.RunExportMetadata {
+	return o.Operation.Metadata().(*logging.RunExportMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ExportRunOperation) Response() *logging.RunExportDetails {
+	return o.Operation.Response().(*logging.RunExportDetails)
+}
+
+// Wait polls the operation until it's done.
+func (o *ExportRunOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*logging.RunExportDetails, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*logging.RunExportDetails)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ExportRunOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*logging.RunExportDetails, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*logging.RunExportDetails)
+	return response, err
+}
+
+// Run is an operation of Yandex.Cloud Logging Export service.
+// It returns an object which should be used to monitor the operation state.
+func (c exportClient) Run(ctx context.Context, in *logging.RunExportRequest, opts ...grpc.CallOption) (*ExportRunOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ExportRun, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := logging.NewExportServiceClient(connection).Run(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*logging.RunExportMetadata)(nil),
+		ResponseType: (*logging.RunExportDetails)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ExportRunOperation{*op}, nil
+}
+
 // ListOperations is an operation of Yandex.Cloud Logging Export service.
 func (c exportClient) ListOperations(ctx context.Context, in *logging.ListExportOperationsRequest, opts ...grpc.CallOption) (*logging.ListExportOperationsResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, ExportListOperations, opts...)
@@ -402,12 +402,12 @@ func (c exportClient) pollOperation(ctx context.Context, operationId string, opt
 }
 
 var (
-	ExportRun                  = protoreflect.FullName("yandex.cloud.logging.v1.ExportService.Run")
 	ExportGet                  = protoreflect.FullName("yandex.cloud.logging.v1.ExportService.Get")
 	ExportList                 = protoreflect.FullName("yandex.cloud.logging.v1.ExportService.List")
 	ExportCreate               = protoreflect.FullName("yandex.cloud.logging.v1.ExportService.Create")
 	ExportUpdate               = protoreflect.FullName("yandex.cloud.logging.v1.ExportService.Update")
 	ExportDelete               = protoreflect.FullName("yandex.cloud.logging.v1.ExportService.Delete")
+	ExportRun                  = protoreflect.FullName("yandex.cloud.logging.v1.ExportService.Run")
 	ExportListOperations       = protoreflect.FullName("yandex.cloud.logging.v1.ExportService.ListOperations")
 	ExportListAccessBindings   = protoreflect.FullName("yandex.cloud.logging.v1.ExportService.ListAccessBindings")
 	ExportSetAccessBindings    = protoreflect.FullName("yandex.cloud.logging.v1.ExportService.SetAccessBindings")
