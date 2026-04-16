@@ -3,8 +3,8 @@ module github.com/yandex-cloud/go-sdk/services/apploadbalancer
 go 1.24.13
 
 require (
-	github.com/yandex-cloud/go-genproto v0.71.0
-	github.com/yandex-cloud/go-sdk/v2 v2.86.0
+	github.com/yandex-cloud/go-genproto v0.72.0
+	github.com/yandex-cloud/go-sdk/v2 v2.88.0
 	google.golang.org/grpc v1.74.0-dev
 	google.golang.org/protobuf v1.36.6
 )

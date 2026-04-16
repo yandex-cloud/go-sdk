@@ -24,6 +24,7 @@ type ArtifactClient interface {
 	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
 	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*ArtifactSetAccessBindingsOperation, error)
 	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*ArtifactUpdateAccessBindingsOperation, error)
+	UpsertFolder(context.Context, *cloudregistry.UpsertFolderRequest, ...grpc.CallOption) (*ArtifactUpsertFolderOperation, error)
 }
 
 var _ ArtifactClient = artifactClient{}
@@ -220,6 +221,57 @@ func (c artifactClient) UpdateAccessBindings(ctx context.Context, in *access.Upd
 	return &ArtifactUpdateAccessBindingsOperation{*op}, nil
 }
 
+// ArtifactUpsertFolderOperation is used to monitor the state of UpsertFolder operations.
+type ArtifactUpsertFolderOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ArtifactUpsertFolderOperation) Metadata() *cloudregistry.UpsertFolderMetadata {
+	return o.Operation.Metadata().(*cloudregistry.UpsertFolderMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ArtifactUpsertFolderOperation) Response() *cloudregistry.Artifact {
+	return o.Operation.Response().(*cloudregistry.Artifact)
+}
+
+// Wait polls the operation until it's done.
+func (o *ArtifactUpsertFolderOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*cloudregistry.Artifact, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*cloudregistry.Artifact)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ArtifactUpsertFolderOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*cloudregistry.Artifact, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*cloudregistry.Artifact)
+	return response, err
+}
+
+// UpsertFolder is an operation of Yandex.Cloud Cloudregistry Artifact service.
+// It returns an object which should be used to monitor the operation state.
+func (c artifactClient) UpsertFolder(ctx context.Context, in *cloudregistry.UpsertFolderRequest, opts ...grpc.CallOption) (*ArtifactUpsertFolderOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ArtifactUpsertFolder, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := cloudregistry.NewArtifactServiceClient(connection).UpsertFolder(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*cloudregistry.UpsertFolderMetadata)(nil),
+		ResponseType: (*cloudregistry.Artifact)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ArtifactUpsertFolderOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c artifactClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, ArtifactOperationPoller, opts...)
@@ -236,5 +288,6 @@ var (
 	ArtifactListAccessBindings   = protoreflect.FullName("yandex.cloud.cloudregistry.v1.ArtifactService.ListAccessBindings")
 	ArtifactSetAccessBindings    = protoreflect.FullName("yandex.cloud.cloudregistry.v1.ArtifactService.SetAccessBindings")
 	ArtifactUpdateAccessBindings = protoreflect.FullName("yandex.cloud.cloudregistry.v1.ArtifactService.UpdateAccessBindings")
+	ArtifactUpsertFolder         = protoreflect.FullName("yandex.cloud.cloudregistry.v1.ArtifactService.UpsertFolder")
 	ArtifactOperationPoller      = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

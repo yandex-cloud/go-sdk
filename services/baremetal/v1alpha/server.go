@@ -26,9 +26,9 @@ type ServerClient interface {
 	PowerOn(context.Context, *baremetal.PowerOnServerRequest, ...grpc.CallOption) (*ServerPowerOnOperation, error)
 	Reboot(context.Context, *baremetal.RebootServerRequest, ...grpc.CallOption) (*ServerRebootOperation, error)
 	Reinstall(context.Context, *baremetal.ReinstallServerRequest, ...grpc.CallOption) (*ServerReinstallOperation, error)
+	ListOperations(context.Context, *baremetal.ListServerOperationsRequest, ...grpc.CallOption) (*baremetal.ListServerOperationsResponse, error)
 	StartProlongation(context.Context, *baremetal.StartProlongationRequest, ...grpc.CallOption) (*ServerStartProlongationOperation, error)
 	StopProlongation(context.Context, *baremetal.StopProlongationRequest, ...grpc.CallOption) (*ServerStopProlongationOperation, error)
-	ListOperations(context.Context, *baremetal.ListServerOperationsRequest, ...grpc.CallOption) (*baremetal.ListServerOperationsResponse, error)
 }
 
 var _ ServerClient = serverClient{}
@@ -435,6 +435,15 @@ func (c serverClient) Reinstall(ctx context.Context, in *baremetal.ReinstallServ
 	return &ServerReinstallOperation{*op}, nil
 }
 
+// ListOperations is an operation of Yandex.Cloud Baremetal Server service.
+func (c serverClient) ListOperations(ctx context.Context, in *baremetal.ListServerOperationsRequest, opts ...grpc.CallOption) (*baremetal.ListServerOperationsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, ServerListOperations, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return baremetal.NewServerServiceClient(connection).ListOperations(ctx, in, opts...)
+}
+
 // ServerStartProlongationOperation is used to monitor the state of StartProlongation operations.
 type ServerStartProlongationOperation struct {
 	sdkop.Operation
@@ -543,15 +552,6 @@ func (c serverClient) StopProlongation(ctx context.Context, in *baremetal.StopPr
 	return &ServerStopProlongationOperation{*op}, nil
 }
 
-// ListOperations is an operation of Yandex.Cloud Baremetal Server service.
-func (c serverClient) ListOperations(ctx context.Context, in *baremetal.ListServerOperationsRequest, opts ...grpc.CallOption) (*baremetal.ListServerOperationsResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, ServerListOperations, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return baremetal.NewServerServiceClient(connection).ListOperations(ctx, in, opts...)
-}
-
 // pollOperation returns the current state of the polled operation.
 func (c serverClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, ServerOperationPoller, opts...)
@@ -571,8 +571,8 @@ var (
 	ServerPowerOn           = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.PowerOn")
 	ServerReboot            = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.Reboot")
 	ServerReinstall         = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.Reinstall")
+	ServerListOperations    = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.ListOperations")
 	ServerStartProlongation = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.StartProlongation")
 	ServerStopProlongation  = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.StopProlongation")
-	ServerListOperations    = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.ListOperations")
 	ServerOperationPoller   = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

@@ -20,6 +20,7 @@ type ConsumptionCoreClient interface {
 	GetSKUUsageReport(context.Context, *usage_records.UsageReportRequest, ...grpc.CallOption) (*usage_records.SKUUsageReportResponse, error)
 	GetResourceUsageReport(context.Context, *usage_records.UsageReportRequest, ...grpc.CallOption) (*usage_records.ResourceUsageReportResponse, error)
 	GetLabelKeyUsageReport(context.Context, *usage_records.UsageReportRequest, ...grpc.CallOption) (*usage_records.LabelKeyUsageReportResponse, error)
+	GetServiceInstanceUsageReport(context.Context, *usage_records.UsageReportRequest, ...grpc.CallOption) (*usage_records.ServiceInstanceUsageReportResponse, error)
 }
 
 var _ ConsumptionCoreClient = consumptionCoreClient{}
@@ -96,12 +97,22 @@ func (c consumptionCoreClient) GetLabelKeyUsageReport(ctx context.Context, in *u
 	return usage_records.NewConsumptionCoreServiceClient(connection).GetLabelKeyUsageReport(ctx, in, opts...)
 }
 
+// GetServiceInstanceUsageReport is an operation of Yandex.Cloud UsageRecords ConsumptionCore service.
+func (c consumptionCoreClient) GetServiceInstanceUsageReport(ctx context.Context, in *usage_records.UsageReportRequest, opts ...grpc.CallOption) (*usage_records.ServiceInstanceUsageReportResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, ConsumptionCoreGetServiceInstanceUsageReport, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return usage_records.NewConsumptionCoreServiceClient(connection).GetServiceInstanceUsageReport(ctx, in, opts...)
+}
+
 var (
-	ConsumptionCoreGetBillingAccountUsageReport = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.ConsumptionCoreService.GetBillingAccountUsageReport")
-	ConsumptionCoreGetCloudUsageReport          = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.ConsumptionCoreService.GetCloudUsageReport")
-	ConsumptionCoreGetFolderUsageReport         = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.ConsumptionCoreService.GetFolderUsageReport")
-	ConsumptionCoreGetServiceUsageReport        = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.ConsumptionCoreService.GetServiceUsageReport")
-	ConsumptionCoreGetSKUUsageReport            = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.ConsumptionCoreService.GetSKUUsageReport")
-	ConsumptionCoreGetResourceUsageReport       = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.ConsumptionCoreService.GetResourceUsageReport")
-	ConsumptionCoreGetLabelKeyUsageReport       = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.ConsumptionCoreService.GetLabelKeyUsageReport")
+	ConsumptionCoreGetBillingAccountUsageReport  = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.ConsumptionCoreService.GetBillingAccountUsageReport")
+	ConsumptionCoreGetCloudUsageReport           = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.ConsumptionCoreService.GetCloudUsageReport")
+	ConsumptionCoreGetFolderUsageReport          = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.ConsumptionCoreService.GetFolderUsageReport")
+	ConsumptionCoreGetServiceUsageReport         = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.ConsumptionCoreService.GetServiceUsageReport")
+	ConsumptionCoreGetSKUUsageReport             = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.ConsumptionCoreService.GetSKUUsageReport")
+	ConsumptionCoreGetResourceUsageReport        = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.ConsumptionCoreService.GetResourceUsageReport")
+	ConsumptionCoreGetLabelKeyUsageReport        = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.ConsumptionCoreService.GetLabelKeyUsageReport")
+	ConsumptionCoreGetServiceInstanceUsageReport = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.ConsumptionCoreService.GetServiceInstanceUsageReport")
 )

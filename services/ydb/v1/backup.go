@@ -21,10 +21,10 @@ type BackupClient interface {
 	Get(context.Context, *ydb.GetBackupRequest, ...grpc.CallOption) (*ydb.Backup, error)
 	ListPaths(context.Context, *ydb.ListPathsRequest, ...grpc.CallOption) (*ydb.ListPathsResponse, error)
 	List(context.Context, *ydb.ListBackupsRequest, ...grpc.CallOption) (*ydb.ListBackupsResponse, error)
+	Delete(context.Context, *ydb.DeleteBackupRequest, ...grpc.CallOption) (*BackupDeleteOperation, error)
 	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
 	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*BackupSetAccessBindingsOperation, error)
 	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*BackupUpdateAccessBindingsOperation, error)
-	Delete(context.Context, *ydb.DeleteBackupRequest, ...grpc.CallOption) (*BackupDeleteOperation, error)
 }
 
 var _ BackupClient = backupClient{}
@@ -63,6 +63,60 @@ func (c backupClient) List(ctx context.Context, in *ydb.ListBackupsRequest, opts
 		return nil, err
 	}
 	return ydb.NewBackupServiceClient(connection).List(ctx, in, opts...)
+}
+
+// BackupDeleteOperation is used to monitor the state of Delete operations.
+type BackupDeleteOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *BackupDeleteOperation) Metadata() *ydb.DeleteBackupMetadata {
+	return o.Operation.Metadata().(*ydb.DeleteBackupMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *BackupDeleteOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *BackupDeleteOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *BackupDeleteOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// Delete is an operation of Yandex.Cloud YDB Backup service.
+// It returns an object which should be used to monitor the operation state.
+func (c backupClient) Delete(ctx context.Context, in *ydb.DeleteBackupRequest, opts ...grpc.CallOption) (*BackupDeleteOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, BackupDelete, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := ydb.NewBackupServiceClient(connection).Delete(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*ydb.DeleteBackupMetadata).GetBackupId()
+		},
+		MetadataType: (*ydb.DeleteBackupMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &BackupDeleteOperation{*op}, nil
 }
 
 // ListAccessBindings is an operation of Yandex.Cloud YDB Backup service.
@@ -176,60 +230,6 @@ func (c backupClient) UpdateAccessBindings(ctx context.Context, in *access.Updat
 	return &BackupUpdateAccessBindingsOperation{*op}, nil
 }
 
-// BackupDeleteOperation is used to monitor the state of Delete operations.
-type BackupDeleteOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *BackupDeleteOperation) Metadata() *ydb.DeleteBackupMetadata {
-	return o.Operation.Metadata().(*ydb.DeleteBackupMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *BackupDeleteOperation) Response() *emptypb.Empty {
-	return o.Operation.Response().(*emptypb.Empty)
-}
-
-// Wait polls the operation until it's done.
-func (o *BackupDeleteOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*emptypb.Empty)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *BackupDeleteOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*emptypb.Empty)
-	return response, err
-}
-
-// Delete is an operation of Yandex.Cloud YDB Backup service.
-// It returns an object which should be used to monitor the operation state.
-func (c backupClient) Delete(ctx context.Context, in *ydb.DeleteBackupRequest, opts ...grpc.CallOption) (*BackupDeleteOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, BackupDelete, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := ydb.NewBackupServiceClient(connection).Delete(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*ydb.DeleteBackupMetadata).GetBackupId()
-		},
-		MetadataType: (*ydb.DeleteBackupMetadata)(nil),
-		ResponseType: (*emptypb.Empty)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &BackupDeleteOperation{*op}, nil
-}
-
 // pollOperation returns the current state of the polled operation.
 func (c backupClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, BackupOperationPoller, opts...)
@@ -243,9 +243,9 @@ var (
 	BackupGet                  = protoreflect.FullName("yandex.cloud.ydb.v1.BackupService.Get")
 	BackupListPaths            = protoreflect.FullName("yandex.cloud.ydb.v1.BackupService.ListPaths")
 	BackupList                 = protoreflect.FullName("yandex.cloud.ydb.v1.BackupService.List")
+	BackupDelete               = protoreflect.FullName("yandex.cloud.ydb.v1.BackupService.Delete")
 	BackupListAccessBindings   = protoreflect.FullName("yandex.cloud.ydb.v1.BackupService.ListAccessBindings")
 	BackupSetAccessBindings    = protoreflect.FullName("yandex.cloud.ydb.v1.BackupService.SetAccessBindings")
 	BackupUpdateAccessBindings = protoreflect.FullName("yandex.cloud.ydb.v1.BackupService.UpdateAccessBindings")
-	BackupDelete               = protoreflect.FullName("yandex.cloud.ydb.v1.BackupService.Delete")
 	BackupOperationPoller      = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

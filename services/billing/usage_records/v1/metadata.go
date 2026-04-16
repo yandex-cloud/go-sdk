@@ -14,9 +14,10 @@ import (
 type MetadataClient interface {
 	MetadataClientIterator
 	GetUsage(context.Context, *usage_records.GetUsageRequest, ...grpc.CallOption) (*usage_records.GetUsageResponse, error)
+	GetServiceInstance(context.Context, *usage_records.GetServiceInstanceRequest, ...grpc.CallOption) (*usage_records.GetServiceInstanceResponse, error)
 	GetLabel(context.Context, *usage_records.GetLabelRequest, ...grpc.CallOption) (*usage_records.GetLabelResponse, error)
 	GetCloud(context.Context, *usage_records.GetCloudRequest, ...grpc.CallOption) (*usage_records.GetCloudResponse, error)
-	GetResourceIDs(context.Context, *usage_records.GetResourceIDsRequest, ...grpc.CallOption) (*usage_records.GetResourceIDsResponse, error)
+	GetResources(context.Context, *usage_records.GetResourcesRequest, ...grpc.CallOption) (*usage_records.GetResourcesResponse, error)
 }
 
 var _ MetadataClient = metadataClient{}
@@ -39,6 +40,15 @@ func (c metadataClient) GetUsage(ctx context.Context, in *usage_records.GetUsage
 	return usage_records.NewMetadataServiceClient(connection).GetUsage(ctx, in, opts...)
 }
 
+// GetServiceInstance is an operation of Yandex.Cloud UsageRecords Metadata service.
+func (c metadataClient) GetServiceInstance(ctx context.Context, in *usage_records.GetServiceInstanceRequest, opts ...grpc.CallOption) (*usage_records.GetServiceInstanceResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, MetadataGetServiceInstance, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return usage_records.NewMetadataServiceClient(connection).GetServiceInstance(ctx, in, opts...)
+}
+
 // GetLabel is an operation of Yandex.Cloud UsageRecords Metadata service.
 func (c metadataClient) GetLabel(ctx context.Context, in *usage_records.GetLabelRequest, opts ...grpc.CallOption) (*usage_records.GetLabelResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, MetadataGetLabel, opts...)
@@ -57,18 +67,19 @@ func (c metadataClient) GetCloud(ctx context.Context, in *usage_records.GetCloud
 	return usage_records.NewMetadataServiceClient(connection).GetCloud(ctx, in, opts...)
 }
 
-// GetResourceIDs is an operation of Yandex.Cloud UsageRecords Metadata service.
-func (c metadataClient) GetResourceIDs(ctx context.Context, in *usage_records.GetResourceIDsRequest, opts ...grpc.CallOption) (*usage_records.GetResourceIDsResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, MetadataGetResourceIDs, opts...)
+// GetResources is an operation of Yandex.Cloud UsageRecords Metadata service.
+func (c metadataClient) GetResources(ctx context.Context, in *usage_records.GetResourcesRequest, opts ...grpc.CallOption) (*usage_records.GetResourcesResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, MetadataGetResources, opts...)
 	if err != nil {
 		return nil, err
 	}
-	return usage_records.NewMetadataServiceClient(connection).GetResourceIDs(ctx, in, opts...)
+	return usage_records.NewMetadataServiceClient(connection).GetResources(ctx, in, opts...)
 }
 
 var (
-	MetadataGetUsage       = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.MetadataService.GetUsage")
-	MetadataGetLabel       = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.MetadataService.GetLabel")
-	MetadataGetCloud       = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.MetadataService.GetCloud")
-	MetadataGetResourceIDs = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.MetadataService.GetResourceIDs")
+	MetadataGetUsage           = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.MetadataService.GetUsage")
+	MetadataGetServiceInstance = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.MetadataService.GetServiceInstance")
+	MetadataGetLabel           = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.MetadataService.GetLabel")
+	MetadataGetCloud           = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.MetadataService.GetCloud")
+	MetadataGetResources       = protoreflect.FullName("yandex.cloud.billing.usage_records.v1.MetadataService.GetResources")
 )

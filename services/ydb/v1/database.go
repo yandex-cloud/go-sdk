@@ -24,13 +24,13 @@ type DatabaseClient interface {
 	Update(context.Context, *ydb.UpdateDatabaseRequest, ...grpc.CallOption) (*DatabaseUpdateOperation, error)
 	Start(context.Context, *ydb.StartDatabaseRequest, ...grpc.CallOption) (*DatabaseStartOperation, error)
 	Stop(context.Context, *ydb.StopDatabaseRequest, ...grpc.CallOption) (*DatabaseStopOperation, error)
+	Delete(context.Context, *ydb.DeleteDatabaseRequest, ...grpc.CallOption) (*DatabaseDeleteOperation, error)
+	Restore(context.Context, *ydb.RestoreBackupRequest, ...grpc.CallOption) (*DatabaseRestoreOperation, error)
+	Backup(context.Context, *ydb.BackupDatabaseRequest, ...grpc.CallOption) (*DatabaseBackupOperation, error)
 	Move(context.Context, *ydb.MoveDatabaseRequest, ...grpc.CallOption) (*DatabaseMoveOperation, error)
 	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
 	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*DatabaseSetAccessBindingsOperation, error)
 	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*DatabaseUpdateAccessBindingsOperation, error)
-	Delete(context.Context, *ydb.DeleteDatabaseRequest, ...grpc.CallOption) (*DatabaseDeleteOperation, error)
-	Restore(context.Context, *ydb.RestoreBackupRequest, ...grpc.CallOption) (*DatabaseRestoreOperation, error)
-	Backup(context.Context, *ydb.BackupDatabaseRequest, ...grpc.CallOption) (*DatabaseBackupOperation, error)
 }
 
 var _ DatabaseClient = databaseClient{}
@@ -278,6 +278,168 @@ func (c databaseClient) Stop(ctx context.Context, in *ydb.StopDatabaseRequest, o
 	return &DatabaseStopOperation{*op}, nil
 }
 
+// DatabaseDeleteOperation is used to monitor the state of Delete operations.
+type DatabaseDeleteOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *DatabaseDeleteOperation) Metadata() *ydb.DeleteDatabaseMetadata {
+	return o.Operation.Metadata().(*ydb.DeleteDatabaseMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *DatabaseDeleteOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *DatabaseDeleteOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *DatabaseDeleteOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// Delete is an operation of Yandex.Cloud YDB Database service.
+// It returns an object which should be used to monitor the operation state.
+func (c databaseClient) Delete(ctx context.Context, in *ydb.DeleteDatabaseRequest, opts ...grpc.CallOption) (*DatabaseDeleteOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, DatabaseDelete, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := ydb.NewDatabaseServiceClient(connection).Delete(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*ydb.DeleteDatabaseMetadata).GetDatabaseId()
+		},
+		MetadataType: (*ydb.DeleteDatabaseMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &DatabaseDeleteOperation{*op}, nil
+}
+
+// DatabaseRestoreOperation is used to monitor the state of Restore operations.
+type DatabaseRestoreOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *DatabaseRestoreOperation) Metadata() *ydb.RestoreBackupMetadata {
+	return o.Operation.Metadata().(*ydb.RestoreBackupMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *DatabaseRestoreOperation) Response() *ydb.Database {
+	return o.Operation.Response().(*ydb.Database)
+}
+
+// Wait polls the operation until it's done.
+func (o *DatabaseRestoreOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*ydb.Database, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*ydb.Database)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *DatabaseRestoreOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*ydb.Database, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*ydb.Database)
+	return response, err
+}
+
+// Restore is an operation of Yandex.Cloud YDB Database service.
+// It returns an object which should be used to monitor the operation state.
+func (c databaseClient) Restore(ctx context.Context, in *ydb.RestoreBackupRequest, opts ...grpc.CallOption) (*DatabaseRestoreOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, DatabaseRestore, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := ydb.NewDatabaseServiceClient(connection).Restore(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*ydb.RestoreBackupMetadata).GetDatabaseId()
+		},
+		MetadataType: (*ydb.RestoreBackupMetadata)(nil),
+		ResponseType: (*ydb.Database)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &DatabaseRestoreOperation{*op}, nil
+}
+
+// DatabaseBackupOperation is used to monitor the state of Backup operations.
+type DatabaseBackupOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *DatabaseBackupOperation) Metadata() *ydb.BackupDatabaseMetadata {
+	return o.Operation.Metadata().(*ydb.BackupDatabaseMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *DatabaseBackupOperation) Response() *ydb.Database {
+	return o.Operation.Response().(*ydb.Database)
+}
+
+// Wait polls the operation until it's done.
+func (o *DatabaseBackupOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*ydb.Database, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*ydb.Database)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *DatabaseBackupOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*ydb.Database, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*ydb.Database)
+	return response, err
+}
+
+// Backup is an operation of Yandex.Cloud YDB Database service.
+// It returns an object which should be used to monitor the operation state.
+func (c databaseClient) Backup(ctx context.Context, in *ydb.BackupDatabaseRequest, opts ...grpc.CallOption) (*DatabaseBackupOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, DatabaseBackup, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := ydb.NewDatabaseServiceClient(connection).Backup(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*ydb.BackupDatabaseMetadata).GetDatabaseId()
+		},
+		MetadataType: (*ydb.BackupDatabaseMetadata)(nil),
+		ResponseType: (*ydb.Database)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &DatabaseBackupOperation{*op}, nil
+}
+
 // DatabaseMoveOperation is used to monitor the state of Move operations.
 type DatabaseMoveOperation struct {
 	sdkop.Operation
@@ -443,168 +605,6 @@ func (c databaseClient) UpdateAccessBindings(ctx context.Context, in *access.Upd
 	return &DatabaseUpdateAccessBindingsOperation{*op}, nil
 }
 
-// DatabaseDeleteOperation is used to monitor the state of Delete operations.
-type DatabaseDeleteOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *DatabaseDeleteOperation) Metadata() *ydb.DeleteDatabaseMetadata {
-	return o.Operation.Metadata().(*ydb.DeleteDatabaseMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *DatabaseDeleteOperation) Response() *emptypb.Empty {
-	return o.Operation.Response().(*emptypb.Empty)
-}
-
-// Wait polls the operation until it's done.
-func (o *DatabaseDeleteOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*emptypb.Empty)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *DatabaseDeleteOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*emptypb.Empty)
-	return response, err
-}
-
-// Delete is an operation of Yandex.Cloud YDB Database service.
-// It returns an object which should be used to monitor the operation state.
-func (c databaseClient) Delete(ctx context.Context, in *ydb.DeleteDatabaseRequest, opts ...grpc.CallOption) (*DatabaseDeleteOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, DatabaseDelete, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := ydb.NewDatabaseServiceClient(connection).Delete(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*ydb.DeleteDatabaseMetadata).GetDatabaseId()
-		},
-		MetadataType: (*ydb.DeleteDatabaseMetadata)(nil),
-		ResponseType: (*emptypb.Empty)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &DatabaseDeleteOperation{*op}, nil
-}
-
-// DatabaseRestoreOperation is used to monitor the state of Restore operations.
-type DatabaseRestoreOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *DatabaseRestoreOperation) Metadata() *ydb.RestoreBackupMetadata {
-	return o.Operation.Metadata().(*ydb.RestoreBackupMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *DatabaseRestoreOperation) Response() *ydb.Database {
-	return o.Operation.Response().(*ydb.Database)
-}
-
-// Wait polls the operation until it's done.
-func (o *DatabaseRestoreOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*ydb.Database, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*ydb.Database)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *DatabaseRestoreOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*ydb.Database, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*ydb.Database)
-	return response, err
-}
-
-// Restore is an operation of Yandex.Cloud YDB Database service.
-// It returns an object which should be used to monitor the operation state.
-func (c databaseClient) Restore(ctx context.Context, in *ydb.RestoreBackupRequest, opts ...grpc.CallOption) (*DatabaseRestoreOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, DatabaseRestore, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := ydb.NewDatabaseServiceClient(connection).Restore(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*ydb.RestoreBackupMetadata).GetDatabaseId()
-		},
-		MetadataType: (*ydb.RestoreBackupMetadata)(nil),
-		ResponseType: (*ydb.Database)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &DatabaseRestoreOperation{*op}, nil
-}
-
-// DatabaseBackupOperation is used to monitor the state of Backup operations.
-type DatabaseBackupOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *DatabaseBackupOperation) Metadata() *ydb.BackupDatabaseMetadata {
-	return o.Operation.Metadata().(*ydb.BackupDatabaseMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *DatabaseBackupOperation) Response() *ydb.Database {
-	return o.Operation.Response().(*ydb.Database)
-}
-
-// Wait polls the operation until it's done.
-func (o *DatabaseBackupOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*ydb.Database, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*ydb.Database)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *DatabaseBackupOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*ydb.Database, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*ydb.Database)
-	return response, err
-}
-
-// Backup is an operation of Yandex.Cloud YDB Database service.
-// It returns an object which should be used to monitor the operation state.
-func (c databaseClient) Backup(ctx context.Context, in *ydb.BackupDatabaseRequest, opts ...grpc.CallOption) (*DatabaseBackupOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, DatabaseBackup, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := ydb.NewDatabaseServiceClient(connection).Backup(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*ydb.BackupDatabaseMetadata).GetDatabaseId()
-		},
-		MetadataType: (*ydb.BackupDatabaseMetadata)(nil),
-		ResponseType: (*ydb.Database)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &DatabaseBackupOperation{*op}, nil
-}
-
 // pollOperation returns the current state of the polled operation.
 func (c databaseClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, DatabaseOperationPoller, opts...)
@@ -621,12 +621,12 @@ var (
 	DatabaseUpdate               = protoreflect.FullName("yandex.cloud.ydb.v1.DatabaseService.Update")
 	DatabaseStart                = protoreflect.FullName("yandex.cloud.ydb.v1.DatabaseService.Start")
 	DatabaseStop                 = protoreflect.FullName("yandex.cloud.ydb.v1.DatabaseService.Stop")
+	DatabaseDelete               = protoreflect.FullName("yandex.cloud.ydb.v1.DatabaseService.Delete")
+	DatabaseRestore              = protoreflect.FullName("yandex.cloud.ydb.v1.DatabaseService.Restore")
+	DatabaseBackup               = protoreflect.FullName("yandex.cloud.ydb.v1.DatabaseService.Backup")
 	DatabaseMove                 = protoreflect.FullName("yandex.cloud.ydb.v1.DatabaseService.Move")
 	DatabaseListAccessBindings   = protoreflect.FullName("yandex.cloud.ydb.v1.DatabaseService.ListAccessBindings")
 	DatabaseSetAccessBindings    = protoreflect.FullName("yandex.cloud.ydb.v1.DatabaseService.SetAccessBindings")
 	DatabaseUpdateAccessBindings = protoreflect.FullName("yandex.cloud.ydb.v1.DatabaseService.UpdateAccessBindings")
-	DatabaseDelete               = protoreflect.FullName("yandex.cloud.ydb.v1.DatabaseService.Delete")
-	DatabaseRestore              = protoreflect.FullName("yandex.cloud.ydb.v1.DatabaseService.Restore")
-	DatabaseBackup               = protoreflect.FullName("yandex.cloud.ydb.v1.DatabaseService.Backup")
 	DatabaseOperationPoller      = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

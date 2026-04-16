@@ -22,6 +22,7 @@ type LifecyclePolicyClient interface {
 	Get(context.Context, *cloudregistry.GetLifecyclePolicyRequest, ...grpc.CallOption) (*cloudregistry.LifecyclePolicy, error)
 	List(context.Context, *cloudregistry.ListLifecyclePolicyRequest, ...grpc.CallOption) (*cloudregistry.ListLifecyclePolicyResponse, error)
 	ChangeState(context.Context, *cloudregistry.ChangeLifecyclePolicyStateRequest, ...grpc.CallOption) (*emptypb.Empty, error)
+	DryRun(context.Context, *cloudregistry.DryRunLifecyclePolicyRequest, ...grpc.CallOption) (*LifecyclePolicyDryRunOperation, error)
 }
 
 var _ LifecyclePolicyClient = lifecyclePolicyClient{}
@@ -215,6 +216,57 @@ func (c lifecyclePolicyClient) ChangeState(ctx context.Context, in *cloudregistr
 	return cloudregistry.NewLifecyclePolicyServiceClient(connection).ChangeState(ctx, in, opts...)
 }
 
+// LifecyclePolicyDryRunOperation is used to monitor the state of DryRun operations.
+type LifecyclePolicyDryRunOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *LifecyclePolicyDryRunOperation) Metadata() *cloudregistry.DryRunLifecyclePolicyMetadata {
+	return o.Operation.Metadata().(*cloudregistry.DryRunLifecyclePolicyMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *LifecyclePolicyDryRunOperation) Response() *cloudregistry.DryRunLifecyclePolicyResponse {
+	return o.Operation.Response().(*cloudregistry.DryRunLifecyclePolicyResponse)
+}
+
+// Wait polls the operation until it's done.
+func (o *LifecyclePolicyDryRunOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*cloudregistry.DryRunLifecyclePolicyResponse, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*cloudregistry.DryRunLifecyclePolicyResponse)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *LifecyclePolicyDryRunOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*cloudregistry.DryRunLifecyclePolicyResponse, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*cloudregistry.DryRunLifecyclePolicyResponse)
+	return response, err
+}
+
+// DryRun is an operation of Yandex.Cloud Cloudregistry LifecyclePolicy service.
+// It returns an object which should be used to monitor the operation state.
+func (c lifecyclePolicyClient) DryRun(ctx context.Context, in *cloudregistry.DryRunLifecyclePolicyRequest, opts ...grpc.CallOption) (*LifecyclePolicyDryRunOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, LifecyclePolicyDryRun, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := cloudregistry.NewLifecyclePolicyServiceClient(connection).DryRun(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*cloudregistry.DryRunLifecyclePolicyMetadata)(nil),
+		ResponseType: (*cloudregistry.DryRunLifecyclePolicyResponse)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &LifecyclePolicyDryRunOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c lifecyclePolicyClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, LifecyclePolicyOperationPoller, opts...)
@@ -231,5 +283,6 @@ var (
 	LifecyclePolicyGet             = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.Get")
 	LifecyclePolicyList            = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.List")
 	LifecyclePolicyChangeState     = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.ChangeState")
+	LifecyclePolicyDryRun          = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.DryRun")
 	LifecyclePolicyOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

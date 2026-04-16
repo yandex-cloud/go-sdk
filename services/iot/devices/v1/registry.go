@@ -30,10 +30,10 @@ type RegistryClient interface {
 	AddPassword(context.Context, *devices.AddRegistryPasswordRequest, ...grpc.CallOption) (*RegistryAddPasswordOperation, error)
 	DeletePassword(context.Context, *devices.DeleteRegistryPasswordRequest, ...grpc.CallOption) (*RegistryDeletePasswordOperation, error)
 	ListDeviceTopicAliases(context.Context, *devices.ListDeviceTopicAliasesRequest, ...grpc.CallOption) (*devices.ListDeviceTopicAliasesResponse, error)
+	ListOperations(context.Context, *devices.ListRegistryOperationsRequest, ...grpc.CallOption) (*devices.ListRegistryOperationsResponse, error)
 	ListDataStreamExports(context.Context, *devices.ListDataStreamExportsRequest, ...grpc.CallOption) (*devices.ListDataStreamExportsResponse, error)
 	AddDataStreamExport(context.Context, *devices.AddDataStreamExportRequest, ...grpc.CallOption) (*RegistryAddDataStreamExportOperation, error)
 	DeleteDataStreamExport(context.Context, *devices.DeleteDataStreamExportRequest, ...grpc.CallOption) (*RegistryDeleteDataStreamExportOperation, error)
-	ListOperations(context.Context, *devices.ListRegistryOperationsRequest, ...grpc.CallOption) (*devices.ListRegistryOperationsResponse, error)
 	Disable(context.Context, *devices.DisableRegistryRequest, ...grpc.CallOption) (*RegistryDisableOperation, error)
 	Enable(context.Context, *devices.EnableRegistryRequest, ...grpc.CallOption) (*RegistryEnableOperation, error)
 }
@@ -481,6 +481,15 @@ func (c registryClient) ListDeviceTopicAliases(ctx context.Context, in *devices.
 	return devices.NewRegistryServiceClient(connection).ListDeviceTopicAliases(ctx, in, opts...)
 }
 
+// ListOperations is an operation of Yandex.Cloud Devices Registry service.
+func (c registryClient) ListOperations(ctx context.Context, in *devices.ListRegistryOperationsRequest, opts ...grpc.CallOption) (*devices.ListRegistryOperationsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, RegistryListOperations, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return devices.NewRegistryServiceClient(connection).ListOperations(ctx, in, opts...)
+}
+
 // ListDataStreamExports is an operation of Yandex.Cloud Devices Registry service.
 func (c registryClient) ListDataStreamExports(ctx context.Context, in *devices.ListDataStreamExportsRequest, opts ...grpc.CallOption) (*devices.ListDataStreamExportsResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, RegistryListDataStreamExports, opts...)
@@ -596,15 +605,6 @@ func (c registryClient) DeleteDataStreamExport(ctx context.Context, in *devices.
 		return nil, err
 	}
 	return &RegistryDeleteDataStreamExportOperation{*op}, nil
-}
-
-// ListOperations is an operation of Yandex.Cloud Devices Registry service.
-func (c registryClient) ListOperations(ctx context.Context, in *devices.ListRegistryOperationsRequest, opts ...grpc.CallOption) (*devices.ListRegistryOperationsResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, RegistryListOperations, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return devices.NewRegistryServiceClient(connection).ListOperations(ctx, in, opts...)
 }
 
 // RegistryDisableOperation is used to monitor the state of Disable operations.
@@ -738,10 +738,10 @@ var (
 	RegistryAddPassword            = protoreflect.FullName("yandex.cloud.iot.devices.v1.RegistryService.AddPassword")
 	RegistryDeletePassword         = protoreflect.FullName("yandex.cloud.iot.devices.v1.RegistryService.DeletePassword")
 	RegistryListDeviceTopicAliases = protoreflect.FullName("yandex.cloud.iot.devices.v1.RegistryService.ListDeviceTopicAliases")
+	RegistryListOperations         = protoreflect.FullName("yandex.cloud.iot.devices.v1.RegistryService.ListOperations")
 	RegistryListDataStreamExports  = protoreflect.FullName("yandex.cloud.iot.devices.v1.RegistryService.ListDataStreamExports")
 	RegistryAddDataStreamExport    = protoreflect.FullName("yandex.cloud.iot.devices.v1.RegistryService.AddDataStreamExport")
 	RegistryDeleteDataStreamExport = protoreflect.FullName("yandex.cloud.iot.devices.v1.RegistryService.DeleteDataStreamExport")
-	RegistryListOperations         = protoreflect.FullName("yandex.cloud.iot.devices.v1.RegistryService.ListOperations")
 	RegistryDisable                = protoreflect.FullName("yandex.cloud.iot.devices.v1.RegistryService.Disable")
 	RegistryEnable                 = protoreflect.FullName("yandex.cloud.iot.devices.v1.RegistryService.Enable")
 	RegistryOperationPoller        = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
