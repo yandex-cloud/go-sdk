@@ -48,6 +48,15 @@ func (c *LifecyclePolicyServiceClient) Delete(ctx context.Context, in *cloudregi
 	return cloudregistry.NewLifecyclePolicyServiceClient(conn).Delete(ctx, in, opts...)
 }
 
+// DryRun implements cloudregistry.LifecyclePolicyServiceClient
+func (c *LifecyclePolicyServiceClient) DryRun(ctx context.Context, in *cloudregistry.DryRunLifecyclePolicyRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudregistry.NewLifecyclePolicyServiceClient(conn).DryRun(ctx, in, opts...)
+}
+
 // Get implements cloudregistry.LifecyclePolicyServiceClient
 func (c *LifecyclePolicyServiceClient) Get(ctx context.Context, in *cloudregistry.GetLifecyclePolicyRequest, opts ...grpc.CallOption) (*cloudregistry.LifecyclePolicy, error) {
 	conn, err := c.getConn(ctx)

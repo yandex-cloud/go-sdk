@@ -181,3 +181,12 @@ func (c *ArtifactServiceClient) UpdateAccessBindings(ctx context.Context, in *ac
 	}
 	return cloudregistry.NewArtifactServiceClient(conn).UpdateAccessBindings(ctx, in, opts...)
 }
+
+// UpsertFolder implements cloudregistry.ArtifactServiceClient
+func (c *ArtifactServiceClient) UpsertFolder(ctx context.Context, in *cloudregistry.UpsertFolderRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudregistry.NewArtifactServiceClient(conn).UpsertFolder(ctx, in, opts...)
+}
