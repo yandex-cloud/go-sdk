@@ -25,14 +25,14 @@ type RoutingInstanceClient interface {
 	Update(context.Context, *cloudrouter.UpdateRoutingInstanceRequest, ...grpc.CallOption) (*RoutingInstanceUpdateOperation, error)
 	UpsertPrefixes(context.Context, *cloudrouter.UpsertPrefixesRequest, ...grpc.CallOption) (*RoutingInstanceUpsertPrefixesOperation, error)
 	RemovePrefixes(context.Context, *cloudrouter.RemovePrefixesRequest, ...grpc.CallOption) (*RoutingInstanceRemovePrefixesOperation, error)
-	UpdateNetworks(context.Context, *cloudrouter.UpdateNetworksRequest, ...grpc.CallOption) (*RoutingInstanceUpdateNetworksOperation, error)
-	MovePrefix(context.Context, *cloudrouter.MovePrefixRequest, ...grpc.CallOption) (*RoutingInstanceMovePrefixOperation, error)
-	UpdatePrefixMask(context.Context, *cloudrouter.UpdatePrefixMaskRequest, ...grpc.CallOption) (*RoutingInstanceUpdatePrefixMaskOperation, error)
 	AddPrivateConnection(context.Context, *cloudrouter.AddPrivateConnectionRequest, ...grpc.CallOption) (*RoutingInstanceAddPrivateConnectionOperation, error)
 	RemovePrivateConnection(context.Context, *cloudrouter.RemovePrivateConnectionRequest, ...grpc.CallOption) (*RoutingInstanceRemovePrivateConnectionOperation, error)
+	UpdateNetworks(context.Context, *cloudrouter.UpdateNetworksRequest, ...grpc.CallOption) (*RoutingInstanceUpdateNetworksOperation, error)
 	Delete(context.Context, *cloudrouter.DeleteRoutingInstanceRequest, ...grpc.CallOption) (*RoutingInstanceDeleteOperation, error)
 	Move(context.Context, *cloudrouter.MoveRoutingInstanceRequest, ...grpc.CallOption) (*RoutingInstanceMoveOperation, error)
 	ListOperations(context.Context, *cloudrouter.ListRoutingInstanceOperationsRequest, ...grpc.CallOption) (*cloudrouter.ListRoutingInstanceOperationsResponse, error)
+	MovePrefix(context.Context, *cloudrouter.MovePrefixRequest, ...grpc.CallOption) (*RoutingInstanceMovePrefixOperation, error)
+	UpdatePrefixMask(context.Context, *cloudrouter.UpdatePrefixMaskRequest, ...grpc.CallOption) (*RoutingInstanceUpdatePrefixMaskOperation, error)
 }
 
 var _ RoutingInstanceClient = routingInstanceClient{}
@@ -298,168 +298,6 @@ func (c routingInstanceClient) RemovePrefixes(ctx context.Context, in *cloudrout
 	return &RoutingInstanceRemovePrefixesOperation{*op}, nil
 }
 
-// RoutingInstanceUpdateNetworksOperation is used to monitor the state of UpdateNetworks operations.
-type RoutingInstanceUpdateNetworksOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *RoutingInstanceUpdateNetworksOperation) Metadata() *cloudrouter.UpdateRoutingInstanceMetadata {
-	return o.Operation.Metadata().(*cloudrouter.UpdateRoutingInstanceMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *RoutingInstanceUpdateNetworksOperation) Response() *cloudrouter.RoutingInstance {
-	return o.Operation.Response().(*cloudrouter.RoutingInstance)
-}
-
-// Wait polls the operation until it's done.
-func (o *RoutingInstanceUpdateNetworksOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*cloudrouter.RoutingInstance, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*cloudrouter.RoutingInstance)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *RoutingInstanceUpdateNetworksOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*cloudrouter.RoutingInstance, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*cloudrouter.RoutingInstance)
-	return response, err
-}
-
-// UpdateNetworks is an operation of Yandex.Cloud Cloudrouter RoutingInstance service.
-// It returns an object which should be used to monitor the operation state.
-func (c routingInstanceClient) UpdateNetworks(ctx context.Context, in *cloudrouter.UpdateNetworksRequest, opts ...grpc.CallOption) (*RoutingInstanceUpdateNetworksOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, RoutingInstanceUpdateNetworks, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := cloudrouter.NewRoutingInstanceServiceClient(connection).UpdateNetworks(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*cloudrouter.UpdateRoutingInstanceMetadata).GetRoutingInstanceId()
-		},
-		MetadataType: (*cloudrouter.UpdateRoutingInstanceMetadata)(nil),
-		ResponseType: (*cloudrouter.RoutingInstance)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &RoutingInstanceUpdateNetworksOperation{*op}, nil
-}
-
-// RoutingInstanceMovePrefixOperation is used to monitor the state of MovePrefix operations.
-type RoutingInstanceMovePrefixOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *RoutingInstanceMovePrefixOperation) Metadata() *cloudrouter.UpdateRoutingInstanceMetadata {
-	return o.Operation.Metadata().(*cloudrouter.UpdateRoutingInstanceMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *RoutingInstanceMovePrefixOperation) Response() *cloudrouter.RoutingInstance {
-	return o.Operation.Response().(*cloudrouter.RoutingInstance)
-}
-
-// Wait polls the operation until it's done.
-func (o *RoutingInstanceMovePrefixOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*cloudrouter.RoutingInstance, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*cloudrouter.RoutingInstance)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *RoutingInstanceMovePrefixOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*cloudrouter.RoutingInstance, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*cloudrouter.RoutingInstance)
-	return response, err
-}
-
-// MovePrefix is an operation of Yandex.Cloud Cloudrouter RoutingInstance service.
-// It returns an object which should be used to monitor the operation state.
-func (c routingInstanceClient) MovePrefix(ctx context.Context, in *cloudrouter.MovePrefixRequest, opts ...grpc.CallOption) (*RoutingInstanceMovePrefixOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, RoutingInstanceMovePrefix, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := cloudrouter.NewRoutingInstanceServiceClient(connection).MovePrefix(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*cloudrouter.UpdateRoutingInstanceMetadata).GetRoutingInstanceId()
-		},
-		MetadataType: (*cloudrouter.UpdateRoutingInstanceMetadata)(nil),
-		ResponseType: (*cloudrouter.RoutingInstance)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &RoutingInstanceMovePrefixOperation{*op}, nil
-}
-
-// RoutingInstanceUpdatePrefixMaskOperation is used to monitor the state of UpdatePrefixMask operations.
-type RoutingInstanceUpdatePrefixMaskOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *RoutingInstanceUpdatePrefixMaskOperation) Metadata() *cloudrouter.UpdateRoutingInstanceMetadata {
-	return o.Operation.Metadata().(*cloudrouter.UpdateRoutingInstanceMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *RoutingInstanceUpdatePrefixMaskOperation) Response() *cloudrouter.RoutingInstance {
-	return o.Operation.Response().(*cloudrouter.RoutingInstance)
-}
-
-// Wait polls the operation until it's done.
-func (o *RoutingInstanceUpdatePrefixMaskOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*cloudrouter.RoutingInstance, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*cloudrouter.RoutingInstance)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *RoutingInstanceUpdatePrefixMaskOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*cloudrouter.RoutingInstance, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*cloudrouter.RoutingInstance)
-	return response, err
-}
-
-// UpdatePrefixMask is an operation of Yandex.Cloud Cloudrouter RoutingInstance service.
-// It returns an object which should be used to monitor the operation state.
-func (c routingInstanceClient) UpdatePrefixMask(ctx context.Context, in *cloudrouter.UpdatePrefixMaskRequest, opts ...grpc.CallOption) (*RoutingInstanceUpdatePrefixMaskOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, RoutingInstanceUpdatePrefixMask, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := cloudrouter.NewRoutingInstanceServiceClient(connection).UpdatePrefixMask(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*cloudrouter.UpdateRoutingInstanceMetadata).GetRoutingInstanceId()
-		},
-		MetadataType: (*cloudrouter.UpdateRoutingInstanceMetadata)(nil),
-		ResponseType: (*cloudrouter.RoutingInstance)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &RoutingInstanceUpdatePrefixMaskOperation{*op}, nil
-}
-
 // RoutingInstanceAddPrivateConnectionOperation is used to monitor the state of AddPrivateConnection operations.
 type RoutingInstanceAddPrivateConnectionOperation struct {
 	sdkop.Operation
@@ -566,6 +404,60 @@ func (c routingInstanceClient) RemovePrivateConnection(ctx context.Context, in *
 		return nil, err
 	}
 	return &RoutingInstanceRemovePrivateConnectionOperation{*op}, nil
+}
+
+// RoutingInstanceUpdateNetworksOperation is used to monitor the state of UpdateNetworks operations.
+type RoutingInstanceUpdateNetworksOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *RoutingInstanceUpdateNetworksOperation) Metadata() *cloudrouter.UpdateRoutingInstanceMetadata {
+	return o.Operation.Metadata().(*cloudrouter.UpdateRoutingInstanceMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *RoutingInstanceUpdateNetworksOperation) Response() *cloudrouter.RoutingInstance {
+	return o.Operation.Response().(*cloudrouter.RoutingInstance)
+}
+
+// Wait polls the operation until it's done.
+func (o *RoutingInstanceUpdateNetworksOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*cloudrouter.RoutingInstance, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*cloudrouter.RoutingInstance)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *RoutingInstanceUpdateNetworksOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*cloudrouter.RoutingInstance, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*cloudrouter.RoutingInstance)
+	return response, err
+}
+
+// UpdateNetworks is an operation of Yandex.Cloud Cloudrouter RoutingInstance service.
+// It returns an object which should be used to monitor the operation state.
+func (c routingInstanceClient) UpdateNetworks(ctx context.Context, in *cloudrouter.UpdateNetworksRequest, opts ...grpc.CallOption) (*RoutingInstanceUpdateNetworksOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, RoutingInstanceUpdateNetworks, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := cloudrouter.NewRoutingInstanceServiceClient(connection).UpdateNetworks(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*cloudrouter.UpdateRoutingInstanceMetadata).GetRoutingInstanceId()
+		},
+		MetadataType: (*cloudrouter.UpdateRoutingInstanceMetadata)(nil),
+		ResponseType: (*cloudrouter.RoutingInstance)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &RoutingInstanceUpdateNetworksOperation{*op}, nil
 }
 
 // RoutingInstanceDeleteOperation is used to monitor the state of Delete operations.
@@ -685,6 +577,114 @@ func (c routingInstanceClient) ListOperations(ctx context.Context, in *cloudrout
 	return cloudrouter.NewRoutingInstanceServiceClient(connection).ListOperations(ctx, in, opts...)
 }
 
+// RoutingInstanceMovePrefixOperation is used to monitor the state of MovePrefix operations.
+type RoutingInstanceMovePrefixOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *RoutingInstanceMovePrefixOperation) Metadata() *cloudrouter.UpdateRoutingInstanceMetadata {
+	return o.Operation.Metadata().(*cloudrouter.UpdateRoutingInstanceMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *RoutingInstanceMovePrefixOperation) Response() *cloudrouter.RoutingInstance {
+	return o.Operation.Response().(*cloudrouter.RoutingInstance)
+}
+
+// Wait polls the operation until it's done.
+func (o *RoutingInstanceMovePrefixOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*cloudrouter.RoutingInstance, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*cloudrouter.RoutingInstance)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *RoutingInstanceMovePrefixOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*cloudrouter.RoutingInstance, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*cloudrouter.RoutingInstance)
+	return response, err
+}
+
+// MovePrefix is an operation of Yandex.Cloud Cloudrouter RoutingInstance service.
+// It returns an object which should be used to monitor the operation state.
+func (c routingInstanceClient) MovePrefix(ctx context.Context, in *cloudrouter.MovePrefixRequest, opts ...grpc.CallOption) (*RoutingInstanceMovePrefixOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, RoutingInstanceMovePrefix, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := cloudrouter.NewRoutingInstanceServiceClient(connection).MovePrefix(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*cloudrouter.UpdateRoutingInstanceMetadata).GetRoutingInstanceId()
+		},
+		MetadataType: (*cloudrouter.UpdateRoutingInstanceMetadata)(nil),
+		ResponseType: (*cloudrouter.RoutingInstance)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &RoutingInstanceMovePrefixOperation{*op}, nil
+}
+
+// RoutingInstanceUpdatePrefixMaskOperation is used to monitor the state of UpdatePrefixMask operations.
+type RoutingInstanceUpdatePrefixMaskOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *RoutingInstanceUpdatePrefixMaskOperation) Metadata() *cloudrouter.UpdateRoutingInstanceMetadata {
+	return o.Operation.Metadata().(*cloudrouter.UpdateRoutingInstanceMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *RoutingInstanceUpdatePrefixMaskOperation) Response() *cloudrouter.RoutingInstance {
+	return o.Operation.Response().(*cloudrouter.RoutingInstance)
+}
+
+// Wait polls the operation until it's done.
+func (o *RoutingInstanceUpdatePrefixMaskOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*cloudrouter.RoutingInstance, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*cloudrouter.RoutingInstance)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *RoutingInstanceUpdatePrefixMaskOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*cloudrouter.RoutingInstance, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*cloudrouter.RoutingInstance)
+	return response, err
+}
+
+// UpdatePrefixMask is an operation of Yandex.Cloud Cloudrouter RoutingInstance service.
+// It returns an object which should be used to monitor the operation state.
+func (c routingInstanceClient) UpdatePrefixMask(ctx context.Context, in *cloudrouter.UpdatePrefixMaskRequest, opts ...grpc.CallOption) (*RoutingInstanceUpdatePrefixMaskOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, RoutingInstanceUpdatePrefixMask, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := cloudrouter.NewRoutingInstanceServiceClient(connection).UpdatePrefixMask(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*cloudrouter.UpdateRoutingInstanceMetadata).GetRoutingInstanceId()
+		},
+		MetadataType: (*cloudrouter.UpdateRoutingInstanceMetadata)(nil),
+		ResponseType: (*cloudrouter.RoutingInstance)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &RoutingInstanceUpdatePrefixMaskOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c routingInstanceClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, RoutingInstanceOperationPoller, opts...)
@@ -703,13 +703,13 @@ var (
 	RoutingInstanceUpdate                      = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.Update")
 	RoutingInstanceUpsertPrefixes              = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.UpsertPrefixes")
 	RoutingInstanceRemovePrefixes              = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.RemovePrefixes")
-	RoutingInstanceUpdateNetworks              = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.UpdateNetworks")
-	RoutingInstanceMovePrefix                  = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.MovePrefix")
-	RoutingInstanceUpdatePrefixMask            = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.UpdatePrefixMask")
 	RoutingInstanceAddPrivateConnection        = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.AddPrivateConnection")
 	RoutingInstanceRemovePrivateConnection     = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.RemovePrivateConnection")
+	RoutingInstanceUpdateNetworks              = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.UpdateNetworks")
 	RoutingInstanceDelete                      = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.Delete")
 	RoutingInstanceMove                        = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.Move")
 	RoutingInstanceListOperations              = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.ListOperations")
+	RoutingInstanceMovePrefix                  = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.MovePrefix")
+	RoutingInstanceUpdatePrefixMask            = protoreflect.FullName("yandex.cloud.cloudrouter.v1.RoutingInstanceService.UpdatePrefixMask")
 	RoutingInstanceOperationPoller             = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
