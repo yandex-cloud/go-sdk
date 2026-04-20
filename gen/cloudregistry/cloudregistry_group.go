@@ -32,3 +32,8 @@ func (c *CloudRegistry) Registry() *RegistryServiceClient {
 func (c *CloudRegistry) LifecyclePolicy() *LifecyclePolicyServiceClient {
 	return &LifecyclePolicyServiceClient{getConn: c.getConn}
 }
+
+// ScanPolicy gets ScanPolicyService client
+func (c *CloudRegistry) ScanPolicy() *ScanPolicyServiceClient {
+	return &ScanPolicyServiceClient{getConn: c.getConn}
+}
