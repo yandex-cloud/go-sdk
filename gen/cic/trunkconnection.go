@@ -20,15 +20,6 @@ type TrunkConnectionServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
 }
 
-// Create implements cic.TrunkConnectionServiceClient
-func (c *TrunkConnectionServiceClient) Create(ctx context.Context, in *cic.CreateTrunkConnectionRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
-	conn, err := c.getConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return cic.NewTrunkConnectionServiceClient(conn).Create(ctx, in, opts...)
-}
-
 // Delete implements cic.TrunkConnectionServiceClient
 func (c *TrunkConnectionServiceClient) Delete(ctx context.Context, in *cic.DeleteTrunkConnectionRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
