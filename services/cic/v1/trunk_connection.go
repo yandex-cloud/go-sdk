@@ -19,7 +19,6 @@ type TrunkConnectionClient interface {
 	TrunkConnectionClientIterator
 	Get(context.Context, *cic.GetTrunkConnectionRequest, ...grpc.CallOption) (*cic.TrunkConnection, error)
 	List(context.Context, *cic.ListTrunkConnectionsRequest, ...grpc.CallOption) (*cic.ListTrunkConnectionsResponse, error)
-	Create(context.Context, *cic.CreateTrunkConnectionRequest, ...grpc.CallOption) (*TrunkConnectionCreateOperation, error)
 	Update(context.Context, *cic.UpdateTrunkConnectionRequest, ...grpc.CallOption) (*TrunkConnectionUpdateOperation, error)
 	Delete(context.Context, *cic.DeleteTrunkConnectionRequest, ...grpc.CallOption) (*TrunkConnectionDeleteOperation, error)
 	Move(context.Context, *cic.MoveTrunkConnectionRequest, ...grpc.CallOption) (*TrunkConnectionMoveOperation, error)
@@ -55,60 +54,6 @@ func (c trunkConnectionClient) List(ctx context.Context, in *cic.ListTrunkConnec
 		return nil, err
 	}
 	return cic.NewTrunkConnectionServiceClient(connection).List(ctx, in, opts...)
-}
-
-// TrunkConnectionCreateOperation is used to monitor the state of Create operations.
-type TrunkConnectionCreateOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *TrunkConnectionCreateOperation) Metadata() *cic.CreateTrunkConnectionMetadata {
-	return o.Operation.Metadata().(*cic.CreateTrunkConnectionMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *TrunkConnectionCreateOperation) Response() *cic.TrunkConnection {
-	return o.Operation.Response().(*cic.TrunkConnection)
-}
-
-// Wait polls the operation until it's done.
-func (o *TrunkConnectionCreateOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*cic.TrunkConnection, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*cic.TrunkConnection)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *TrunkConnectionCreateOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*cic.TrunkConnection, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*cic.TrunkConnection)
-	return response, err
-}
-
-// Create is an operation of Yandex.Cloud Cic TrunkConnection service.
-// It returns an object which should be used to monitor the operation state.
-func (c trunkConnectionClient) Create(ctx context.Context, in *cic.CreateTrunkConnectionRequest, opts ...grpc.CallOption) (*TrunkConnectionCreateOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, TrunkConnectionCreate, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := cic.NewTrunkConnectionServiceClient(connection).Create(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*cic.CreateTrunkConnectionMetadata).GetTrunkConnectionId()
-		},
-		MetadataType: (*cic.CreateTrunkConnectionMetadata)(nil),
-		ResponseType: (*cic.TrunkConnection)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &TrunkConnectionCreateOperation{*op}, nil
 }
 
 // TrunkConnectionUpdateOperation is used to monitor the state of Update operations.
@@ -312,7 +257,6 @@ func (c trunkConnectionClient) pollOperation(ctx context.Context, operationId st
 var (
 	TrunkConnectionGet                    = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Get")
 	TrunkConnectionList                   = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.List")
-	TrunkConnectionCreate                 = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Create")
 	TrunkConnectionUpdate                 = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Update")
 	TrunkConnectionDelete                 = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Delete")
 	TrunkConnectionMove                   = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Move")
