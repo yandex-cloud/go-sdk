@@ -17,9 +17,9 @@ import (
 type QuotaRequestClient interface {
 	QuotaRequestClientIterator
 	Get(context.Context, *quotamanager.GetQuotaRequestRequest, ...grpc.CallOption) (*quotamanager.QuotaRequest, error)
+	List(context.Context, *quotamanager.ListQuotaRequestRequest, ...grpc.CallOption) (*quotamanager.ListQuotaRequestResponse, error)
 	Create(context.Context, *quotamanager.CreateQuotaRequestRequest, ...grpc.CallOption) (*QuotaRequestCreateOperation, error)
 	Cancel(context.Context, *quotamanager.CancelQuotaRequestRequest, ...grpc.CallOption) (*QuotaRequestCancelOperation, error)
-	List(context.Context, *quotamanager.ListQuotaRequestRequest, ...grpc.CallOption) (*quotamanager.ListQuotaRequestResponse, error)
 	ListOperations(context.Context, *quotamanager.ListQuotaRequestOperationsRequest, ...grpc.CallOption) (*quotamanager.ListQuotaRequestOperationsResponse, error)
 }
 
@@ -41,6 +41,15 @@ func (c quotaRequestClient) Get(ctx context.Context, in *quotamanager.GetQuotaRe
 		return nil, err
 	}
 	return quotamanager.NewQuotaRequestServiceClient(connection).Get(ctx, in, opts...)
+}
+
+// List is an operation of Yandex.Cloud QuotaManager QuotaRequest service.
+func (c quotaRequestClient) List(ctx context.Context, in *quotamanager.ListQuotaRequestRequest, opts ...grpc.CallOption) (*quotamanager.ListQuotaRequestResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, QuotaRequestList, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return quotamanager.NewQuotaRequestServiceClient(connection).List(ctx, in, opts...)
 }
 
 // QuotaRequestCreateOperation is used to monitor the state of Create operations.
@@ -151,15 +160,6 @@ func (c quotaRequestClient) Cancel(ctx context.Context, in *quotamanager.CancelQ
 	return &QuotaRequestCancelOperation{*op}, nil
 }
 
-// List is an operation of Yandex.Cloud QuotaManager QuotaRequest service.
-func (c quotaRequestClient) List(ctx context.Context, in *quotamanager.ListQuotaRequestRequest, opts ...grpc.CallOption) (*quotamanager.ListQuotaRequestResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, QuotaRequestList, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return quotamanager.NewQuotaRequestServiceClient(connection).List(ctx, in, opts...)
-}
-
 // ListOperations is an operation of Yandex.Cloud QuotaManager QuotaRequest service.
 func (c quotaRequestClient) ListOperations(ctx context.Context, in *quotamanager.ListQuotaRequestOperationsRequest, opts ...grpc.CallOption) (*quotamanager.ListQuotaRequestOperationsResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, QuotaRequestListOperations, opts...)
@@ -180,9 +180,9 @@ func (c quotaRequestClient) pollOperation(ctx context.Context, operationId strin
 
 var (
 	QuotaRequestGet             = protoreflect.FullName("yandex.cloud.quotamanager.v1.QuotaRequestService.Get")
+	QuotaRequestList            = protoreflect.FullName("yandex.cloud.quotamanager.v1.QuotaRequestService.List")
 	QuotaRequestCreate          = protoreflect.FullName("yandex.cloud.quotamanager.v1.QuotaRequestService.Create")
 	QuotaRequestCancel          = protoreflect.FullName("yandex.cloud.quotamanager.v1.QuotaRequestService.Cancel")
-	QuotaRequestList            = protoreflect.FullName("yandex.cloud.quotamanager.v1.QuotaRequestService.List")
 	QuotaRequestListOperations  = protoreflect.FullName("yandex.cloud.quotamanager.v1.QuotaRequestService.ListOperations")
 	QuotaRequestOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
