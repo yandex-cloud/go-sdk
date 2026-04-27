@@ -208,7 +208,7 @@ func (sdk *SDK) GetEndpoint(method protoreflect.FullName) (*endpoints.Endpoint, 
 func (sdk *SDK) WithEndpoints(endpoints *endpoints.PrefixEndpointsResolver) *SDK {
 	return &SDK{
 		ctx:              sdk.ctx,
-		conn:             sdk.conn,
+		conn:             transport.NewConnector(endpoints, sdk.connPool),
 		endpointResolver: endpoints,
 		connPool:         sdk.connPool,
 		authenticator:    sdk.authenticator,
@@ -218,7 +218,7 @@ func (sdk *SDK) WithEndpoints(endpoints *endpoints.PrefixEndpointsResolver) *SDK
 func (sdk *SDK) WithEnpointsResolver(endpointsResolver endpoints.EndpointsResolver) *SDK {
 	return &SDK{
 		ctx:              sdk.ctx,
-		conn:             sdk.conn,
+		conn:             transport.NewConnector(endpointsResolver, sdk.connPool),
 		endpointResolver: endpointsResolver,
 		connPool:         sdk.connPool,
 		authenticator:    sdk.authenticator,
