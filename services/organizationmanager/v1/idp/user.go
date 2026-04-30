@@ -31,6 +31,8 @@ type UserClient interface {
 	ConvertToExternal(context.Context, *idp.ConvertToExternalUserRequest, ...grpc.CallOption) (*UserConvertToExternalOperation, error)
 	SetPasswordHash(context.Context, *idp.SetPasswordHashRequest, ...grpc.CallOption) (*UserSetPasswordHashOperation, error)
 	ResolveExternalIds(context.Context, *idp.ResolveExternalIdsRequest, ...grpc.CallOption) (*idp.ResolveExternalIdsResponse, error)
+	GetPasswordChanges(context.Context, ...grpc.CallOption) (idp.UserService_GetPasswordChangesClient, error)
+	CommitPassword(context.Context, *idp.CommitPasswordRequest, ...grpc.CallOption) (*UserCommitPasswordOperation, error)
 }
 
 var _ UserClient = userClient{}
@@ -575,6 +577,66 @@ func (c userClient) ResolveExternalIds(ctx context.Context, in *idp.ResolveExter
 	return idp.NewUserServiceClient(connection).ResolveExternalIds(ctx, in, opts...)
 }
 
+// GetPasswordChanges is an operation of Yandex.Cloud Idp User service.
+func (c userClient) GetPasswordChanges(ctx context.Context, opts ...grpc.CallOption) (idp.UserService_GetPasswordChangesClient, error) {
+	connection, err := c.connector.GetConnection(ctx, UserGetPasswordChanges, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return idp.NewUserServiceClient(connection).GetPasswordChanges(ctx, opts...)
+}
+
+// UserCommitPasswordOperation is used to monitor the state of CommitPassword operations.
+type UserCommitPasswordOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *UserCommitPasswordOperation) Metadata() *idp.CommitPasswordMetadata {
+	return o.Operation.Metadata().(*idp.CommitPasswordMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *UserCommitPasswordOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *UserCommitPasswordOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *UserCommitPasswordOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// CommitPassword is an operation of Yandex.Cloud Idp User service.
+// It returns an object which should be used to monitor the operation state.
+func (c userClient) CommitPassword(ctx context.Context, in *idp.CommitPasswordRequest, opts ...grpc.CallOption) (*UserCommitPasswordOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, UserCommitPassword, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := idp.NewUserServiceClient(connection).CommitPassword(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*idp.CommitPasswordMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &UserCommitPasswordOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c userClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, UserOperationPoller, opts...)
@@ -599,5 +661,7 @@ var (
 	UserConvertToExternal       = protoreflect.FullName("yandex.cloud.organizationmanager.v1.idp.UserService.ConvertToExternal")
 	UserSetPasswordHash         = protoreflect.FullName("yandex.cloud.organizationmanager.v1.idp.UserService.SetPasswordHash")
 	UserResolveExternalIds      = protoreflect.FullName("yandex.cloud.organizationmanager.v1.idp.UserService.ResolveExternalIds")
+	UserGetPasswordChanges      = protoreflect.FullName("yandex.cloud.organizationmanager.v1.idp.UserService.GetPasswordChanges")
+	UserCommitPassword          = protoreflect.FullName("yandex.cloud.organizationmanager.v1.idp.UserService.CommitPassword")
 	UserOperationPoller         = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
