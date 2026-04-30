@@ -27,3 +27,8 @@ func (d *DNS) DnsZone() *DnsZoneServiceClient {
 func (d *DNS) DnsFirewall() *DnsFirewallServiceClient {
 	return &DnsFirewallServiceClient{getConn: d.getConn}
 }
+
+// DnsInboundEndpoint gets DnsInboundEndpointService client
+func (d *DNS) DnsInboundEndpoint() *DnsInboundEndpointServiceClient {
+	return &DnsInboundEndpointServiceClient{getConn: d.getConn}
+}

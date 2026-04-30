@@ -21,6 +21,15 @@ type UserServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
 }
 
+// CommitPassword implements idp.UserServiceClient
+func (c *UserServiceClient) CommitPassword(ctx context.Context, in *idp.CommitPasswordRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return idp.NewUserServiceClient(conn).CommitPassword(ctx, in, opts...)
+}
+
 // ConvertToExternal implements idp.UserServiceClient
 func (c *UserServiceClient) ConvertToExternal(ctx context.Context, in *idp.ConvertToExternalUserRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -64,6 +73,15 @@ func (c *UserServiceClient) Get(ctx context.Context, in *idp.GetUserRequest, opt
 		return nil, err
 	}
 	return idp.NewUserServiceClient(conn).Get(ctx, in, opts...)
+}
+
+// GetPasswordChanges implements idp.UserServiceClient
+func (c *UserServiceClient) GetPasswordChanges(ctx context.Context, opts ...grpc.CallOption) (idp.UserService_GetPasswordChangesClient, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return idp.NewUserServiceClient(conn).GetPasswordChanges(ctx, opts...)
 }
 
 // GetSelfPasswordMetadata implements idp.UserServiceClient
