@@ -22,13 +22,13 @@ type DesktopClient interface {
 	List(context.Context, *clouddesktop.ListDesktopsRequest, ...grpc.CallOption) (*clouddesktop.ListDesktopsResponse, error)
 	ListOperations(context.Context, *clouddesktop.ListDesktopOperationsRequest, ...grpc.CallOption) (*clouddesktop.ListDesktopOperationsResponse, error)
 	Create(context.Context, *clouddesktop.CreateDesktopRequest, ...grpc.CallOption) (*DesktopCreateOperation, error)
-	UpdateProperties(context.Context, *clouddesktop.UpdatePropertiesRequest, ...grpc.CallOption) (*DesktopUpdatePropertiesOperation, error)
-	Delete(context.Context, *clouddesktop.DeleteDesktopRequest, ...grpc.CallOption) (*DesktopDeleteOperation, error)
 	ResetPassword(context.Context, *clouddesktop.ResetPasswordRequest, ...grpc.CallOption) (*clouddesktop.ResetPasswordResponse, error)
 	Restart(context.Context, *clouddesktop.RestartRequest, ...grpc.CallOption) (*DesktopRestartOperation, error)
-	Update(context.Context, *clouddesktop.UpdateRequest, ...grpc.CallOption) (*DesktopUpdateOperation, error)
 	Start(context.Context, *clouddesktop.StartRequest, ...grpc.CallOption) (*DesktopStartOperation, error)
 	Stop(context.Context, *clouddesktop.StopRequest, ...grpc.CallOption) (*DesktopStopOperation, error)
+	Update(context.Context, *clouddesktop.UpdateRequest, ...grpc.CallOption) (*DesktopUpdateOperation, error)
+	UpdateProperties(context.Context, *clouddesktop.UpdatePropertiesRequest, ...grpc.CallOption) (*DesktopUpdatePropertiesOperation, error)
+	Delete(context.Context, *clouddesktop.DeleteDesktopRequest, ...grpc.CallOption) (*DesktopDeleteOperation, error)
 }
 
 var _ DesktopClient = desktopClient{}
@@ -132,114 +132,6 @@ func (c desktopClient) Create(ctx context.Context, in *clouddesktop.CreateDeskto
 	return &DesktopCreateOperation{*op}, nil
 }
 
-// DesktopUpdatePropertiesOperation is used to monitor the state of UpdateProperties operations.
-type DesktopUpdatePropertiesOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *DesktopUpdatePropertiesOperation) Metadata() *clouddesktop.UpdateDesktopPropertiesMetadata {
-	return o.Operation.Metadata().(*clouddesktop.UpdateDesktopPropertiesMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *DesktopUpdatePropertiesOperation) Response() *clouddesktop.Desktop {
-	return o.Operation.Response().(*clouddesktop.Desktop)
-}
-
-// Wait polls the operation until it's done.
-func (o *DesktopUpdatePropertiesOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*clouddesktop.Desktop, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*clouddesktop.Desktop)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *DesktopUpdatePropertiesOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*clouddesktop.Desktop, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*clouddesktop.Desktop)
-	return response, err
-}
-
-// UpdateProperties is an operation of Yandex.Cloud Api Desktop service.
-// It returns an object which should be used to monitor the operation state.
-func (c desktopClient) UpdateProperties(ctx context.Context, in *clouddesktop.UpdatePropertiesRequest, opts ...grpc.CallOption) (*DesktopUpdatePropertiesOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, DesktopUpdateProperties, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := clouddesktop.NewDesktopServiceClient(connection).UpdateProperties(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*clouddesktop.UpdateDesktopPropertiesMetadata).GetDesktopId()
-		},
-		MetadataType: (*clouddesktop.UpdateDesktopPropertiesMetadata)(nil),
-		ResponseType: (*clouddesktop.Desktop)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &DesktopUpdatePropertiesOperation{*op}, nil
-}
-
-// DesktopDeleteOperation is used to monitor the state of Delete operations.
-type DesktopDeleteOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *DesktopDeleteOperation) Metadata() *clouddesktop.DeleteDesktopMetadata {
-	return o.Operation.Metadata().(*clouddesktop.DeleteDesktopMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *DesktopDeleteOperation) Response() *emptypb.Empty {
-	return o.Operation.Response().(*emptypb.Empty)
-}
-
-// Wait polls the operation until it's done.
-func (o *DesktopDeleteOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*emptypb.Empty)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *DesktopDeleteOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*emptypb.Empty)
-	return response, err
-}
-
-// Delete is an operation of Yandex.Cloud Api Desktop service.
-// It returns an object which should be used to monitor the operation state.
-func (c desktopClient) Delete(ctx context.Context, in *clouddesktop.DeleteDesktopRequest, opts ...grpc.CallOption) (*DesktopDeleteOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, DesktopDelete, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := clouddesktop.NewDesktopServiceClient(connection).Delete(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*clouddesktop.DeleteDesktopMetadata).GetDesktopId()
-		},
-		MetadataType: (*clouddesktop.DeleteDesktopMetadata)(nil),
-		ResponseType: (*emptypb.Empty)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &DesktopDeleteOperation{*op}, nil
-}
-
 // ResetPassword is an operation of Yandex.Cloud Api Desktop service.
 func (c desktopClient) ResetPassword(ctx context.Context, in *clouddesktop.ResetPasswordRequest, opts ...grpc.CallOption) (*clouddesktop.ResetPasswordResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, DesktopResetPassword, opts...)
@@ -301,60 +193,6 @@ func (c desktopClient) Restart(ctx context.Context, in *clouddesktop.RestartRequ
 		return nil, err
 	}
 	return &DesktopRestartOperation{*op}, nil
-}
-
-// DesktopUpdateOperation is used to monitor the state of Update operations.
-type DesktopUpdateOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *DesktopUpdateOperation) Metadata() *clouddesktop.UpdateDesktopMetadata {
-	return o.Operation.Metadata().(*clouddesktop.UpdateDesktopMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *DesktopUpdateOperation) Response() *clouddesktop.Desktop {
-	return o.Operation.Response().(*clouddesktop.Desktop)
-}
-
-// Wait polls the operation until it's done.
-func (o *DesktopUpdateOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*clouddesktop.Desktop, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*clouddesktop.Desktop)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *DesktopUpdateOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*clouddesktop.Desktop, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*clouddesktop.Desktop)
-	return response, err
-}
-
-// Update is an operation of Yandex.Cloud Api Desktop service.
-// It returns an object which should be used to monitor the operation state.
-func (c desktopClient) Update(ctx context.Context, in *clouddesktop.UpdateRequest, opts ...grpc.CallOption) (*DesktopUpdateOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, DesktopUpdate, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := clouddesktop.NewDesktopServiceClient(connection).Update(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*clouddesktop.UpdateDesktopMetadata).GetDesktopId()
-		},
-		MetadataType: (*clouddesktop.UpdateDesktopMetadata)(nil),
-		ResponseType: (*clouddesktop.Desktop)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &DesktopUpdateOperation{*op}, nil
 }
 
 // DesktopStartOperation is used to monitor the state of Start operations.
@@ -465,6 +303,168 @@ func (c desktopClient) Stop(ctx context.Context, in *clouddesktop.StopRequest, o
 	return &DesktopStopOperation{*op}, nil
 }
 
+// DesktopUpdateOperation is used to monitor the state of Update operations.
+type DesktopUpdateOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *DesktopUpdateOperation) Metadata() *clouddesktop.UpdateDesktopMetadata {
+	return o.Operation.Metadata().(*clouddesktop.UpdateDesktopMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *DesktopUpdateOperation) Response() *clouddesktop.Desktop {
+	return o.Operation.Response().(*clouddesktop.Desktop)
+}
+
+// Wait polls the operation until it's done.
+func (o *DesktopUpdateOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*clouddesktop.Desktop, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*clouddesktop.Desktop)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *DesktopUpdateOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*clouddesktop.Desktop, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*clouddesktop.Desktop)
+	return response, err
+}
+
+// Update is an operation of Yandex.Cloud Api Desktop service.
+// It returns an object which should be used to monitor the operation state.
+func (c desktopClient) Update(ctx context.Context, in *clouddesktop.UpdateRequest, opts ...grpc.CallOption) (*DesktopUpdateOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, DesktopUpdate, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := clouddesktop.NewDesktopServiceClient(connection).Update(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*clouddesktop.UpdateDesktopMetadata).GetDesktopId()
+		},
+		MetadataType: (*clouddesktop.UpdateDesktopMetadata)(nil),
+		ResponseType: (*clouddesktop.Desktop)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &DesktopUpdateOperation{*op}, nil
+}
+
+// DesktopUpdatePropertiesOperation is used to monitor the state of UpdateProperties operations.
+type DesktopUpdatePropertiesOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *DesktopUpdatePropertiesOperation) Metadata() *clouddesktop.UpdateDesktopPropertiesMetadata {
+	return o.Operation.Metadata().(*clouddesktop.UpdateDesktopPropertiesMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *DesktopUpdatePropertiesOperation) Response() *clouddesktop.Desktop {
+	return o.Operation.Response().(*clouddesktop.Desktop)
+}
+
+// Wait polls the operation until it's done.
+func (o *DesktopUpdatePropertiesOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*clouddesktop.Desktop, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*clouddesktop.Desktop)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *DesktopUpdatePropertiesOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*clouddesktop.Desktop, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*clouddesktop.Desktop)
+	return response, err
+}
+
+// UpdateProperties is an operation of Yandex.Cloud Api Desktop service.
+// It returns an object which should be used to monitor the operation state.
+func (c desktopClient) UpdateProperties(ctx context.Context, in *clouddesktop.UpdatePropertiesRequest, opts ...grpc.CallOption) (*DesktopUpdatePropertiesOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, DesktopUpdateProperties, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := clouddesktop.NewDesktopServiceClient(connection).UpdateProperties(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*clouddesktop.UpdateDesktopPropertiesMetadata).GetDesktopId()
+		},
+		MetadataType: (*clouddesktop.UpdateDesktopPropertiesMetadata)(nil),
+		ResponseType: (*clouddesktop.Desktop)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &DesktopUpdatePropertiesOperation{*op}, nil
+}
+
+// DesktopDeleteOperation is used to monitor the state of Delete operations.
+type DesktopDeleteOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *DesktopDeleteOperation) Metadata() *clouddesktop.DeleteDesktopMetadata {
+	return o.Operation.Metadata().(*clouddesktop.DeleteDesktopMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *DesktopDeleteOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *DesktopDeleteOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *DesktopDeleteOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// Delete is an operation of Yandex.Cloud Api Desktop service.
+// It returns an object which should be used to monitor the operation state.
+func (c desktopClient) Delete(ctx context.Context, in *clouddesktop.DeleteDesktopRequest, opts ...grpc.CallOption) (*DesktopDeleteOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, DesktopDelete, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := clouddesktop.NewDesktopServiceClient(connection).Delete(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*clouddesktop.DeleteDesktopMetadata).GetDesktopId()
+		},
+		MetadataType: (*clouddesktop.DeleteDesktopMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &DesktopDeleteOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c desktopClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, DesktopOperationPoller, opts...)
@@ -480,12 +480,12 @@ var (
 	DesktopList             = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopService.List")
 	DesktopListOperations   = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopService.ListOperations")
 	DesktopCreate           = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopService.Create")
-	DesktopUpdateProperties = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopService.UpdateProperties")
-	DesktopDelete           = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopService.Delete")
 	DesktopResetPassword    = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopService.ResetPassword")
 	DesktopRestart          = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopService.Restart")
-	DesktopUpdate           = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopService.Update")
 	DesktopStart            = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopService.Start")
 	DesktopStop             = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopService.Stop")
+	DesktopUpdate           = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopService.Update")
+	DesktopUpdateProperties = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopService.UpdateProperties")
+	DesktopDelete           = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopService.Delete")
 	DesktopOperationPoller  = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

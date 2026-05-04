@@ -23,8 +23,8 @@ type DesktopGroupClient interface {
 	ListDesktops(context.Context, *clouddesktop.ListDesktopGroupDesktopsRequest, ...grpc.CallOption) (*clouddesktop.ListDesktopGroupDesktopsResponse, error)
 	ListOperations(context.Context, *clouddesktop.ListDesktopGroupOperationsRequest, ...grpc.CallOption) (*clouddesktop.ListDesktopGroupOperationsResponse, error)
 	Create(context.Context, *clouddesktop.CreateDesktopGroupRequest, ...grpc.CallOption) (*DesktopGroupCreateOperation, error)
-	Update(context.Context, *clouddesktop.UpdateDesktopGroupRequest, ...grpc.CallOption) (*DesktopGroupUpdateOperation, error)
 	Delete(context.Context, *clouddesktop.DeleteDesktopGroupRequest, ...grpc.CallOption) (*DesktopGroupDeleteOperation, error)
+	Update(context.Context, *clouddesktop.UpdateDesktopGroupRequest, ...grpc.CallOption) (*DesktopGroupUpdateOperation, error)
 	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
 	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*DesktopGroupSetAccessBindingsOperation, error)
 	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*DesktopGroupUpdateAccessBindingsOperation, error)
@@ -131,60 +131,6 @@ func (c desktopGroupClient) Create(ctx context.Context, in *clouddesktop.CreateD
 	return &DesktopGroupCreateOperation{*op}, nil
 }
 
-// DesktopGroupUpdateOperation is used to monitor the state of Update operations.
-type DesktopGroupUpdateOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *DesktopGroupUpdateOperation) Metadata() *clouddesktop.UpdateDesktopGroupMetadata {
-	return o.Operation.Metadata().(*clouddesktop.UpdateDesktopGroupMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *DesktopGroupUpdateOperation) Response() *emptypb.Empty {
-	return o.Operation.Response().(*emptypb.Empty)
-}
-
-// Wait polls the operation until it's done.
-func (o *DesktopGroupUpdateOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*emptypb.Empty)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *DesktopGroupUpdateOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*emptypb.Empty)
-	return response, err
-}
-
-// Update is an operation of Yandex.Cloud Api DesktopGroup service.
-// It returns an object which should be used to monitor the operation state.
-func (c desktopGroupClient) Update(ctx context.Context, in *clouddesktop.UpdateDesktopGroupRequest, opts ...grpc.CallOption) (*DesktopGroupUpdateOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, DesktopGroupUpdate, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := clouddesktop.NewDesktopGroupServiceClient(connection).Update(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*clouddesktop.UpdateDesktopGroupMetadata).GetDesktopGroupId()
-		},
-		MetadataType: (*clouddesktop.UpdateDesktopGroupMetadata)(nil),
-		ResponseType: (*emptypb.Empty)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &DesktopGroupUpdateOperation{*op}, nil
-}
-
 // DesktopGroupDeleteOperation is used to monitor the state of Delete operations.
 type DesktopGroupDeleteOperation struct {
 	sdkop.Operation
@@ -237,6 +183,60 @@ func (c desktopGroupClient) Delete(ctx context.Context, in *clouddesktop.DeleteD
 		return nil, err
 	}
 	return &DesktopGroupDeleteOperation{*op}, nil
+}
+
+// DesktopGroupUpdateOperation is used to monitor the state of Update operations.
+type DesktopGroupUpdateOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *DesktopGroupUpdateOperation) Metadata() *clouddesktop.UpdateDesktopGroupMetadata {
+	return o.Operation.Metadata().(*clouddesktop.UpdateDesktopGroupMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *DesktopGroupUpdateOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *DesktopGroupUpdateOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *DesktopGroupUpdateOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// Update is an operation of Yandex.Cloud Api DesktopGroup service.
+// It returns an object which should be used to monitor the operation state.
+func (c desktopGroupClient) Update(ctx context.Context, in *clouddesktop.UpdateDesktopGroupRequest, opts ...grpc.CallOption) (*DesktopGroupUpdateOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, DesktopGroupUpdate, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := clouddesktop.NewDesktopGroupServiceClient(connection).Update(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*clouddesktop.UpdateDesktopGroupMetadata).GetDesktopGroupId()
+		},
+		MetadataType: (*clouddesktop.UpdateDesktopGroupMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &DesktopGroupUpdateOperation{*op}, nil
 }
 
 // ListAccessBindings is an operation of Yandex.Cloud Api DesktopGroup service.
@@ -365,8 +365,8 @@ var (
 	DesktopGroupListDesktops         = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopGroupService.ListDesktops")
 	DesktopGroupListOperations       = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopGroupService.ListOperations")
 	DesktopGroupCreate               = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopGroupService.Create")
-	DesktopGroupUpdate               = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopGroupService.Update")
 	DesktopGroupDelete               = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopGroupService.Delete")
+	DesktopGroupUpdate               = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopGroupService.Update")
 	DesktopGroupListAccessBindings   = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopGroupService.ListAccessBindings")
 	DesktopGroupSetAccessBindings    = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopGroupService.SetAccessBindings")
 	DesktopGroupUpdateAccessBindings = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopGroupService.UpdateAccessBindings")

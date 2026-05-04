@@ -19,8 +19,8 @@ type DesktopImageClient interface {
 	List(context.Context, *clouddesktop.ListDesktopImagesRequest, ...grpc.CallOption) (*clouddesktop.ListDesktopImagesResponse, error)
 	Get(context.Context, *clouddesktop.GetDesktopImageRequest, ...grpc.CallOption) (*clouddesktop.DesktopImage, error)
 	Copy(context.Context, *clouddesktop.CopyDesktopImageRequest, ...grpc.CallOption) (*DesktopImageCopyOperation, error)
-	Update(context.Context, *clouddesktop.UpdateDesktopImageRequest, ...grpc.CallOption) (*DesktopImageUpdateOperation, error)
 	CopyFromDesktop(context.Context, *clouddesktop.CopyFromDesktopRequest, ...grpc.CallOption) (*DesktopImageCopyFromDesktopOperation, error)
+	Update(context.Context, *clouddesktop.UpdateDesktopImageRequest, ...grpc.CallOption) (*DesktopImageUpdateOperation, error)
 	Delete(context.Context, *clouddesktop.DeleteDesktopImageRequest, ...grpc.CallOption) (*DesktopImageDeleteOperation, error)
 }
 
@@ -104,57 +104,6 @@ func (c desktopImageClient) Copy(ctx context.Context, in *clouddesktop.CopyDeskt
 	return &DesktopImageCopyOperation{*op}, nil
 }
 
-// DesktopImageUpdateOperation is used to monitor the state of Update operations.
-type DesktopImageUpdateOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *DesktopImageUpdateOperation) Metadata() *clouddesktop.UpdateDesktopImageMetadata {
-	return o.Operation.Metadata().(*clouddesktop.UpdateDesktopImageMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *DesktopImageUpdateOperation) Response() *clouddesktop.DesktopImage {
-	return o.Operation.Response().(*clouddesktop.DesktopImage)
-}
-
-// Wait polls the operation until it's done.
-func (o *DesktopImageUpdateOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*clouddesktop.DesktopImage, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*clouddesktop.DesktopImage)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *DesktopImageUpdateOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*clouddesktop.DesktopImage, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*clouddesktop.DesktopImage)
-	return response, err
-}
-
-// Update is an operation of Yandex.Cloud Api DesktopImage service.
-// It returns an object which should be used to monitor the operation state.
-func (c desktopImageClient) Update(ctx context.Context, in *clouddesktop.UpdateDesktopImageRequest, opts ...grpc.CallOption) (*DesktopImageUpdateOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, DesktopImageUpdate, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := clouddesktop.NewDesktopImageServiceClient(connection).Update(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll:         c.pollOperation,
-		MetadataType: (*clouddesktop.UpdateDesktopImageMetadata)(nil),
-		ResponseType: (*clouddesktop.DesktopImage)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &DesktopImageUpdateOperation{*op}, nil
-}
-
 // DesktopImageCopyFromDesktopOperation is used to monitor the state of CopyFromDesktop operations.
 type DesktopImageCopyFromDesktopOperation struct {
 	sdkop.Operation
@@ -204,6 +153,57 @@ func (c desktopImageClient) CopyFromDesktop(ctx context.Context, in *clouddeskto
 		return nil, err
 	}
 	return &DesktopImageCopyFromDesktopOperation{*op}, nil
+}
+
+// DesktopImageUpdateOperation is used to monitor the state of Update operations.
+type DesktopImageUpdateOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *DesktopImageUpdateOperation) Metadata() *clouddesktop.UpdateDesktopImageMetadata {
+	return o.Operation.Metadata().(*clouddesktop.UpdateDesktopImageMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *DesktopImageUpdateOperation) Response() *clouddesktop.DesktopImage {
+	return o.Operation.Response().(*clouddesktop.DesktopImage)
+}
+
+// Wait polls the operation until it's done.
+func (o *DesktopImageUpdateOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*clouddesktop.DesktopImage, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*clouddesktop.DesktopImage)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *DesktopImageUpdateOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*clouddesktop.DesktopImage, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*clouddesktop.DesktopImage)
+	return response, err
+}
+
+// Update is an operation of Yandex.Cloud Api DesktopImage service.
+// It returns an object which should be used to monitor the operation state.
+func (c desktopImageClient) Update(ctx context.Context, in *clouddesktop.UpdateDesktopImageRequest, opts ...grpc.CallOption) (*DesktopImageUpdateOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, DesktopImageUpdate, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := clouddesktop.NewDesktopImageServiceClient(connection).Update(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*clouddesktop.UpdateDesktopImageMetadata)(nil),
+		ResponseType: (*clouddesktop.DesktopImage)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &DesktopImageUpdateOperation{*op}, nil
 }
 
 // DesktopImageDeleteOperation is used to monitor the state of Delete operations.
@@ -270,8 +270,8 @@ var (
 	DesktopImageList            = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopImageService.List")
 	DesktopImageGet             = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopImageService.Get")
 	DesktopImageCopy            = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopImageService.Copy")
-	DesktopImageUpdate          = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopImageService.Update")
 	DesktopImageCopyFromDesktop = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopImageService.CopyFromDesktop")
+	DesktopImageUpdate          = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopImageService.Update")
 	DesktopImageDelete          = protoreflect.FullName("yandex.cloud.clouddesktop.v1.api.DesktopImageService.Delete")
 	DesktopImageOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
