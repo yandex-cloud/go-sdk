@@ -17,9 +17,9 @@ import (
 // LockClient provides methods for managing Lock resources of Yandex.Cloud Saas.
 type LockClient interface {
 	LockClientIterator
-	Ensure(context.Context, *saas.EnsureLockRequest, ...grpc.CallOption) (*LockEnsureOperation, error)
 	Get(context.Context, *saas.GetLockRequest, ...grpc.CallOption) (*licensemanager.Lock, error)
 	GetByResourceID(context.Context, *saas.GetLockByResourceIDRequest, ...grpc.CallOption) (*licensemanager.Lock, error)
+	Ensure(context.Context, *saas.EnsureLockRequest, ...grpc.CallOption) (*LockEnsureOperation, error)
 }
 
 var _ LockClient = lockClient{}
@@ -31,6 +31,24 @@ type lockClient struct {
 // NewLockClient returns LockClient implementation.
 func NewLockClient(connector transport.Connector) LockClient {
 	return lockClient{connector}
+}
+
+// Get is an operation of Yandex.Cloud Saas Lock service.
+func (c lockClient) Get(ctx context.Context, in *saas.GetLockRequest, opts ...grpc.CallOption) (*licensemanager.Lock, error) {
+	connection, err := c.connector.GetConnection(ctx, LockGet, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return saas.NewLockServiceClient(connection).Get(ctx, in, opts...)
+}
+
+// GetByResourceID is an operation of Yandex.Cloud Saas Lock service.
+func (c lockClient) GetByResourceID(ctx context.Context, in *saas.GetLockByResourceIDRequest, opts ...grpc.CallOption) (*licensemanager.Lock, error) {
+	connection, err := c.connector.GetConnection(ctx, LockGetByResourceID, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return saas.NewLockServiceClient(connection).GetByResourceID(ctx, in, opts...)
 }
 
 // LockEnsureOperation is used to monitor the state of Ensure operations.
@@ -87,24 +105,6 @@ func (c lockClient) Ensure(ctx context.Context, in *saas.EnsureLockRequest, opts
 	return &LockEnsureOperation{*op}, nil
 }
 
-// Get is an operation of Yandex.Cloud Saas Lock service.
-func (c lockClient) Get(ctx context.Context, in *saas.GetLockRequest, opts ...grpc.CallOption) (*licensemanager.Lock, error) {
-	connection, err := c.connector.GetConnection(ctx, LockGet, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return saas.NewLockServiceClient(connection).Get(ctx, in, opts...)
-}
-
-// GetByResourceID is an operation of Yandex.Cloud Saas Lock service.
-func (c lockClient) GetByResourceID(ctx context.Context, in *saas.GetLockByResourceIDRequest, opts ...grpc.CallOption) (*licensemanager.Lock, error) {
-	connection, err := c.connector.GetConnection(ctx, LockGetByResourceID, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return saas.NewLockServiceClient(connection).GetByResourceID(ctx, in, opts...)
-}
-
 // pollOperation returns the current state of the polled operation.
 func (c lockClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, LockOperationPoller, opts...)
@@ -115,8 +115,8 @@ func (c lockClient) pollOperation(ctx context.Context, operationId string, opts 
 }
 
 var (
-	LockEnsure          = protoreflect.FullName("yandex.cloud.marketplace.licensemanager.saas.v1.LockService.Ensure")
 	LockGet             = protoreflect.FullName("yandex.cloud.marketplace.licensemanager.saas.v1.LockService.Get")
 	LockGetByResourceID = protoreflect.FullName("yandex.cloud.marketplace.licensemanager.saas.v1.LockService.GetByResourceID")
+	LockEnsure          = protoreflect.FullName("yandex.cloud.marketplace.licensemanager.saas.v1.LockService.Ensure")
 	LockOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

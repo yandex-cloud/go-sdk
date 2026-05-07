@@ -78,6 +78,8 @@ var DynamicEndpoints = map[protoreflect.FullName]string{
 	protoreflect.FullName("yandex.cloud.lockbox.v1.PayloadService"):                                          "lockbox-payload",
 	protoreflect.FullName("yandex.cloud.lockbox.v1.SecretService"):                                           "lockbox",
 	protoreflect.FullName("yandex.cloud.logging.v1"):                                                         "logging",
+	protoreflect.FullName("yandex.cloud.logging.v1.LogIngestionService"):                                     "log-ingestion",
+	protoreflect.FullName("yandex.cloud.logging.v1.LogReadingService"):                                       "log-reading",
 	protoreflect.FullName("yandex.cloud.marketplace.licensemanager.saas.v1"):                                 "marketplace",
 	protoreflect.FullName("yandex.cloud.marketplace.licensemanager.v1"):                                      "marketplace",
 	protoreflect.FullName("yandex.cloud.marketplace.metering.v1"):                                            "marketplace",
