@@ -19,10 +19,10 @@ import (
 type FederationClient interface {
 	FederationClientIterator
 	Get(context.Context, *oidc.GetFederationRequest, ...grpc.CallOption) (*oidc.Federation, error)
-	List(context.Context, *oidc.ListFederationsRequest, ...grpc.CallOption) (*oidc.ListFederationsResponse, error)
 	Create(context.Context, *oidc.CreateFederationRequest, ...grpc.CallOption) (*FederationCreateOperation, error)
 	Update(context.Context, *oidc.UpdateFederationRequest, ...grpc.CallOption) (*FederationUpdateOperation, error)
 	Delete(context.Context, *oidc.DeleteFederationRequest, ...grpc.CallOption) (*FederationDeleteOperation, error)
+	List(context.Context, *oidc.ListFederationsRequest, ...grpc.CallOption) (*oidc.ListFederationsResponse, error)
 	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
 	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*FederationSetAccessBindingsOperation, error)
 	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*FederationUpdateAccessBindingsOperation, error)
@@ -46,15 +46,6 @@ func (c federationClient) Get(ctx context.Context, in *oidc.GetFederationRequest
 		return nil, err
 	}
 	return oidc.NewFederationServiceClient(connection).Get(ctx, in, opts...)
-}
-
-// List is an operation of Yandex.Cloud Oidc Federation service.
-func (c federationClient) List(ctx context.Context, in *oidc.ListFederationsRequest, opts ...grpc.CallOption) (*oidc.ListFederationsResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, FederationList, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return oidc.NewFederationServiceClient(connection).List(ctx, in, opts...)
 }
 
 // FederationCreateOperation is used to monitor the state of Create operations.
@@ -219,6 +210,15 @@ func (c federationClient) Delete(ctx context.Context, in *oidc.DeleteFederationR
 	return &FederationDeleteOperation{*op}, nil
 }
 
+// List is an operation of Yandex.Cloud Oidc Federation service.
+func (c federationClient) List(ctx context.Context, in *oidc.ListFederationsRequest, opts ...grpc.CallOption) (*oidc.ListFederationsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, FederationList, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return oidc.NewFederationServiceClient(connection).List(ctx, in, opts...)
+}
+
 // ListAccessBindings is an operation of Yandex.Cloud Oidc Federation service.
 func (c federationClient) ListAccessBindings(ctx context.Context, in *access.ListAccessBindingsRequest, opts ...grpc.CallOption) (*access.ListAccessBindingsResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, FederationListAccessBindings, opts...)
@@ -341,10 +341,10 @@ func (c federationClient) pollOperation(ctx context.Context, operationId string,
 
 var (
 	FederationGet                  = protoreflect.FullName("yandex.cloud.iam.v1.workload.oidc.FederationService.Get")
-	FederationList                 = protoreflect.FullName("yandex.cloud.iam.v1.workload.oidc.FederationService.List")
 	FederationCreate               = protoreflect.FullName("yandex.cloud.iam.v1.workload.oidc.FederationService.Create")
 	FederationUpdate               = protoreflect.FullName("yandex.cloud.iam.v1.workload.oidc.FederationService.Update")
 	FederationDelete               = protoreflect.FullName("yandex.cloud.iam.v1.workload.oidc.FederationService.Delete")
+	FederationList                 = protoreflect.FullName("yandex.cloud.iam.v1.workload.oidc.FederationService.List")
 	FederationListAccessBindings   = protoreflect.FullName("yandex.cloud.iam.v1.workload.oidc.FederationService.ListAccessBindings")
 	FederationSetAccessBindings    = protoreflect.FullName("yandex.cloud.iam.v1.workload.oidc.FederationService.SetAccessBindings")
 	FederationUpdateAccessBindings = protoreflect.FullName("yandex.cloud.iam.v1.workload.oidc.FederationService.UpdateAccessBindings")
