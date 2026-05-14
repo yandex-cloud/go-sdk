@@ -11,6 +11,7 @@ import (
 
 type ConfigurationClientIterator interface {
 	Iterator(context.Context, *baremetal.ListConfigurationsRequest, ...grpc.CallOption) *iterator.Iterator[*baremetal.ListConfigurationsRequest, *baremetal.Configuration]
+	ConfigurationNetworkInterfaceIterator(context.Context, *baremetal.ListConfigurationNetworkInterfaceRequest, ...grpc.CallOption) *iterator.Iterator[*baremetal.ListConfigurationNetworkInterfaceRequest, *baremetal.ConfigurationNetworkInterface]
 }
 
 type configurationServiceListInternal struct {
@@ -29,5 +30,24 @@ func (c configurationClient) Iterator(ctx context.Context, req *baremetal.ListCo
 				return nil, err
 			}
 			return configurationServiceListInternal{resp}, nil
+		})
+}
+
+type configurationServiceListConfigurationNetworkInterfaceInternal struct {
+	*baremetal.ListConfigurationNetworkInterfaceResponse
+}
+
+func (r configurationServiceListConfigurationNetworkInterfaceInternal) Items() []*baremetal.ConfigurationNetworkInterface {
+	return r.ListConfigurationNetworkInterfaceResponse.ConfigurationNetworkInterfaces
+}
+
+func (c configurationClient) ConfigurationNetworkInterfaceIterator(ctx context.Context, req *baremetal.ListConfigurationNetworkInterfaceRequest, opts ...grpc.CallOption) *iterator.Iterator[*baremetal.ListConfigurationNetworkInterfaceRequest, *baremetal.ConfigurationNetworkInterface] {
+	return iterator.NewIterator[*baremetal.ListConfigurationNetworkInterfaceRequest, *baremetal.ConfigurationNetworkInterface](ctx, req,
+		func(ctx context.Context, req *baremetal.ListConfigurationNetworkInterfaceRequest, opts ...grpc.CallOption) (iterator.PageResponse[*baremetal.ConfigurationNetworkInterface], error) {
+			resp, err := c.ListConfigurationNetworkInterface(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return configurationServiceListConfigurationNetworkInterfaceInternal{resp}, nil
 		})
 }

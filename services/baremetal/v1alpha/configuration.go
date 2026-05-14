@@ -15,6 +15,7 @@ type ConfigurationClient interface {
 	ConfigurationClientIterator
 	Get(context.Context, *baremetal.GetConfigurationRequest, ...grpc.CallOption) (*baremetal.Configuration, error)
 	List(context.Context, *baremetal.ListConfigurationsRequest, ...grpc.CallOption) (*baremetal.ListConfigurationsResponse, error)
+	ListConfigurationNetworkInterface(context.Context, *baremetal.ListConfigurationNetworkInterfaceRequest, ...grpc.CallOption) (*baremetal.ListConfigurationNetworkInterfaceResponse, error)
 }
 
 var _ ConfigurationClient = configurationClient{}
@@ -46,7 +47,17 @@ func (c configurationClient) List(ctx context.Context, in *baremetal.ListConfigu
 	return baremetal.NewConfigurationServiceClient(connection).List(ctx, in, opts...)
 }
 
+// ListConfigurationNetworkInterface is an operation of Yandex.Cloud Baremetal Configuration service.
+func (c configurationClient) ListConfigurationNetworkInterface(ctx context.Context, in *baremetal.ListConfigurationNetworkInterfaceRequest, opts ...grpc.CallOption) (*baremetal.ListConfigurationNetworkInterfaceResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, ConfigurationListConfigurationNetworkInterface, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return baremetal.NewConfigurationServiceClient(connection).ListConfigurationNetworkInterface(ctx, in, opts...)
+}
+
 var (
-	ConfigurationGet  = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ConfigurationService.Get")
-	ConfigurationList = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ConfigurationService.List")
+	ConfigurationGet                               = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ConfigurationService.Get")
+	ConfigurationList                              = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ConfigurationService.List")
+	ConfigurationListConfigurationNetworkInterface = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ConfigurationService.ListConfigurationNetworkInterface")
 )

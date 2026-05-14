@@ -33,3 +33,29 @@ func (r *configurationResolver) Run(ctx context.Context) error {
 	})
 	return r.FindName(resp.TakeAll())
 }
+
+type configurationConfigurationNetworkInterfaceResolver struct {
+	client ConfigurationClient
+	sdkresolvers.BaseNameResolver
+}
+
+func ConfigurationConfigurationNetworkInterfaceResolver(name string, client ConfigurationClient, opts ...sdkresolvers.ResolveOption) sdkresolvers.Resolver {
+	return &configurationConfigurationNetworkInterfaceResolver{
+		client:           client,
+		BaseNameResolver: sdkresolvers.NewBaseNameResolver(name, "ConfigurationConfigurationNetworkInterface", opts...),
+	}
+}
+
+func (r *configurationConfigurationNetworkInterfaceResolver) Run(ctx context.Context) error {
+	err := r.EnsureFolderID()
+	if err != nil {
+		return err
+	}
+
+	resp := r.client.ConfigurationNetworkInterfaceIterator(ctx, &baremetal.ListConfigurationNetworkInterfaceRequest{
+		FolderId: r.FolderID(),
+		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),
+		PageSize: sdkresolvers.DefaultResolverPageSize,
+	})
+	return r.FindName(resp.TakeAll())
+}
