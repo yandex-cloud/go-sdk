@@ -143,3 +143,119 @@ func (it *ConfigurationIterator) Value() *baremetal.Configuration {
 func (it *ConfigurationIterator) Error() error {
 	return it.err
 }
+
+// ListConfigurationNetworkInterface implements baremetal.ConfigurationServiceClient
+func (c *ConfigurationServiceClient) ListConfigurationNetworkInterface(ctx context.Context, in *baremetal.ListConfigurationNetworkInterfaceRequest, opts ...grpc.CallOption) (*baremetal.ListConfigurationNetworkInterfaceResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return baremetal.NewConfigurationServiceClient(conn).ListConfigurationNetworkInterface(ctx, in, opts...)
+}
+
+type ConfigurationConfigurationNetworkInterfaceIterator struct {
+	ctx  context.Context
+	opts []grpc.CallOption
+
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
+
+	client  *ConfigurationServiceClient
+	request *baremetal.ListConfigurationNetworkInterfaceRequest
+
+	items []*baremetal.ConfigurationNetworkInterface
+}
+
+func (c *ConfigurationServiceClient) ConfigurationConfigurationNetworkInterfaceIterator(ctx context.Context, req *baremetal.ListConfigurationNetworkInterfaceRequest, opts ...grpc.CallOption) *ConfigurationConfigurationNetworkInterfaceIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
+	return &ConfigurationConfigurationNetworkInterfaceIterator{
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
+	}
+}
+
+func (it *ConfigurationConfigurationNetworkInterfaceIterator) Next() bool {
+	if it.err != nil {
+		return false
+	}
+	if len(it.items) > 1 {
+		it.items[0] = nil
+		it.items = it.items[1:]
+		return true
+	}
+	it.items = nil // consume last item, if any
+
+	if it.started && it.request.PageToken == "" {
+		return false
+	}
+	it.started = true
+
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
+	response, err := it.client.ListConfigurationNetworkInterface(it.ctx, it.request, it.opts...)
+	it.err = err
+	if err != nil {
+		return false
+	}
+
+	it.items = response.ConfigurationNetworkInterfaces
+	it.request.PageToken = response.NextPageToken
+	return len(it.items) > 0
+}
+
+func (it *ConfigurationConfigurationNetworkInterfaceIterator) Take(size int64) ([]*baremetal.ConfigurationNetworkInterface, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*baremetal.ConfigurationNetworkInterface
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *ConfigurationConfigurationNetworkInterfaceIterator) TakeAll() ([]*baremetal.ConfigurationNetworkInterface, error) {
+	return it.Take(0)
+}
+
+func (it *ConfigurationConfigurationNetworkInterfaceIterator) Value() *baremetal.ConfigurationNetworkInterface {
+	if len(it.items) == 0 {
+		panic("calling Value on empty iterator")
+	}
+	return it.items[0]
+}
+
+func (it *ConfigurationConfigurationNetworkInterfaceIterator) Error() error {
+	return it.err
+}
