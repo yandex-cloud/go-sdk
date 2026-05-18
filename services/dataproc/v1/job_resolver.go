@@ -21,11 +21,6 @@ func JobResolver(name string, client JobClient, opts ...sdkresolvers.ResolveOpti
 }
 
 func (r *jobResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &dataproc.ListJobsRequest{
 		ClusterId: r.ClusterID(),
 		Filter:    sdkresolvers.CreateResolverFilter("name", r.Name),

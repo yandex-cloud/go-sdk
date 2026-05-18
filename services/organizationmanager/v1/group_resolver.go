@@ -21,11 +21,6 @@ func GroupResolver(name string, client GroupClient, opts ...sdkresolvers.Resolve
 }
 
 func (r *groupResolver) Run(ctx context.Context) error {
-	err := r.EnsureOrganizationID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &organizationmanager.ListGroupsRequest{
 		OrganizationId: r.OrganizationID(),
 		Filter:         sdkresolvers.CreateResolverFilter("name", r.Name),
@@ -47,11 +42,6 @@ func GroupEffectiveResolver(name string, client GroupClient, opts ...sdkresolver
 }
 
 func (r *groupEffectiveResolver) Run(ctx context.Context) error {
-	err := r.EnsureOrganizationID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.EffectiveIterator(ctx, &organizationmanager.ListEffectiveRequest{
 		OrganizationId: r.OrganizationID(),
 		Filter:         sdkresolvers.CreateResolverFilter("name", r.Name),

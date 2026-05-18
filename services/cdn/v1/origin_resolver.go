@@ -21,11 +21,6 @@ func OriginResolver(name string, client OriginClient, opts ...sdkresolvers.Resol
 }
 
 func (r *originResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &cdn.ListOriginsRequest{
 		FolderId: r.FolderID(),
 	})

@@ -117,3 +117,11 @@ func WithCustomDialOptions(opts ...grpc.DialOption) Option {
 		o.CustomDialOpts = opts
 	}
 }
+
+// WithLogger sets the structured logger used by the SDK and its middleware
+// (auth, request-id, grpcdebug). When unset, the SDK uses a no-op logger.
+func WithLogger(logger *zap.Logger) Option {
+	return func(o *Options) {
+		o.Logger = logger
+	}
+}

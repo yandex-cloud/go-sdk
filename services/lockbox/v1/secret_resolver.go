@@ -21,11 +21,6 @@ func SecretResolver(name string, client SecretClient, opts ...sdkresolvers.Resol
 }
 
 func (r *secretResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &lockbox.ListSecretsRequest{
 		FolderId: r.FolderID(),
 

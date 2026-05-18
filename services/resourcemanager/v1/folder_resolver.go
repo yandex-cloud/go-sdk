@@ -21,11 +21,6 @@ func FolderResolver(name string, client FolderClient, opts ...sdkresolvers.Resol
 }
 
 func (r *folderResolver) Run(ctx context.Context) error {
-	err := r.EnsureCloudID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &resourcemanager.ListFoldersRequest{
 		CloudId:  r.CloudID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),
@@ -47,11 +42,6 @@ func FolderOperationsResolver(name string, client FolderClient, opts ...sdkresol
 }
 
 func (r *folderOperationsResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.OperationsIterator(ctx, &resourcemanager.ListFolderOperationsRequest{
 		FolderId: r.FolderID(),
 

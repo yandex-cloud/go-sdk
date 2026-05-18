@@ -21,11 +21,6 @@ func SubclusterResolver(name string, client SubclusterClient, opts ...sdkresolve
 }
 
 func (r *subclusterResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &dataproc.ListSubclustersRequest{
 		ClusterId: r.ClusterID(),
 		Filter:    sdkresolvers.CreateResolverFilter("name", r.Name),

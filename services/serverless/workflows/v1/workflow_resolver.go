@@ -21,11 +21,6 @@ func WorkflowResolver(name string, client WorkflowClient, opts ...sdkresolvers.R
 }
 
 func (r *workflowResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &workflows.ListWorkflowsRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

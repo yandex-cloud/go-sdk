@@ -21,11 +21,6 @@ func ClusterResolver(name string, client ClusterClient, opts ...sdkresolvers.Res
 }
 
 func (r *clusterResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &dataproc.ListClustersRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),
@@ -47,11 +42,6 @@ func ClusterOperationsResolver(name string, client ClusterClient, opts ...sdkres
 }
 
 func (r *clusterOperationsResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.OperationsIterator(ctx, &dataproc.ListClusterOperationsRequest{
 		ClusterId: r.ClusterID(),
 
@@ -73,11 +63,6 @@ func ClusterHostsResolver(name string, client ClusterClient, opts ...sdkresolver
 }
 
 func (r *clusterHostsResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.HostsIterator(ctx, &dataproc.ListClusterHostsRequest{
 		ClusterId: r.ClusterID(),
 		Filter:    sdkresolvers.CreateResolverFilter("name", r.Name),
@@ -99,11 +84,6 @@ func ClusterUILinksResolver(name string, client ClusterClient, opts ...sdkresolv
 }
 
 func (r *clusterUILinksResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.UILinksIterator(ctx, &dataproc.ListUILinksRequest{
 		ClusterId: r.ClusterID(),
 	})

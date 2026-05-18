@@ -21,11 +21,6 @@ func BusResolver(name string, client BusClient, opts ...sdkresolvers.ResolveOpti
 }
 
 func (r *busResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &eventrouter.ListBusesRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

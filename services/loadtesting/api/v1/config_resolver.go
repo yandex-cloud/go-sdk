@@ -21,11 +21,6 @@ func ConfigResolver(name string, client ConfigClient, opts ...sdkresolvers.Resol
 }
 
 func (r *configResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &api.ListConfigsRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

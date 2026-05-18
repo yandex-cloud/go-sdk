@@ -5,12 +5,14 @@ import (
 	"context"
 
 	cic "github.com/yandex-cloud/go-genproto/yandex/cloud/cic/v1"
+	operation "github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/iterator"
 	"google.golang.org/grpc"
 )
 
 type PublicConnectionClientIterator interface {
 	Iterator(context.Context, *cic.ListPublicConnectionsRequest, ...grpc.CallOption) *iterator.Iterator[*cic.ListPublicConnectionsRequest, *cic.PublicConnection]
+	OperationsIterator(context.Context, *cic.ListPublicConnectionOperationsRequest, ...grpc.CallOption) *iterator.Iterator[*cic.ListPublicConnectionOperationsRequest, *operation.Operation]
 }
 
 type publicConnectionServiceListInternal struct {
@@ -29,5 +31,24 @@ func (c publicConnectionClient) Iterator(ctx context.Context, req *cic.ListPubli
 				return nil, err
 			}
 			return publicConnectionServiceListInternal{resp}, nil
+		})
+}
+
+type publicConnectionServiceListOperationsInternal struct {
+	*cic.ListPublicConnectionOperationsResponse
+}
+
+func (r publicConnectionServiceListOperationsInternal) Items() []*operation.Operation {
+	return r.ListPublicConnectionOperationsResponse.Operations
+}
+
+func (c publicConnectionClient) OperationsIterator(ctx context.Context, req *cic.ListPublicConnectionOperationsRequest, opts ...grpc.CallOption) *iterator.Iterator[*cic.ListPublicConnectionOperationsRequest, *operation.Operation] {
+	return iterator.NewIterator[*cic.ListPublicConnectionOperationsRequest, *operation.Operation](ctx, req,
+		func(ctx context.Context, req *cic.ListPublicConnectionOperationsRequest, opts ...grpc.CallOption) (iterator.PageResponse[*operation.Operation], error) {
+			resp, err := c.ListOperations(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return publicConnectionServiceListOperationsInternal{resp}, nil
 		})
 }

@@ -21,11 +21,6 @@ func ConnectorResolver(name string, client ConnectorClient, opts ...sdkresolvers
 }
 
 func (r *connectorResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &kafka.ListConnectorsRequest{
 		ClusterId: r.ClusterID(),
 

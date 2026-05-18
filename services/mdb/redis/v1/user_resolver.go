@@ -21,11 +21,6 @@ func UserResolver(name string, client UserClient, opts ...sdkresolvers.ResolveOp
 }
 
 func (r *userResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &redis.ListUsersRequest{
 		ClusterId: r.ClusterID(),
 

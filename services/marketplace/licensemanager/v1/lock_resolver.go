@@ -21,11 +21,6 @@ func LockResolver(name string, client LockClient, opts ...sdkresolvers.ResolveOp
 }
 
 func (r *lockResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &licensemanager.ListLocksRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

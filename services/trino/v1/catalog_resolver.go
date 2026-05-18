@@ -21,11 +21,6 @@ func CatalogResolver(name string, client CatalogClient, opts ...sdkresolvers.Res
 }
 
 func (r *catalogResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &trino.ListCatalogsRequest{
 		ClusterId: r.ClusterID(),
 		Filter:    sdkresolvers.CreateResolverFilter("name", r.Name),

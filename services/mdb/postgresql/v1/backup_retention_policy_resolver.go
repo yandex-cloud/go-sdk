@@ -21,11 +21,6 @@ func BackupRetentionPolicyResolver(name string, client BackupRetentionPolicyClie
 }
 
 func (r *backupRetentionPolicyResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &postgresql.ListBackupRetentionPoliciesRequest{
 		ClusterId: r.ClusterID(),
 

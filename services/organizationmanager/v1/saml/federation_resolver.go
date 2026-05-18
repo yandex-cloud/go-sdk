@@ -21,11 +21,6 @@ func FederationResolver(name string, client FederationClient, opts ...sdkresolve
 }
 
 func (r *federationResolver) Run(ctx context.Context) error {
-	err := r.EnsureOrganizationID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &saml.ListFederationsRequest{
 		OrganizationId: r.OrganizationID(),
 		Filter:         sdkresolvers.CreateResolverFilter("name", r.Name),
@@ -47,11 +42,6 @@ func FederationUserAccountsResolver(name string, client FederationClient, opts .
 }
 
 func (r *federationUserAccountsResolver) Run(ctx context.Context) error {
-	err := r.EnsureFederationID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.UserAccountsIterator(ctx, &saml.ListFederatedUserAccountsRequest{
 		FederationId: r.FederationID(),
 		Filter:       sdkresolvers.CreateResolverFilter("name", r.Name),
@@ -73,11 +63,6 @@ func FederationOperationsResolver(name string, client FederationClient, opts ...
 }
 
 func (r *federationOperationsResolver) Run(ctx context.Context) error {
-	err := r.EnsureFederationID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.OperationsIterator(ctx, &saml.ListFederationOperationsRequest{
 		FederationId: r.FederationID(),
 
@@ -99,11 +84,6 @@ func FederationDomainsResolver(name string, client FederationClient, opts ...sdk
 }
 
 func (r *federationDomainsResolver) Run(ctx context.Context) error {
-	err := r.EnsureFederationID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.DomainsIterator(ctx, &saml.ListFederationDomainsRequest{
 		FederationId: r.FederationID(),
 		Filter:       sdkresolvers.CreateResolverFilter("name", r.Name),

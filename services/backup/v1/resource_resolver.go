@@ -21,11 +21,6 @@ func ResourceResolver(name string, client ResourceClient, opts ...sdkresolvers.R
 }
 
 func (r *resourceResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &backup.ListResourcesRequest{
 		FolderId: r.FolderID(),
 
@@ -47,11 +42,6 @@ func ResourceDirectoryResolver(name string, client ResourceClient, opts ...sdkre
 }
 
 func (r *resourceDirectoryResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.DirectoryIterator(ctx, &backup.ListDirectoryRequest{
 		FolderId: r.FolderID(),
 	})

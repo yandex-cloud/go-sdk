@@ -21,11 +21,6 @@ func PublicConnectionResolver(name string, client PublicConnectionClient, opts .
 }
 
 func (r *publicConnectionResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &cic.ListPublicConnectionsRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

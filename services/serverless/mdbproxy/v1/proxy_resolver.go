@@ -21,11 +21,6 @@ func ProxyResolver(name string, client ProxyClient, opts ...sdkresolvers.Resolve
 }
 
 func (r *proxyResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &mdbproxy.ListProxyRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

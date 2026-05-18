@@ -9,3 +9,7 @@ type AuthError struct {
 func (e *AuthError) Error() string {
 	return fmt.Sprintf("authentication error: %v", e.Err)
 }
+
+func (e *AuthError) Unwrap() error {
+	return e.Err
+}

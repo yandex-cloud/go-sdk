@@ -21,11 +21,6 @@ func GroupMappingItemsResolver(name string, client GroupMappingClient, opts ...s
 }
 
 func (r *groupMappingItemsResolver) Run(ctx context.Context) error {
-	err := r.EnsureFederationID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.ItemsIterator(ctx, &organizationmanager.ListGroupMappingItemsRequest{
 		FederationId: r.FederationID(),
 		Filter:       sdkresolvers.CreateResolverFilter("name", r.Name),

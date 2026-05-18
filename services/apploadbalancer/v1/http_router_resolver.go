@@ -21,11 +21,6 @@ func HttpRouterResolver(name string, client HttpRouterClient, opts ...sdkresolve
 }
 
 func (r *httpRouterResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &apploadbalancer.ListHttpRoutersRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

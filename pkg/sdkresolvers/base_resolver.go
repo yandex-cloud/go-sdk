@@ -17,13 +17,14 @@ func CreateResolverFilter(nameField string, value string) string {
 }
 
 type resolveOptions struct {
-	out            *string
-	folderID       string
-	cloudID        string
-	organizationID string
-	clusterID      string
-	federationID   string
-	communityID    string
+	out                    *string
+	folderID               string
+	cloudID                string
+	organizationID         string
+	organizationIDFallback string
+	clusterID              string
+	federationID           string
+	communityID            string
 }
 
 type ResolveOption func(*resolveOptions)
@@ -52,6 +53,16 @@ func CloudID(cloudID string) ResolveOption {
 func OrganizationID(organizationID string) ResolveOption {
 	return func(o *resolveOptions) {
 		o.organizationID = organizationID
+	}
+}
+
+// OrganizationIDFallback supplies a default organization id used by name
+// resolvers whose underlying List request marks organization_id required. The
+// fallback is consulted only when OrganizationID() is empty. sdk-v2 carries no
+// opinion about the value — the caller (e.g. cli-v2) chooses it.
+func OrganizationIDFallback(organizationID string) ResolveOption {
+	return func(o *resolveOptions) {
+		o.organizationIDFallback = organizationID
 	}
 }
 
@@ -146,6 +157,13 @@ func (r *BaseResolver) CloudID() string {
 
 func (r *BaseResolver) OrganizationID() string {
 	return r.opts.organizationID
+}
+
+// OrganizationIDFallback returns the caller-supplied default organization id.
+// Generated resolvers for List requests that mark organization_id required
+// use this value when OrganizationID() is empty.
+func (r *BaseResolver) OrganizationIDFallback() string {
+	return r.opts.organizationIDFallback
 }
 
 func (r *BaseResolver) CommunityID() string {

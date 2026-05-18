@@ -21,11 +21,6 @@ func ResourceGroupResolver(name string, client ResourceGroupClient, opts ...sdkr
 }
 
 func (r *resourceGroupResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &greenplum.ListResourceGroupsRequest{
 		ClusterId: r.ClusterID(),
 	})

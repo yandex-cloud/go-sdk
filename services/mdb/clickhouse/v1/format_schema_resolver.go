@@ -21,11 +21,6 @@ func FormatSchemaResolver(name string, client FormatSchemaClient, opts ...sdkres
 }
 
 func (r *formatSchemaResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &clickhouse.ListFormatSchemasRequest{
 		ClusterId: r.ClusterID(),
 

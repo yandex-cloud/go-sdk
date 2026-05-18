@@ -21,11 +21,6 @@ func ClusterResolver(name string, client ClusterClient, opts ...sdkresolvers.Res
 }
 
 func (r *clusterResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &clickhouse.ListClustersRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),
@@ -47,11 +42,6 @@ func ClusterLogsResolver(name string, client ClusterClient, opts ...sdkresolvers
 }
 
 func (r *clusterLogsResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.LogsIterator(ctx, &clickhouse.ListClusterLogsRequest{
 		ClusterId: r.ClusterID(),
 
@@ -73,11 +63,6 @@ func ClusterOperationsResolver(name string, client ClusterClient, opts ...sdkres
 }
 
 func (r *clusterOperationsResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.OperationsIterator(ctx, &clickhouse.ListClusterOperationsRequest{
 		ClusterId: r.ClusterID(),
 
@@ -99,11 +84,6 @@ func ClusterBackupsResolver(name string, client ClusterClient, opts ...sdkresolv
 }
 
 func (r *clusterBackupsResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.BackupsIterator(ctx, &clickhouse.ListClusterBackupsRequest{
 		ClusterId: r.ClusterID(),
 
@@ -125,11 +105,6 @@ func ClusterHostsResolver(name string, client ClusterClient, opts ...sdkresolver
 }
 
 func (r *clusterHostsResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.HostsIterator(ctx, &clickhouse.ListClusterHostsRequest{
 		ClusterId: r.ClusterID(),
 
@@ -151,11 +126,6 @@ func ClusterShardsResolver(name string, client ClusterClient, opts ...sdkresolve
 }
 
 func (r *clusterShardsResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.ShardsIterator(ctx, &clickhouse.ListClusterShardsRequest{
 		ClusterId: r.ClusterID(),
 
@@ -177,11 +147,6 @@ func ClusterShardGroupsResolver(name string, client ClusterClient, opts ...sdkre
 }
 
 func (r *clusterShardGroupsResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.ShardGroupsIterator(ctx, &clickhouse.ListClusterShardGroupsRequest{
 		ClusterId: r.ClusterID(),
 
@@ -203,11 +168,6 @@ func ClusterExternalDictionariesResolver(name string, client ClusterClient, opts
 }
 
 func (r *clusterExternalDictionariesResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.ExternalDictionariesIterator(ctx, &clickhouse.ListClusterExternalDictionariesRequest{
 		ClusterId: r.ClusterID(),
 

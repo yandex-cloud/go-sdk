@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
 	iampb "github.com/yandex-cloud/go-genproto/yandex/cloud/iam/v1"
@@ -12,6 +13,8 @@ import (
 	"github.com/yandex-cloud/go-sdk/v2/pkg/endpoints"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/errors"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/transport"
+	"github.com/yandex-cloud/go-sdk/v2/pkg/transport/middleware/grpcdebug"
+	"github.com/yandex-cloud/go-sdk/v2/pkg/transport/middleware/requestid"
 	iamsdk "github.com/yandex-cloud/go-sdk/v2/services/iam/v1"
 )
 
@@ -30,8 +33,16 @@ type AuthenticatorImpl struct {
 
 // NewAuthenticatorFromEndpoint creates a new AuthenticatorImpl using provided credentials and endpoint configuration.
 // Returns the constructed AuthenticatorImpl instance or an error if the connector initialization fails.
+// The IAM token client gets the requestid interceptor so token-creation failures carry x-request-id /
+// x-server-trace-id all the way up to error reporting, and the grpcdebug interceptor so the call is
+// logged when the supplied logger is at Debug level (i.e. when --debug is on).
 func NewAuthenticatorFromEndpoint(logger *zap.Logger, creds credentials.Credentials, endpoint *endpoints.Endpoint) (*AuthenticatorImpl, error) {
-	return NewAuthenticator(logger, creds, iamsdk.NewIamTokenClient(transport.NewSingleConnector(endpoint.Addr, endpoint.DialOptions...))), nil
+	dialOpts := append([]grpc.DialOption{}, endpoint.DialOptions...)
+	dialOpts = append(dialOpts, grpc.WithChainUnaryInterceptor(
+		requestid.Interceptor(),
+		grpcdebug.UnaryClientInterceptor(logger),
+	))
+	return NewAuthenticator(logger, creds, iamsdk.NewIamTokenClient(transport.NewSingleConnector(endpoint.Addr, dialOpts...))), nil
 }
 
 // NewAuthenticator creates and returns a new instance of AuthenticatorImpl using the provided credentials and IamTokenClient.

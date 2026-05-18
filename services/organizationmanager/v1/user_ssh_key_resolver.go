@@ -21,11 +21,6 @@ func UserSshKeyResolver(name string, client UserSshKeyClient, opts ...sdkresolve
 }
 
 func (r *userSshKeyResolver) Run(ctx context.Context) error {
-	err := r.EnsureOrganizationID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &organizationmanager.ListUserSshKeysRequest{
 		OrganizationId: r.OrganizationID(),
 

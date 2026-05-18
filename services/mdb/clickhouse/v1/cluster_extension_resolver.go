@@ -21,11 +21,6 @@ func ClusterExtensionResolver(name string, client ClusterExtensionClient, opts .
 }
 
 func (r *clusterExtensionResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &clickhouse.ListClusterExtensionsRequest{
 		ClusterId: r.ClusterID(),
 

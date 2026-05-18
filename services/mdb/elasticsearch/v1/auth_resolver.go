@@ -21,11 +21,6 @@ func AuthProvidersResolver(name string, client AuthClient, opts ...sdkresolvers.
 }
 
 func (r *authProvidersResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.ProvidersIterator(ctx, &elasticsearch.ListAuthProvidersRequest{
 		ClusterId: r.ClusterID(),
 	})

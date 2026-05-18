@@ -21,11 +21,6 @@ func ClusterResolver(name string, client ClusterClient, opts ...sdkresolvers.Res
 }
 
 func (r *clusterResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &airflow.ListClustersRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),
@@ -47,11 +42,6 @@ func ClusterOperationsResolver(name string, client ClusterClient, opts ...sdkres
 }
 
 func (r *clusterOperationsResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.OperationsIterator(ctx, &airflow.ListClusterOperationsRequest{
 		ClusterId: r.ClusterID(),
 

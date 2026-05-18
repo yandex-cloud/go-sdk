@@ -21,11 +21,6 @@ func PXFDatasourceResolver(name string, client PXFDatasourceClient, opts ...sdkr
 }
 
 func (r *pxfDatasourceResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &greenplum.ListPXFDatasourcesRequest{
 		ClusterId: r.ClusterID(),
 	})

@@ -21,11 +21,6 @@ func UserpoolResolver(name string, client UserpoolClient, opts ...sdkresolvers.R
 }
 
 func (r *userpoolResolver) Run(ctx context.Context) error {
-	err := r.EnsureOrganizationID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &idp.ListUserpoolsRequest{
 		OrganizationId: r.OrganizationID(),
 		Filter:         sdkresolvers.CreateResolverFilter("name", r.Name),

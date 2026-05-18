@@ -21,11 +21,6 @@ func TrailResolver(name string, client TrailClient, opts ...sdkresolvers.Resolve
 }
 
 func (r *trailResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &audittrails.ListTrailsRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

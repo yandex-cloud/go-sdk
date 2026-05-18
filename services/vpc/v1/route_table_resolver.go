@@ -21,11 +21,6 @@ func RouteTableResolver(name string, client RouteTableClient, opts ...sdkresolve
 }
 
 func (r *routeTableResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &vpc.ListRouteTablesRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

@@ -21,11 +21,6 @@ func AsymmetricEncryptionKeyResolver(name string, client AsymmetricEncryptionKey
 }
 
 func (r *asymmetricEncryptionKeyResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &asymmetricencryption.ListAsymmetricEncryptionKeysRequest{
 		FolderId: r.FolderID(),
 

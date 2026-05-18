@@ -21,11 +21,6 @@ func TopicResolver(name string, client TopicClient, opts ...sdkresolvers.Resolve
 }
 
 func (r *topicResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &kafka.ListTopicsRequest{
 		ClusterId: r.ClusterID(),
 

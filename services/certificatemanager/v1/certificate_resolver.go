@@ -21,11 +21,6 @@ func CertificateResolver(name string, client CertificateClient, opts ...sdkresol
 }
 
 func (r *certificateResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &certificatemanager.ListCertificatesRequest{
 		FolderId: r.FolderID(),
 

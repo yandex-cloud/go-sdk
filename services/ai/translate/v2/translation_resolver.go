@@ -21,11 +21,6 @@ func TranslationLanguagesResolver(name string, client TranslationClient, opts ..
 }
 
 func (r *translationLanguagesResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.LanguagesIterator(ctx, &translate.ListLanguagesRequest{
 		FolderId: r.FolderID(),
 	})

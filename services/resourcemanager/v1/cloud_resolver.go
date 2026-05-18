@@ -21,11 +21,6 @@ func CloudResolver(name string, client CloudClient, opts ...sdkresolvers.Resolve
 }
 
 func (r *cloudResolver) Run(ctx context.Context) error {
-	err := r.EnsureOrganizationID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &resourcemanager.ListCloudsRequest{
 		OrganizationId: r.OrganizationID(),
 		Filter:         sdkresolvers.CreateResolverFilter("name", r.Name),
@@ -47,11 +42,6 @@ func CloudOperationsResolver(name string, client CloudClient, opts ...sdkresolve
 }
 
 func (r *cloudOperationsResolver) Run(ctx context.Context) error {
-	err := r.EnsureCloudID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.OperationsIterator(ctx, &resourcemanager.ListCloudOperationsRequest{
 		CloudId: r.CloudID(),
 

@@ -21,11 +21,6 @@ func UserMembersResolver(name string, client UserClient, opts ...sdkresolvers.Re
 }
 
 func (r *userMembersResolver) Run(ctx context.Context) error {
-	err := r.EnsureOrganizationID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.MembersIterator(ctx, &organizationmanager.ListMembersRequest{
 		OrganizationId: r.OrganizationID(),
 

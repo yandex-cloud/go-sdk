@@ -21,11 +21,6 @@ func OAuthClientResolver(name string, client OAuthClientClient, opts ...sdkresol
 }
 
 func (r *oAuthClientResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &iam.ListOAuthClientsRequest{
 		FolderId: r.FolderID(),
 

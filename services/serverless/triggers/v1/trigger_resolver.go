@@ -21,11 +21,6 @@ func TriggerResolver(name string, client TriggerClient, opts ...sdkresolvers.Res
 }
 
 func (r *triggerResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &triggers.ListTriggersRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

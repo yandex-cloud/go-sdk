@@ -21,11 +21,6 @@ func LogGroupResolver(name string, client LogGroupClient, opts ...sdkresolvers.R
 }
 
 func (r *logGroupResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &logging.ListLogGroupsRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

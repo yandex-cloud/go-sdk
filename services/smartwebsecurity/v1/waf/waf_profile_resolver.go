@@ -21,11 +21,6 @@ func WafProfileResolver(name string, client WafProfileClient, opts ...sdkresolve
 }
 
 func (r *wafProfileResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &waf.ListWafProfilesRequest{
 		FolderId: r.FolderID(),
 	})

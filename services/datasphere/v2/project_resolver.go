@@ -21,11 +21,6 @@ func ProjectResolver(name string, client ProjectClient, opts ...sdkresolvers.Res
 }
 
 func (r *projectResolver) Run(ctx context.Context) error {
-	err := r.EnsureCommunityID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &datasphere.ListProjectsRequest{
 		CommunityId: r.CommunityID(),
 

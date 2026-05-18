@@ -21,11 +21,6 @@ func MfaEnforcementResolver(name string, client MfaEnforcementClient, opts ...sd
 }
 
 func (r *mfaEnforcementResolver) Run(ctx context.Context) error {
-	err := r.EnsureOrganizationID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &organizationmanager.ListMfaEnforcementsRequest{
 		OrganizationId: r.OrganizationID(),
 

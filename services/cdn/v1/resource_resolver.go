@@ -21,11 +21,6 @@ func ResourceResolver(name string, client ResourceClient, opts ...sdkresolvers.R
 }
 
 func (r *resourceResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &cdn.ListResourcesRequest{
 		FolderId: r.FolderID(),
 

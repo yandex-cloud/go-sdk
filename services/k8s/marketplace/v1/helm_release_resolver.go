@@ -21,11 +21,6 @@ func HelmReleaseResolver(name string, client HelmReleaseClient, opts ...sdkresol
 }
 
 func (r *helmReleaseResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &marketplace.ListHelmReleasesRequest{
 		ClusterId: r.ClusterID(),
 

@@ -21,11 +21,6 @@ func TargetGroupResolver(name string, client TargetGroupClient, opts ...sdkresol
 }
 
 func (r *targetGroupResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &loadbalancer.ListTargetGroupsRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

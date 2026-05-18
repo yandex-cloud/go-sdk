@@ -21,11 +21,6 @@ func OrganizationOperationsResolver(name string, client OrganizationClient, opts
 }
 
 func (r *organizationOperationsResolver) Run(ctx context.Context) error {
-	err := r.EnsureOrganizationID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.OperationsIterator(ctx, &organizationmanager.ListOrganizationOperationsRequest{
 		OrganizationId: r.OrganizationID(),
 

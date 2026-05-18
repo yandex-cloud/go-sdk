@@ -21,11 +21,6 @@ func AdvancedRateLimiterProfileResolver(name string, client AdvancedRateLimiterP
 }
 
 func (r *advancedRateLimiterProfileResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &advanced_rate_limiter.ListAdvancedRateLimiterProfilesRequest{
 		FolderId: r.FolderID(),
 	})

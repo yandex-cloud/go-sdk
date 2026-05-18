@@ -21,11 +21,6 @@ func HBARuleResolver(name string, client HBARuleClient, opts ...sdkresolvers.Res
 }
 
 func (r *hbaRuleResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &greenplum.ListHBARulesRequest{
 		ClusterId: r.ClusterID(),
 	})
@@ -45,11 +40,6 @@ func HBARuleAtRevisionResolver(name string, client HBARuleClient, opts ...sdkres
 }
 
 func (r *hbaRuleAtRevisionResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.AtRevisionIterator(ctx, &greenplum.ListHBARulesAtRevisionRequest{
 		ClusterId: r.ClusterID(),
 	})

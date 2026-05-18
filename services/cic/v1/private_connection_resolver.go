@@ -21,11 +21,6 @@ func PrivateConnectionResolver(name string, client PrivateConnectionClient, opts
 }
 
 func (r *privateConnectionResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &cic.ListPrivateConnectionsRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

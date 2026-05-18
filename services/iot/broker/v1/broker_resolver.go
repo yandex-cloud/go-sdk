@@ -21,11 +21,6 @@ func BrokerResolver(name string, client BrokerClient, opts ...sdkresolvers.Resol
 }
 
 func (r *brokerResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &broker.ListBrokersRequest{
 		FolderId: r.FolderID(),
 

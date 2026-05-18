@@ -21,11 +21,6 @@ func ReservedInstancePoolResolver(name string, client ReservedInstancePoolClient
 }
 
 func (r *reservedInstancePoolResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &compute.ListReservedInstancePoolsRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

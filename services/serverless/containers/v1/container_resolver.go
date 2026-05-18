@@ -21,11 +21,6 @@ func ContainerResolver(name string, client ContainerClient, opts ...sdkresolvers
 }
 
 func (r *containerResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &containers.ListContainersRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

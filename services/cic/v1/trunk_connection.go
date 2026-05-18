@@ -18,6 +18,7 @@ import (
 type TrunkConnectionClient interface {
 	TrunkConnectionClientIterator
 	Get(context.Context, *cic.GetTrunkConnectionRequest, ...grpc.CallOption) (*cic.TrunkConnection, error)
+	BatchGet(context.Context, *cic.BatchGetTrunkConnectionsRequest, ...grpc.CallOption) (*cic.BatchGetTrunkConnectionsResponse, error)
 	List(context.Context, *cic.ListTrunkConnectionsRequest, ...grpc.CallOption) (*cic.ListTrunkConnectionsResponse, error)
 	Update(context.Context, *cic.UpdateTrunkConnectionRequest, ...grpc.CallOption) (*TrunkConnectionUpdateOperation, error)
 	Delete(context.Context, *cic.DeleteTrunkConnectionRequest, ...grpc.CallOption) (*TrunkConnectionDeleteOperation, error)
@@ -45,6 +46,15 @@ func (c trunkConnectionClient) Get(ctx context.Context, in *cic.GetTrunkConnecti
 		return nil, err
 	}
 	return cic.NewTrunkConnectionServiceClient(connection).Get(ctx, in, opts...)
+}
+
+// BatchGet is an operation of Yandex.Cloud Cic TrunkConnection service.
+func (c trunkConnectionClient) BatchGet(ctx context.Context, in *cic.BatchGetTrunkConnectionsRequest, opts ...grpc.CallOption) (*cic.BatchGetTrunkConnectionsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, TrunkConnectionBatchGet, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return cic.NewTrunkConnectionServiceClient(connection).BatchGet(ctx, in, opts...)
 }
 
 // List is an operation of Yandex.Cloud Cic TrunkConnection service.
@@ -256,6 +266,7 @@ func (c trunkConnectionClient) pollOperation(ctx context.Context, operationId st
 
 var (
 	TrunkConnectionGet                    = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Get")
+	TrunkConnectionBatchGet               = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.BatchGet")
 	TrunkConnectionList                   = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.List")
 	TrunkConnectionUpdate                 = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Update")
 	TrunkConnectionDelete                 = protoreflect.FullName("yandex.cloud.cic.v1.TrunkConnectionService.Delete")

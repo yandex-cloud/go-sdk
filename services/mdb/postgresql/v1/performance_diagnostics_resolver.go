@@ -21,11 +21,6 @@ func PerformanceDiagnosticsRawSessionStatesResolver(name string, client Performa
 }
 
 func (r *performanceDiagnosticsRawSessionStatesResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.RawSessionStatesIterator(ctx, &postgresql.ListRawSessionStatesRequest{
 		ClusterId: r.ClusterID(),
 
@@ -47,11 +42,6 @@ func PerformanceDiagnosticsRawStatementsResolver(name string, client Performance
 }
 
 func (r *performanceDiagnosticsRawStatementsResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.RawStatementsIterator(ctx, &postgresql.ListRawStatementsRequest{
 		ClusterId: r.ClusterID(),
 

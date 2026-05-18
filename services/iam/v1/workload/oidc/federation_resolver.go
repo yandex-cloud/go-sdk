@@ -21,11 +21,6 @@ func FederationResolver(name string, client FederationClient, opts ...sdkresolve
 }
 
 func (r *federationResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &oidc.ListFederationsRequest{
 		FolderId: r.FolderID(),
 

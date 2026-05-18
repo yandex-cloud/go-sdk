@@ -21,11 +21,6 @@ func DatabaseResolver(name string, client DatabaseClient, opts ...sdkresolvers.R
 }
 
 func (r *databaseResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &ydb.ListDatabasesRequest{
 		FolderId: r.FolderID(),
 

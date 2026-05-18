@@ -21,11 +21,6 @@ func BucketResolver(name string, client BucketClient, opts ...sdkresolvers.Resol
 }
 
 func (r *bucketResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &storage.ListBucketsRequest{
 		FolderId: r.FolderID(),
 

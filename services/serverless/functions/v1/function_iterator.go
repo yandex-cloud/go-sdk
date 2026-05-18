@@ -14,7 +14,9 @@ import (
 type FunctionClientIterator interface {
 	Iterator(context.Context, *functions.ListFunctionsRequest, ...grpc.CallOption) *iterator.Iterator[*functions.ListFunctionsRequest, *functions.Function]
 	VersionsIterator(context.Context, *functions.ListFunctionsVersionsRequest, ...grpc.CallOption) *iterator.Iterator[*functions.ListFunctionsVersionsRequest, *functions.Version]
+	FunctionVersionsIterator(context.Context, *functions.ListFunctionsVersionsRequest, ...grpc.CallOption) *iterator.Iterator[*functions.ListFunctionsVersionsRequest, *functions.Version]
 	TagHistoryIterator(context.Context, *functions.ListFunctionTagHistoryRequest, ...grpc.CallOption) *iterator.Iterator[*functions.ListFunctionTagHistoryRequest, *functions.ListFunctionTagHistoryResponse_FunctionTagHistoryRecord]
+	FunctionTagHistoryIterator(context.Context, *functions.ListFunctionTagHistoryRequest, ...grpc.CallOption) *iterator.Iterator[*functions.ListFunctionTagHistoryRequest, *functions.ListFunctionTagHistoryResponse_FunctionTagHistoryRecord]
 	OperationsIterator(context.Context, *functions.ListFunctionOperationsRequest, ...grpc.CallOption) *iterator.Iterator[*functions.ListFunctionOperationsRequest, *operation.Operation]
 	AccessBindingsIterator(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) *iterator.Iterator[*access.ListAccessBindingsRequest, *access.AccessBinding]
 	ScalingPoliciesIterator(context.Context, *functions.ListScalingPoliciesRequest, ...grpc.CallOption) *iterator.Iterator[*functions.ListScalingPoliciesRequest, *functions.ScalingPolicy]
@@ -58,6 +60,25 @@ func (c functionClient) VersionsIterator(ctx context.Context, req *functions.Lis
 		})
 }
 
+type functionServiceListFunctionVersionsInternal struct {
+	*functions.ListFunctionsVersionsResponse
+}
+
+func (r functionServiceListFunctionVersionsInternal) Items() []*functions.Version {
+	return r.ListFunctionsVersionsResponse.Versions
+}
+
+func (c functionClient) FunctionVersionsIterator(ctx context.Context, req *functions.ListFunctionsVersionsRequest, opts ...grpc.CallOption) *iterator.Iterator[*functions.ListFunctionsVersionsRequest, *functions.Version] {
+	return iterator.NewIterator[*functions.ListFunctionsVersionsRequest, *functions.Version](ctx, req,
+		func(ctx context.Context, req *functions.ListFunctionsVersionsRequest, opts ...grpc.CallOption) (iterator.PageResponse[*functions.Version], error) {
+			resp, err := c.ListFunctionVersions(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return functionServiceListFunctionVersionsInternal{resp}, nil
+		})
+}
+
 type functionServiceListTagHistoryInternal struct {
 	*functions.ListFunctionTagHistoryResponse
 }
@@ -74,6 +95,25 @@ func (c functionClient) TagHistoryIterator(ctx context.Context, req *functions.L
 				return nil, err
 			}
 			return functionServiceListTagHistoryInternal{resp}, nil
+		})
+}
+
+type functionServiceListFunctionTagHistoryInternal struct {
+	*functions.ListFunctionTagHistoryResponse
+}
+
+func (r functionServiceListFunctionTagHistoryInternal) Items() []*functions.ListFunctionTagHistoryResponse_FunctionTagHistoryRecord {
+	return r.ListFunctionTagHistoryResponse.FunctionTagHistoryRecord
+}
+
+func (c functionClient) FunctionTagHistoryIterator(ctx context.Context, req *functions.ListFunctionTagHistoryRequest, opts ...grpc.CallOption) *iterator.Iterator[*functions.ListFunctionTagHistoryRequest, *functions.ListFunctionTagHistoryResponse_FunctionTagHistoryRecord] {
+	return iterator.NewIterator[*functions.ListFunctionTagHistoryRequest, *functions.ListFunctionTagHistoryResponse_FunctionTagHistoryRecord](ctx, req,
+		func(ctx context.Context, req *functions.ListFunctionTagHistoryRequest, opts ...grpc.CallOption) (iterator.PageResponse[*functions.ListFunctionTagHistoryResponse_FunctionTagHistoryRecord], error) {
+			resp, err := c.ListFunctionTagHistory(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return functionServiceListFunctionTagHistoryInternal{resp}, nil
 		})
 }
 

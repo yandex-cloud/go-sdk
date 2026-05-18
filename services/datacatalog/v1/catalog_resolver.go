@@ -21,11 +21,6 @@ func CatalogCatalogsResolver(name string, client CatalogClient, opts ...sdkresol
 }
 
 func (r *catalogCatalogsResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.CatalogsIterator(ctx, &datacatalog.ListCatalogsRequest{
 		FolderId: r.FolderID(),
 

@@ -21,11 +21,6 @@ func SymmetricKeyResolver(name string, client SymmetricKeyClient, opts ...sdkres
 }
 
 func (r *symmetricKeyResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &kms.ListSymmetricKeysRequest{
 		FolderId: r.FolderID(),
 

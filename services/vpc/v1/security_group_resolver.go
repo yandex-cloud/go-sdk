@@ -21,11 +21,6 @@ func SecurityGroupResolver(name string, client SecurityGroupClient, opts ...sdkr
 }
 
 func (r *securityGroupResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &vpc.ListSecurityGroupsRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

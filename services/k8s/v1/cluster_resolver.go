@@ -21,11 +21,6 @@ func ClusterResolver(name string, client ClusterClient, opts ...sdkresolvers.Res
 }
 
 func (r *clusterResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &k8s.ListClustersRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),
@@ -47,11 +42,6 @@ func ClusterNodeGroupsResolver(name string, client ClusterClient, opts ...sdkres
 }
 
 func (r *clusterNodeGroupsResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.NodeGroupsIterator(ctx, &k8s.ListClusterNodeGroupsRequest{
 		ClusterId: r.ClusterID(),
 		Filter:    sdkresolvers.CreateResolverFilter("name", r.Name),
@@ -73,11 +63,6 @@ func ClusterOperationsResolver(name string, client ClusterClient, opts ...sdkres
 }
 
 func (r *clusterOperationsResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.OperationsIterator(ctx, &k8s.ListClusterOperationsRequest{
 		ClusterId: r.ClusterID(),
 		Filter:    sdkresolvers.CreateResolverFilter("name", r.Name),
@@ -99,11 +84,6 @@ func ClusterNodesResolver(name string, client ClusterClient, opts ...sdkresolver
 }
 
 func (r *clusterNodesResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.NodesIterator(ctx, &k8s.ListClusterNodesRequest{
 		ClusterId: r.ClusterID(),
 

@@ -21,11 +21,6 @@ func DesktopGroupResolver(name string, client DesktopGroupClient, opts ...sdkres
 }
 
 func (r *desktopGroupResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &clouddesktop.ListDesktopGroupsRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

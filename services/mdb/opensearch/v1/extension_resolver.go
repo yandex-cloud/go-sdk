@@ -21,11 +21,6 @@ func ExtensionResolver(name string, client ExtensionClient, opts ...sdkresolvers
 }
 
 func (r *extensionResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &opensearch.ListExtensionsRequest{
 		ClusterId: r.ClusterID(),
 

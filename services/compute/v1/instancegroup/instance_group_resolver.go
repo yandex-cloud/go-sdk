@@ -21,11 +21,6 @@ func InstanceGroupResolver(name string, client InstanceGroupClient, opts ...sdkr
 }
 
 func (r *instanceGroupResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &instancegroup.ListInstanceGroupsRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

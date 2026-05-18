@@ -21,11 +21,6 @@ func AsymmetricSignatureKeyResolver(name string, client AsymmetricSignatureKeyCl
 }
 
 func (r *asymmetricSignatureKeyResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &asymmetricsignature.ListAsymmetricSignatureKeysRequest{
 		FolderId: r.FolderID(),
 

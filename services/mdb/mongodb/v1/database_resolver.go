@@ -21,11 +21,6 @@ func DatabaseResolver(name string, client DatabaseClient, opts ...sdkresolvers.R
 }
 
 func (r *databaseResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &mongodb.ListDatabasesRequest{
 		ClusterId: r.ClusterID(),
 

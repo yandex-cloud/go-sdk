@@ -21,11 +21,6 @@ func ConfigurationResolver(name string, client ConfigurationClient, opts ...sdkr
 }
 
 func (r *configurationResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &baremetal.ListConfigurationsRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),
@@ -47,11 +42,6 @@ func ConfigurationConfigurationNetworkInterfaceResolver(name string, client Conf
 }
 
 func (r *configurationConfigurationNetworkInterfaceResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.ConfigurationNetworkInterfaceIterator(ctx, &baremetal.ListConfigurationNetworkInterfaceRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

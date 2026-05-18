@@ -21,11 +21,6 @@ func BackupResolver(name string, client BackupClient, opts ...sdkresolvers.Resol
 }
 
 func (r *backupResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &elasticsearch.ListBackupsRequest{
 		FolderId: r.FolderID(),
 

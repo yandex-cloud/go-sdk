@@ -21,11 +21,6 @@ func MlModelResolver(name string, client MlModelClient, opts ...sdkresolvers.Res
 }
 
 func (r *mlModelResolver) Run(ctx context.Context) error {
-	err := r.EnsureClusterID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &clickhouse.ListMlModelsRequest{
 		ClusterId: r.ClusterID(),
 

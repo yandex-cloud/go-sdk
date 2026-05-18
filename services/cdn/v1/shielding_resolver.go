@@ -21,11 +21,6 @@ func ShieldingAvailableLocationsResolver(name string, client ShieldingClient, op
 }
 
 func (r *shieldingAvailableLocationsResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.AvailableLocationsIterator(ctx, &cdn.ListShieldingLocationsRequest{
 		FolderId: r.FolderID(),
 

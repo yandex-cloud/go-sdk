@@ -19,6 +19,7 @@ type PublicConnectionClient interface {
 	Get(context.Context, *cic.GetPublicConnectionRequest, ...grpc.CallOption) (*cic.PublicConnection, error)
 	List(context.Context, *cic.ListPublicConnectionsRequest, ...grpc.CallOption) (*cic.ListPublicConnectionsResponse, error)
 	Move(context.Context, *cic.MovePublicConnectionRequest, ...grpc.CallOption) (*PublicConnectionMoveOperation, error)
+	ListOperations(context.Context, *cic.ListPublicConnectionOperationsRequest, ...grpc.CallOption) (*cic.ListPublicConnectionOperationsResponse, error)
 }
 
 var _ PublicConnectionClient = publicConnectionClient{}
@@ -104,6 +105,15 @@ func (c publicConnectionClient) Move(ctx context.Context, in *cic.MovePublicConn
 	return &PublicConnectionMoveOperation{*op}, nil
 }
 
+// ListOperations is an operation of Yandex.Cloud Cic PublicConnection service.
+func (c publicConnectionClient) ListOperations(ctx context.Context, in *cic.ListPublicConnectionOperationsRequest, opts ...grpc.CallOption) (*cic.ListPublicConnectionOperationsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, PublicConnectionListOperations, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return cic.NewPublicConnectionServiceClient(connection).ListOperations(ctx, in, opts...)
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c publicConnectionClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, PublicConnectionOperationPoller, opts...)
@@ -117,5 +127,6 @@ var (
 	PublicConnectionGet             = protoreflect.FullName("yandex.cloud.cic.v1.PublicConnectionService.Get")
 	PublicConnectionList            = protoreflect.FullName("yandex.cloud.cic.v1.PublicConnectionService.List")
 	PublicConnectionMove            = protoreflect.FullName("yandex.cloud.cic.v1.PublicConnectionService.Move")
+	PublicConnectionListOperations  = protoreflect.FullName("yandex.cloud.cic.v1.PublicConnectionService.ListOperations")
 	PublicConnectionOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

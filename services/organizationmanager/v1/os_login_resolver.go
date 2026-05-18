@@ -21,11 +21,6 @@ func OsLoginProfilesResolver(name string, client OsLoginClient, opts ...sdkresol
 }
 
 func (r *osLoginProfilesResolver) Run(ctx context.Context) error {
-	err := r.EnsureOrganizationID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.ProfilesIterator(ctx, &organizationmanager.ListOsLoginProfilesRequest{
 		OrganizationId: r.OrganizationID(),
 		Filter:         sdkresolvers.CreateResolverFilter("name", r.Name),

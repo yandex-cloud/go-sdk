@@ -21,11 +21,6 @@ func McpGatewayResolver(name string, client McpGatewayClient, opts ...sdkresolve
 }
 
 func (r *mcpGatewayResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &mcpgateway.ListMcpGatewayRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

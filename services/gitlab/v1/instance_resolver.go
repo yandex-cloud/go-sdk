@@ -21,11 +21,6 @@ func InstanceResolver(name string, client InstanceClient, opts ...sdkresolvers.R
 }
 
 func (r *instanceResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &gitlab.ListInstancesRequest{
 		FolderId: r.FolderID(),
 

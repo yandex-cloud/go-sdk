@@ -21,11 +21,6 @@ func ServiceAccountResolver(name string, client ServiceAccountClient, opts ...sd
 }
 
 func (r *serviceAccountResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &iam.ListServiceAccountsRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

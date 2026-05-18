@@ -21,11 +21,6 @@ func BackupFilesResolver(name string, client BackupClient, opts ...sdkresolvers.
 }
 
 func (r *backupFilesResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.FilesIterator(ctx, &backup.ListFilesRequest{
 		FolderId: r.FolderID(),
 	})

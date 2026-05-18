@@ -21,11 +21,6 @@ func DiskPlacementGroupResolver(name string, client DiskPlacementGroupClient, op
 }
 
 func (r *diskPlacementGroupResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &compute.ListDiskPlacementGroupsRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

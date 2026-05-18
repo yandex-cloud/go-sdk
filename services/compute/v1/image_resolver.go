@@ -21,11 +21,6 @@ func ImageResolver(name string, client ImageClient, opts ...sdkresolvers.Resolve
 }
 
 func (r *imageResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &compute.ListImagesRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

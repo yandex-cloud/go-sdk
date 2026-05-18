@@ -21,11 +21,6 @@ func CertificateResolver(name string, client CertificateClient, opts ...sdkresol
 }
 
 func (r *certificateResolver) Run(ctx context.Context) error {
-	err := r.EnsureFederationID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &saml.ListCertificatesRequest{
 		FederationId: r.FederationID(),
 		Filter:       sdkresolvers.CreateResolverFilter("name", r.Name),

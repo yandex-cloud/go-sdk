@@ -21,11 +21,6 @@ func RoutingInstanceResolver(name string, client RoutingInstanceClient, opts ...
 }
 
 func (r *routingInstanceResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &cloudrouter.ListRoutingInstancesRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

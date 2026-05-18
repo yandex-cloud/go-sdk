@@ -21,11 +21,6 @@ func SubnetResolver(name string, client SubnetClient, opts ...sdkresolvers.Resol
 }
 
 func (r *subnetResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &vpc.ListSubnetsRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

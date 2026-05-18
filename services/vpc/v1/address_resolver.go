@@ -21,11 +21,6 @@ func AddressResolver(name string, client AddressClient, opts ...sdkresolvers.Res
 }
 
 func (r *addressResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &vpc.ListAddressesRequest{
 		FolderId: r.FolderID(),
 		Filter:   sdkresolvers.CreateResolverFilter("name", r.Name),

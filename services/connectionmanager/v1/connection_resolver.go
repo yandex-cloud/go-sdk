@@ -21,11 +21,6 @@ func ConnectionResolver(name string, client ConnectionClient, opts ...sdkresolve
 }
 
 func (r *connectionResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &connectionmanager.ListConnectionRequest{
 		FolderId: r.FolderID(),
 

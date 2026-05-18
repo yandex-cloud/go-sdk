@@ -21,11 +21,6 @@ func PolicyResolver(name string, client PolicyClient, opts ...sdkresolvers.Resol
 }
 
 func (r *policyResolver) Run(ctx context.Context) error {
-	err := r.EnsureFolderID()
-	if err != nil {
-		return err
-	}
-
 	resp := r.client.Iterator(ctx, &backup.ListPoliciesRequest{
 		FolderId: r.FolderID(),
 	})
