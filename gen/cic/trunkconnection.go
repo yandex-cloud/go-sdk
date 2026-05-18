@@ -20,6 +20,15 @@ type TrunkConnectionServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
 }
 
+// BatchGet implements cic.TrunkConnectionServiceClient
+func (c *TrunkConnectionServiceClient) BatchGet(ctx context.Context, in *cic.BatchGetTrunkConnectionsRequest, opts ...grpc.CallOption) (*cic.BatchGetTrunkConnectionsResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cic.NewTrunkConnectionServiceClient(conn).BatchGet(ctx, in, opts...)
+}
+
 // Delete implements cic.TrunkConnectionServiceClient
 func (c *TrunkConnectionServiceClient) Delete(ctx context.Context, in *cic.DeleteTrunkConnectionRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
