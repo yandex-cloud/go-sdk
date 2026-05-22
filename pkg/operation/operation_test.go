@@ -26,6 +26,33 @@ import (
 
 var _ PollIntervalFunc = defaultPollIntervalFunc
 
+func TestWaitSkipsPollWhenAlreadyDone(t *testing.T) {
+	pollErr := errors.New("poll error")
+	pollCalled := false
+	poll := func(context.Context, string, ...grpc.CallOption) (YCOperation, error) {
+		pollCalled = true
+		return nil, pollErr
+	}
+
+	expectedResp := &durationpb.Duration{Seconds: 10}
+	op, err := NewOperation(
+		&operation.Operation{
+			Id:   "op-id",
+			Done: true,
+			Result: &operation.Operation_Response{
+				Response: Any(t, expectedResp),
+			},
+		},
+		&Concretization{poll, nil, &durationpb.Duration{}, nil},
+	)
+	require.NoError(t, err)
+
+	resp, err := op.Wait(context.Background())
+	require.NoError(t, err)
+	require.False(t, pollCalled)
+	Equal(t, expectedResp, resp)
+}
+
 func TestWaitReturnsPollError(t *testing.T) {
 	pollErr := errors.New("poll error")
 	poll := func(context.Context, string, ...grpc.CallOption) (YCOperation, error) {

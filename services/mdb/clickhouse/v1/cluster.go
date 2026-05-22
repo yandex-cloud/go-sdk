@@ -23,10 +23,10 @@ type ClusterClient interface {
 	Create(context.Context, *clickhouse.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)
 	Update(context.Context, *clickhouse.UpdateClusterRequest, ...grpc.CallOption) (*ClusterUpdateOperation, error)
 	Delete(context.Context, *clickhouse.DeleteClusterRequest, ...grpc.CallOption) (*ClusterDeleteOperation, error)
+	AddZookeeper(context.Context, *clickhouse.AddClusterZookeeperRequest, ...grpc.CallOption) (*ClusterAddZookeeperOperation, error)
 	Start(context.Context, *clickhouse.StartClusterRequest, ...grpc.CallOption) (*ClusterStartOperation, error)
 	Stop(context.Context, *clickhouse.StopClusterRequest, ...grpc.CallOption) (*ClusterStopOperation, error)
 	Move(context.Context, *clickhouse.MoveClusterRequest, ...grpc.CallOption) (*ClusterMoveOperation, error)
-	AddZookeeper(context.Context, *clickhouse.AddClusterZookeeperRequest, ...grpc.CallOption) (*ClusterAddZookeeperOperation, error)
 	Backup(context.Context, *clickhouse.BackupClusterRequest, ...grpc.CallOption) (*ClusterBackupOperation, error)
 	Restore(context.Context, *clickhouse.RestoreClusterRequest, ...grpc.CallOption) (*ClusterRestoreOperation, error)
 	RescheduleMaintenance(context.Context, *clickhouse.RescheduleMaintenanceRequest, ...grpc.CallOption) (*ClusterRescheduleMaintenanceOperation, error)
@@ -251,6 +251,60 @@ func (c clusterClient) Delete(ctx context.Context, in *clickhouse.DeleteClusterR
 	return &ClusterDeleteOperation{*op}, nil
 }
 
+// ClusterAddZookeeperOperation is used to monitor the state of AddZookeeper operations.
+type ClusterAddZookeeperOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ClusterAddZookeeperOperation) Metadata() *clickhouse.AddClusterZookeeperMetadata {
+	return o.Operation.Metadata().(*clickhouse.AddClusterZookeeperMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ClusterAddZookeeperOperation) Response() *clickhouse.Cluster {
+	return o.Operation.Response().(*clickhouse.Cluster)
+}
+
+// Wait polls the operation until it's done.
+func (o *ClusterAddZookeeperOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*clickhouse.Cluster, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*clickhouse.Cluster)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ClusterAddZookeeperOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*clickhouse.Cluster, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*clickhouse.Cluster)
+	return response, err
+}
+
+// AddZookeeper is an operation of Yandex.Cloud Clickhouse Cluster service.
+// It returns an object which should be used to monitor the operation state.
+func (c clusterClient) AddZookeeper(ctx context.Context, in *clickhouse.AddClusterZookeeperRequest, opts ...grpc.CallOption) (*ClusterAddZookeeperOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ClusterAddZookeeper, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := clickhouse.NewClusterServiceClient(connection).AddZookeeper(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*clickhouse.AddClusterZookeeperMetadata).GetClusterId()
+		},
+		MetadataType: (*clickhouse.AddClusterZookeeperMetadata)(nil),
+		ResponseType: (*clickhouse.Cluster)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ClusterAddZookeeperOperation{*op}, nil
+}
+
 // ClusterStartOperation is used to monitor the state of Start operations.
 type ClusterStartOperation struct {
 	sdkop.Operation
@@ -411,60 +465,6 @@ func (c clusterClient) Move(ctx context.Context, in *clickhouse.MoveClusterReque
 		return nil, err
 	}
 	return &ClusterMoveOperation{*op}, nil
-}
-
-// ClusterAddZookeeperOperation is used to monitor the state of AddZookeeper operations.
-type ClusterAddZookeeperOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *ClusterAddZookeeperOperation) Metadata() *clickhouse.AddClusterZookeeperMetadata {
-	return o.Operation.Metadata().(*clickhouse.AddClusterZookeeperMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *ClusterAddZookeeperOperation) Response() *clickhouse.Cluster {
-	return o.Operation.Response().(*clickhouse.Cluster)
-}
-
-// Wait polls the operation until it's done.
-func (o *ClusterAddZookeeperOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*clickhouse.Cluster, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*clickhouse.Cluster)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *ClusterAddZookeeperOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*clickhouse.Cluster, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*clickhouse.Cluster)
-	return response, err
-}
-
-// AddZookeeper is an operation of Yandex.Cloud Clickhouse Cluster service.
-// It returns an object which should be used to monitor the operation state.
-func (c clusterClient) AddZookeeper(ctx context.Context, in *clickhouse.AddClusterZookeeperRequest, opts ...grpc.CallOption) (*ClusterAddZookeeperOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, ClusterAddZookeeper, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := clickhouse.NewClusterServiceClient(connection).AddZookeeper(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*clickhouse.AddClusterZookeeperMetadata).GetClusterId()
-		},
-		MetadataType: (*clickhouse.AddClusterZookeeperMetadata)(nil),
-		ResponseType: (*clickhouse.Cluster)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &ClusterAddZookeeperOperation{*op}, nil
 }
 
 // ClusterBackupOperation is used to monitor the state of Backup operations.
@@ -1655,10 +1655,10 @@ var (
 	ClusterCreate                   = protoreflect.FullName("yandex.cloud.mdb.clickhouse.v1.ClusterService.Create")
 	ClusterUpdate                   = protoreflect.FullName("yandex.cloud.mdb.clickhouse.v1.ClusterService.Update")
 	ClusterDelete                   = protoreflect.FullName("yandex.cloud.mdb.clickhouse.v1.ClusterService.Delete")
+	ClusterAddZookeeper             = protoreflect.FullName("yandex.cloud.mdb.clickhouse.v1.ClusterService.AddZookeeper")
 	ClusterStart                    = protoreflect.FullName("yandex.cloud.mdb.clickhouse.v1.ClusterService.Start")
 	ClusterStop                     = protoreflect.FullName("yandex.cloud.mdb.clickhouse.v1.ClusterService.Stop")
 	ClusterMove                     = protoreflect.FullName("yandex.cloud.mdb.clickhouse.v1.ClusterService.Move")
-	ClusterAddZookeeper             = protoreflect.FullName("yandex.cloud.mdb.clickhouse.v1.ClusterService.AddZookeeper")
 	ClusterBackup                   = protoreflect.FullName("yandex.cloud.mdb.clickhouse.v1.ClusterService.Backup")
 	ClusterRestore                  = protoreflect.FullName("yandex.cloud.mdb.clickhouse.v1.ClusterService.Restore")
 	ClusterRescheduleMaintenance    = protoreflect.FullName("yandex.cloud.mdb.clickhouse.v1.ClusterService.RescheduleMaintenance")

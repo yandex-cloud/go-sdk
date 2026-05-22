@@ -152,6 +152,18 @@ func (o *Operation) WaitInterval(
 	pollInterval PollIntervalFunc,
 	opts ...grpc.CallOption,
 ) (proto.Message, error) {
+	if o.Done() {
+		if o.responseError != nil {
+			return nil, o.responseError
+		}
+
+		if err := Error(o.proto); err != nil {
+			return nil, fmt.Errorf("operation (id=%s) failed: %w", o.ID(), err)
+		}
+
+		return o.response, nil
+	}
+
 	op, err := waitInterval(ctx, o.proto.GetId(), o.concretization.Poll, pollInterval, opts...)
 	if err != nil {
 		return nil, err
