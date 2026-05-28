@@ -20,6 +20,15 @@ type PrivateConnectionServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
 }
 
+// BatchGet implements cic.PrivateConnectionServiceClient
+func (c *PrivateConnectionServiceClient) BatchGet(ctx context.Context, in *cic.BatchGetPrivateConnectionsRequest, opts ...grpc.CallOption) (*cic.BatchGetPrivateConnectionsResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cic.NewPrivateConnectionServiceClient(conn).BatchGet(ctx, in, opts...)
+}
+
 // Create implements cic.PrivateConnectionServiceClient
 func (c *PrivateConnectionServiceClient) Create(ctx context.Context, in *cic.CreatePrivateConnectionRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
