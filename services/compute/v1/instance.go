@@ -32,15 +32,15 @@ type InstanceClient interface {
 	DetachDisk(context.Context, *compute.DetachInstanceDiskRequest, ...grpc.CallOption) (*InstanceDetachDiskOperation, error)
 	AttachFilesystem(context.Context, *compute.AttachInstanceFilesystemRequest, ...grpc.CallOption) (*InstanceAttachFilesystemOperation, error)
 	DetachFilesystem(context.Context, *compute.DetachInstanceFilesystemRequest, ...grpc.CallOption) (*InstanceDetachFilesystemOperation, error)
-	AttachNetworkInterface(context.Context, *compute.AttachInstanceNetworkInterfaceRequest, ...grpc.CallOption) (*InstanceAttachNetworkInterfaceOperation, error)
-	DetachNetworkInterface(context.Context, *compute.DetachInstanceNetworkInterfaceRequest, ...grpc.CallOption) (*InstanceDetachNetworkInterfaceOperation, error)
 	AddOneToOneNat(context.Context, *compute.AddInstanceOneToOneNatRequest, ...grpc.CallOption) (*InstanceAddOneToOneNatOperation, error)
 	RemoveOneToOneNat(context.Context, *compute.RemoveInstanceOneToOneNatRequest, ...grpc.CallOption) (*InstanceRemoveOneToOneNatOperation, error)
 	UpdateNetworkInterface(context.Context, *compute.UpdateInstanceNetworkInterfaceRequest, ...grpc.CallOption) (*InstanceUpdateNetworkInterfaceOperation, error)
+	AttachNetworkInterface(context.Context, *compute.AttachInstanceNetworkInterfaceRequest, ...grpc.CallOption) (*InstanceAttachNetworkInterfaceOperation, error)
+	DetachNetworkInterface(context.Context, *compute.DetachInstanceNetworkInterfaceRequest, ...grpc.CallOption) (*InstanceDetachNetworkInterfaceOperation, error)
 	ListOperations(context.Context, *compute.ListInstanceOperationsRequest, ...grpc.CallOption) (*compute.ListInstanceOperationsResponse, error)
+	SimulateMaintenanceEvent(context.Context, *compute.SimulateInstanceMaintenanceEventRequest, ...grpc.CallOption) (*InstanceSimulateMaintenanceEventOperation, error)
 	Move(context.Context, *compute.MoveInstanceRequest, ...grpc.CallOption) (*InstanceMoveOperation, error)
 	Relocate(context.Context, *compute.RelocateInstanceRequest, ...grpc.CallOption) (*InstanceRelocateOperation, error)
-	SimulateMaintenanceEvent(context.Context, *compute.SimulateInstanceMaintenanceEventRequest, ...grpc.CallOption) (*InstanceSimulateMaintenanceEventOperation, error)
 	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
 	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*InstanceSetAccessBindingsOperation, error)
 	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*InstanceUpdateAccessBindingsOperation, error)
@@ -678,114 +678,6 @@ func (c instanceClient) DetachFilesystem(ctx context.Context, in *compute.Detach
 	return &InstanceDetachFilesystemOperation{*op}, nil
 }
 
-// InstanceAttachNetworkInterfaceOperation is used to monitor the state of AttachNetworkInterface operations.
-type InstanceAttachNetworkInterfaceOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *InstanceAttachNetworkInterfaceOperation) Metadata() *compute.AttachInstanceNetworkInterfaceMetadata {
-	return o.Operation.Metadata().(*compute.AttachInstanceNetworkInterfaceMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *InstanceAttachNetworkInterfaceOperation) Response() *compute.Instance {
-	return o.Operation.Response().(*compute.Instance)
-}
-
-// Wait polls the operation until it's done.
-func (o *InstanceAttachNetworkInterfaceOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*compute.Instance, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*compute.Instance)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *InstanceAttachNetworkInterfaceOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*compute.Instance, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*compute.Instance)
-	return response, err
-}
-
-// AttachNetworkInterface is an operation of Yandex.Cloud Compute Instance service.
-// It returns an object which should be used to monitor the operation state.
-func (c instanceClient) AttachNetworkInterface(ctx context.Context, in *compute.AttachInstanceNetworkInterfaceRequest, opts ...grpc.CallOption) (*InstanceAttachNetworkInterfaceOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, InstanceAttachNetworkInterface, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := compute.NewInstanceServiceClient(connection).AttachNetworkInterface(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*compute.AttachInstanceNetworkInterfaceMetadata).GetInstanceId()
-		},
-		MetadataType: (*compute.AttachInstanceNetworkInterfaceMetadata)(nil),
-		ResponseType: (*compute.Instance)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &InstanceAttachNetworkInterfaceOperation{*op}, nil
-}
-
-// InstanceDetachNetworkInterfaceOperation is used to monitor the state of DetachNetworkInterface operations.
-type InstanceDetachNetworkInterfaceOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *InstanceDetachNetworkInterfaceOperation) Metadata() *compute.DetachInstanceNetworkInterfaceMetadata {
-	return o.Operation.Metadata().(*compute.DetachInstanceNetworkInterfaceMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *InstanceDetachNetworkInterfaceOperation) Response() *compute.Instance {
-	return o.Operation.Response().(*compute.Instance)
-}
-
-// Wait polls the operation until it's done.
-func (o *InstanceDetachNetworkInterfaceOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*compute.Instance, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*compute.Instance)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *InstanceDetachNetworkInterfaceOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*compute.Instance, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*compute.Instance)
-	return response, err
-}
-
-// DetachNetworkInterface is an operation of Yandex.Cloud Compute Instance service.
-// It returns an object which should be used to monitor the operation state.
-func (c instanceClient) DetachNetworkInterface(ctx context.Context, in *compute.DetachInstanceNetworkInterfaceRequest, opts ...grpc.CallOption) (*InstanceDetachNetworkInterfaceOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, InstanceDetachNetworkInterface, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := compute.NewInstanceServiceClient(connection).DetachNetworkInterface(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*compute.DetachInstanceNetworkInterfaceMetadata).GetInstanceId()
-		},
-		MetadataType: (*compute.DetachInstanceNetworkInterfaceMetadata)(nil),
-		ResponseType: (*compute.Instance)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &InstanceDetachNetworkInterfaceOperation{*op}, nil
-}
-
 // InstanceAddOneToOneNatOperation is used to monitor the state of AddOneToOneNat operations.
 type InstanceAddOneToOneNatOperation struct {
 	sdkop.Operation
@@ -948,6 +840,114 @@ func (c instanceClient) UpdateNetworkInterface(ctx context.Context, in *compute.
 	return &InstanceUpdateNetworkInterfaceOperation{*op}, nil
 }
 
+// InstanceAttachNetworkInterfaceOperation is used to monitor the state of AttachNetworkInterface operations.
+type InstanceAttachNetworkInterfaceOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *InstanceAttachNetworkInterfaceOperation) Metadata() *compute.AttachInstanceNetworkInterfaceMetadata {
+	return o.Operation.Metadata().(*compute.AttachInstanceNetworkInterfaceMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *InstanceAttachNetworkInterfaceOperation) Response() *compute.Instance {
+	return o.Operation.Response().(*compute.Instance)
+}
+
+// Wait polls the operation until it's done.
+func (o *InstanceAttachNetworkInterfaceOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*compute.Instance, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*compute.Instance)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *InstanceAttachNetworkInterfaceOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*compute.Instance, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*compute.Instance)
+	return response, err
+}
+
+// AttachNetworkInterface is an operation of Yandex.Cloud Compute Instance service.
+// It returns an object which should be used to monitor the operation state.
+func (c instanceClient) AttachNetworkInterface(ctx context.Context, in *compute.AttachInstanceNetworkInterfaceRequest, opts ...grpc.CallOption) (*InstanceAttachNetworkInterfaceOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, InstanceAttachNetworkInterface, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := compute.NewInstanceServiceClient(connection).AttachNetworkInterface(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*compute.AttachInstanceNetworkInterfaceMetadata).GetInstanceId()
+		},
+		MetadataType: (*compute.AttachInstanceNetworkInterfaceMetadata)(nil),
+		ResponseType: (*compute.Instance)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &InstanceAttachNetworkInterfaceOperation{*op}, nil
+}
+
+// InstanceDetachNetworkInterfaceOperation is used to monitor the state of DetachNetworkInterface operations.
+type InstanceDetachNetworkInterfaceOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *InstanceDetachNetworkInterfaceOperation) Metadata() *compute.DetachInstanceNetworkInterfaceMetadata {
+	return o.Operation.Metadata().(*compute.DetachInstanceNetworkInterfaceMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *InstanceDetachNetworkInterfaceOperation) Response() *compute.Instance {
+	return o.Operation.Response().(*compute.Instance)
+}
+
+// Wait polls the operation until it's done.
+func (o *InstanceDetachNetworkInterfaceOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*compute.Instance, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*compute.Instance)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *InstanceDetachNetworkInterfaceOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*compute.Instance, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*compute.Instance)
+	return response, err
+}
+
+// DetachNetworkInterface is an operation of Yandex.Cloud Compute Instance service.
+// It returns an object which should be used to monitor the operation state.
+func (c instanceClient) DetachNetworkInterface(ctx context.Context, in *compute.DetachInstanceNetworkInterfaceRequest, opts ...grpc.CallOption) (*InstanceDetachNetworkInterfaceOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, InstanceDetachNetworkInterface, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := compute.NewInstanceServiceClient(connection).DetachNetworkInterface(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*compute.DetachInstanceNetworkInterfaceMetadata).GetInstanceId()
+		},
+		MetadataType: (*compute.DetachInstanceNetworkInterfaceMetadata)(nil),
+		ResponseType: (*compute.Instance)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &InstanceDetachNetworkInterfaceOperation{*op}, nil
+}
+
 // ListOperations is an operation of Yandex.Cloud Compute Instance service.
 func (c instanceClient) ListOperations(ctx context.Context, in *compute.ListInstanceOperationsRequest, opts ...grpc.CallOption) (*compute.ListInstanceOperationsResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, InstanceListOperations, opts...)
@@ -955,6 +955,60 @@ func (c instanceClient) ListOperations(ctx context.Context, in *compute.ListInst
 		return nil, err
 	}
 	return compute.NewInstanceServiceClient(connection).ListOperations(ctx, in, opts...)
+}
+
+// InstanceSimulateMaintenanceEventOperation is used to monitor the state of SimulateMaintenanceEvent operations.
+type InstanceSimulateMaintenanceEventOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *InstanceSimulateMaintenanceEventOperation) Metadata() *compute.SimulateInstanceMaintenanceEventMetadata {
+	return o.Operation.Metadata().(*compute.SimulateInstanceMaintenanceEventMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *InstanceSimulateMaintenanceEventOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *InstanceSimulateMaintenanceEventOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *InstanceSimulateMaintenanceEventOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// SimulateMaintenanceEvent is an operation of Yandex.Cloud Compute Instance service.
+// It returns an object which should be used to monitor the operation state.
+func (c instanceClient) SimulateMaintenanceEvent(ctx context.Context, in *compute.SimulateInstanceMaintenanceEventRequest, opts ...grpc.CallOption) (*InstanceSimulateMaintenanceEventOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, InstanceSimulateMaintenanceEvent, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := compute.NewInstanceServiceClient(connection).SimulateMaintenanceEvent(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*compute.SimulateInstanceMaintenanceEventMetadata).GetInstanceId()
+		},
+		MetadataType: (*compute.SimulateInstanceMaintenanceEventMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &InstanceSimulateMaintenanceEventOperation{*op}, nil
 }
 
 // InstanceMoveOperation is used to monitor the state of Move operations.
@@ -1063,60 +1117,6 @@ func (c instanceClient) Relocate(ctx context.Context, in *compute.RelocateInstan
 		return nil, err
 	}
 	return &InstanceRelocateOperation{*op}, nil
-}
-
-// InstanceSimulateMaintenanceEventOperation is used to monitor the state of SimulateMaintenanceEvent operations.
-type InstanceSimulateMaintenanceEventOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *InstanceSimulateMaintenanceEventOperation) Metadata() *compute.SimulateInstanceMaintenanceEventMetadata {
-	return o.Operation.Metadata().(*compute.SimulateInstanceMaintenanceEventMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *InstanceSimulateMaintenanceEventOperation) Response() *emptypb.Empty {
-	return o.Operation.Response().(*emptypb.Empty)
-}
-
-// Wait polls the operation until it's done.
-func (o *InstanceSimulateMaintenanceEventOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*emptypb.Empty)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *InstanceSimulateMaintenanceEventOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*emptypb.Empty)
-	return response, err
-}
-
-// SimulateMaintenanceEvent is an operation of Yandex.Cloud Compute Instance service.
-// It returns an object which should be used to monitor the operation state.
-func (c instanceClient) SimulateMaintenanceEvent(ctx context.Context, in *compute.SimulateInstanceMaintenanceEventRequest, opts ...grpc.CallOption) (*InstanceSimulateMaintenanceEventOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, InstanceSimulateMaintenanceEvent, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := compute.NewInstanceServiceClient(connection).SimulateMaintenanceEvent(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*compute.SimulateInstanceMaintenanceEventMetadata).GetInstanceId()
-		},
-		MetadataType: (*compute.SimulateInstanceMaintenanceEventMetadata)(nil),
-		ResponseType: (*emptypb.Empty)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &InstanceSimulateMaintenanceEventOperation{*op}, nil
 }
 
 // ListAccessBindings is an operation of Yandex.Cloud Compute Instance service.
@@ -1254,15 +1254,15 @@ var (
 	InstanceDetachDisk               = protoreflect.FullName("yandex.cloud.compute.v1.InstanceService.DetachDisk")
 	InstanceAttachFilesystem         = protoreflect.FullName("yandex.cloud.compute.v1.InstanceService.AttachFilesystem")
 	InstanceDetachFilesystem         = protoreflect.FullName("yandex.cloud.compute.v1.InstanceService.DetachFilesystem")
-	InstanceAttachNetworkInterface   = protoreflect.FullName("yandex.cloud.compute.v1.InstanceService.AttachNetworkInterface")
-	InstanceDetachNetworkInterface   = protoreflect.FullName("yandex.cloud.compute.v1.InstanceService.DetachNetworkInterface")
 	InstanceAddOneToOneNat           = protoreflect.FullName("yandex.cloud.compute.v1.InstanceService.AddOneToOneNat")
 	InstanceRemoveOneToOneNat        = protoreflect.FullName("yandex.cloud.compute.v1.InstanceService.RemoveOneToOneNat")
 	InstanceUpdateNetworkInterface   = protoreflect.FullName("yandex.cloud.compute.v1.InstanceService.UpdateNetworkInterface")
+	InstanceAttachNetworkInterface   = protoreflect.FullName("yandex.cloud.compute.v1.InstanceService.AttachNetworkInterface")
+	InstanceDetachNetworkInterface   = protoreflect.FullName("yandex.cloud.compute.v1.InstanceService.DetachNetworkInterface")
 	InstanceListOperations           = protoreflect.FullName("yandex.cloud.compute.v1.InstanceService.ListOperations")
+	InstanceSimulateMaintenanceEvent = protoreflect.FullName("yandex.cloud.compute.v1.InstanceService.SimulateMaintenanceEvent")
 	InstanceMove                     = protoreflect.FullName("yandex.cloud.compute.v1.InstanceService.Move")
 	InstanceRelocate                 = protoreflect.FullName("yandex.cloud.compute.v1.InstanceService.Relocate")
-	InstanceSimulateMaintenanceEvent = protoreflect.FullName("yandex.cloud.compute.v1.InstanceService.SimulateMaintenanceEvent")
 	InstanceListAccessBindings       = protoreflect.FullName("yandex.cloud.compute.v1.InstanceService.ListAccessBindings")
 	InstanceSetAccessBindings        = protoreflect.FullName("yandex.cloud.compute.v1.InstanceService.SetAccessBindings")
 	InstanceUpdateAccessBindings     = protoreflect.FullName("yandex.cloud.compute.v1.InstanceService.UpdateAccessBindings")

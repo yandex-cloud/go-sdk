@@ -26,6 +26,7 @@ type PrivateConnectionClient interface {
 	ListOperations(context.Context, *cic.ListPrivateConnectionOperationsRequest, ...grpc.CallOption) (*cic.ListPrivateConnectionOperationsResponse, error)
 	UpsertStaticRoute(context.Context, *cic.UpsertStaticRouteRequest, ...grpc.CallOption) (*PrivateConnectionUpsertStaticRouteOperation, error)
 	RemoveStaticRoute(context.Context, *cic.RemoveStaticRouteRequest, ...grpc.CallOption) (*PrivateConnectionRemoveStaticRouteOperation, error)
+	BatchGet(context.Context, *cic.BatchGetPrivateConnectionsRequest, ...grpc.CallOption) (*cic.BatchGetPrivateConnectionsResponse, error)
 }
 
 var _ PrivateConnectionClient = privateConnectionClient{}
@@ -390,6 +391,15 @@ func (c privateConnectionClient) RemoveStaticRoute(ctx context.Context, in *cic.
 	return &PrivateConnectionRemoveStaticRouteOperation{*op}, nil
 }
 
+// BatchGet is an operation of Yandex.Cloud Cic PrivateConnection service.
+func (c privateConnectionClient) BatchGet(ctx context.Context, in *cic.BatchGetPrivateConnectionsRequest, opts ...grpc.CallOption) (*cic.BatchGetPrivateConnectionsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, PrivateConnectionBatchGet, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return cic.NewPrivateConnectionServiceClient(connection).BatchGet(ctx, in, opts...)
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c privateConnectionClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, PrivateConnectionOperationPoller, opts...)
@@ -409,5 +419,6 @@ var (
 	PrivateConnectionListOperations    = protoreflect.FullName("yandex.cloud.cic.v1.PrivateConnectionService.ListOperations")
 	PrivateConnectionUpsertStaticRoute = protoreflect.FullName("yandex.cloud.cic.v1.PrivateConnectionService.UpsertStaticRoute")
 	PrivateConnectionRemoveStaticRoute = protoreflect.FullName("yandex.cloud.cic.v1.PrivateConnectionService.RemoveStaticRoute")
+	PrivateConnectionBatchGet          = protoreflect.FullName("yandex.cloud.cic.v1.PrivateConnectionService.BatchGet")
 	PrivateConnectionOperationPoller   = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

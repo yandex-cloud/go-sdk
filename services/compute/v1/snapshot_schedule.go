@@ -19,13 +19,13 @@ import (
 type SnapshotScheduleClient interface {
 	SnapshotScheduleClientIterator
 	Get(context.Context, *compute.GetSnapshotScheduleRequest, ...grpc.CallOption) (*compute.SnapshotSchedule, error)
-	List(context.Context, *compute.ListSnapshotSchedulesRequest, ...grpc.CallOption) (*compute.ListSnapshotSchedulesResponse, error)
 	Create(context.Context, *compute.CreateSnapshotScheduleRequest, ...grpc.CallOption) (*SnapshotScheduleCreateOperation, error)
 	Update(context.Context, *compute.UpdateSnapshotScheduleRequest, ...grpc.CallOption) (*SnapshotScheduleUpdateOperation, error)
 	Delete(context.Context, *compute.DeleteSnapshotScheduleRequest, ...grpc.CallOption) (*SnapshotScheduleDeleteOperation, error)
 	UpdateDisks(context.Context, *compute.UpdateSnapshotScheduleDisksRequest, ...grpc.CallOption) (*SnapshotScheduleUpdateDisksOperation, error)
 	Disable(context.Context, *compute.DisableSnapshotScheduleRequest, ...grpc.CallOption) (*SnapshotScheduleDisableOperation, error)
 	Enable(context.Context, *compute.EnableSnapshotScheduleRequest, ...grpc.CallOption) (*SnapshotScheduleEnableOperation, error)
+	List(context.Context, *compute.ListSnapshotSchedulesRequest, ...grpc.CallOption) (*compute.ListSnapshotSchedulesResponse, error)
 	ListOperations(context.Context, *compute.ListSnapshotScheduleOperationsRequest, ...grpc.CallOption) (*compute.ListSnapshotScheduleOperationsResponse, error)
 	ListSnapshots(context.Context, *compute.ListSnapshotScheduleSnapshotsRequest, ...grpc.CallOption) (*compute.ListSnapshotScheduleSnapshotsResponse, error)
 	ListDisks(context.Context, *compute.ListSnapshotScheduleDisksRequest, ...grpc.CallOption) (*compute.ListSnapshotScheduleDisksResponse, error)
@@ -52,15 +52,6 @@ func (c snapshotScheduleClient) Get(ctx context.Context, in *compute.GetSnapshot
 		return nil, err
 	}
 	return compute.NewSnapshotScheduleServiceClient(connection).Get(ctx, in, opts...)
-}
-
-// List is an operation of Yandex.Cloud Compute SnapshotSchedule service.
-func (c snapshotScheduleClient) List(ctx context.Context, in *compute.ListSnapshotSchedulesRequest, opts ...grpc.CallOption) (*compute.ListSnapshotSchedulesResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, SnapshotScheduleList, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return compute.NewSnapshotScheduleServiceClient(connection).List(ctx, in, opts...)
 }
 
 // SnapshotScheduleCreateOperation is used to monitor the state of Create operations.
@@ -387,6 +378,15 @@ func (c snapshotScheduleClient) Enable(ctx context.Context, in *compute.EnableSn
 	return &SnapshotScheduleEnableOperation{*op}, nil
 }
 
+// List is an operation of Yandex.Cloud Compute SnapshotSchedule service.
+func (c snapshotScheduleClient) List(ctx context.Context, in *compute.ListSnapshotSchedulesRequest, opts ...grpc.CallOption) (*compute.ListSnapshotSchedulesResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, SnapshotScheduleList, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return compute.NewSnapshotScheduleServiceClient(connection).List(ctx, in, opts...)
+}
+
 // ListOperations is an operation of Yandex.Cloud Compute SnapshotSchedule service.
 func (c snapshotScheduleClient) ListOperations(ctx context.Context, in *compute.ListSnapshotScheduleOperationsRequest, opts ...grpc.CallOption) (*compute.ListSnapshotScheduleOperationsResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, SnapshotScheduleListOperations, opts...)
@@ -536,13 +536,13 @@ func (c snapshotScheduleClient) pollOperation(ctx context.Context, operationId s
 
 var (
 	SnapshotScheduleGet                  = protoreflect.FullName("yandex.cloud.compute.v1.SnapshotScheduleService.Get")
-	SnapshotScheduleList                 = protoreflect.FullName("yandex.cloud.compute.v1.SnapshotScheduleService.List")
 	SnapshotScheduleCreate               = protoreflect.FullName("yandex.cloud.compute.v1.SnapshotScheduleService.Create")
 	SnapshotScheduleUpdate               = protoreflect.FullName("yandex.cloud.compute.v1.SnapshotScheduleService.Update")
 	SnapshotScheduleDelete               = protoreflect.FullName("yandex.cloud.compute.v1.SnapshotScheduleService.Delete")
 	SnapshotScheduleUpdateDisks          = protoreflect.FullName("yandex.cloud.compute.v1.SnapshotScheduleService.UpdateDisks")
 	SnapshotScheduleDisable              = protoreflect.FullName("yandex.cloud.compute.v1.SnapshotScheduleService.Disable")
 	SnapshotScheduleEnable               = protoreflect.FullName("yandex.cloud.compute.v1.SnapshotScheduleService.Enable")
+	SnapshotScheduleList                 = protoreflect.FullName("yandex.cloud.compute.v1.SnapshotScheduleService.List")
 	SnapshotScheduleListOperations       = protoreflect.FullName("yandex.cloud.compute.v1.SnapshotScheduleService.ListOperations")
 	SnapshotScheduleListSnapshots        = protoreflect.FullName("yandex.cloud.compute.v1.SnapshotScheduleService.ListSnapshots")
 	SnapshotScheduleListDisks            = protoreflect.FullName("yandex.cloud.compute.v1.SnapshotScheduleService.ListDisks")

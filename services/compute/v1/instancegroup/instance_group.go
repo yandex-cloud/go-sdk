@@ -24,23 +24,23 @@ type InstanceGroupClient interface {
 	CreateFromYaml(context.Context, *instancegroup.CreateInstanceGroupFromYamlRequest, ...grpc.CallOption) (*InstanceGroupCreateFromYamlOperation, error)
 	Update(context.Context, *instancegroup.UpdateInstanceGroupRequest, ...grpc.CallOption) (*InstanceGroupUpdateOperation, error)
 	UpdateFromYaml(context.Context, *instancegroup.UpdateInstanceGroupFromYamlRequest, ...grpc.CallOption) (*InstanceGroupUpdateFromYamlOperation, error)
+	Delete(context.Context, *instancegroup.DeleteInstanceGroupRequest, ...grpc.CallOption) (*InstanceGroupDeleteOperation, error)
+	Start(context.Context, *instancegroup.StartInstanceGroupRequest, ...grpc.CallOption) (*InstanceGroupStartOperation, error)
 	Stop(context.Context, *instancegroup.StopInstanceGroupRequest, ...grpc.CallOption) (*InstanceGroupStopOperation, error)
 	RollingRestart(context.Context, *instancegroup.RollingRestartRequest, ...grpc.CallOption) (*InstanceGroupRollingRestartOperation, error)
 	RollingRecreate(context.Context, *instancegroup.RollingRecreateRequest, ...grpc.CallOption) (*InstanceGroupRollingRecreateOperation, error)
-	Start(context.Context, *instancegroup.StartInstanceGroupRequest, ...grpc.CallOption) (*InstanceGroupStartOperation, error)
-	Delete(context.Context, *instancegroup.DeleteInstanceGroupRequest, ...grpc.CallOption) (*InstanceGroupDeleteOperation, error)
 	ListInstances(context.Context, *instancegroup.ListInstanceGroupInstancesRequest, ...grpc.CallOption) (*instancegroup.ListInstanceGroupInstancesResponse, error)
 	DeleteInstances(context.Context, *instancegroup.DeleteInstancesRequest, ...grpc.CallOption) (*InstanceGroupDeleteInstancesOperation, error)
 	StopInstances(context.Context, *instancegroup.StopInstancesRequest, ...grpc.CallOption) (*InstanceGroupStopInstancesOperation, error)
+	ResumeProcesses(context.Context, *instancegroup.ResumeInstanceGroupProcessesRequest, ...grpc.CallOption) (*InstanceGroupResumeProcessesOperation, error)
+	PauseProcesses(context.Context, *instancegroup.PauseInstanceGroupProcessesRequest, ...grpc.CallOption) (*InstanceGroupPauseProcessesOperation, error)
+	DisableZones(context.Context, *instancegroup.DisableZonesRequest, ...grpc.CallOption) (*InstanceGroupDisableZonesOperation, error)
+	EnableZones(context.Context, *instancegroup.EnableZonesRequest, ...grpc.CallOption) (*InstanceGroupEnableZonesOperation, error)
 	ListOperations(context.Context, *instancegroup.ListInstanceGroupOperationsRequest, ...grpc.CallOption) (*instancegroup.ListInstanceGroupOperationsResponse, error)
 	ListLogRecords(context.Context, *instancegroup.ListInstanceGroupLogRecordsRequest, ...grpc.CallOption) (*instancegroup.ListInstanceGroupLogRecordsResponse, error)
 	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
 	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*InstanceGroupSetAccessBindingsOperation, error)
 	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*InstanceGroupUpdateAccessBindingsOperation, error)
-	ResumeProcesses(context.Context, *instancegroup.ResumeInstanceGroupProcessesRequest, ...grpc.CallOption) (*InstanceGroupResumeProcessesOperation, error)
-	PauseProcesses(context.Context, *instancegroup.PauseInstanceGroupProcessesRequest, ...grpc.CallOption) (*InstanceGroupPauseProcessesOperation, error)
-	DisableZones(context.Context, *instancegroup.DisableZonesRequest, ...grpc.CallOption) (*InstanceGroupDisableZonesOperation, error)
-	EnableZones(context.Context, *instancegroup.EnableZonesRequest, ...grpc.CallOption) (*InstanceGroupEnableZonesOperation, error)
 }
 
 var _ InstanceGroupClient = instanceGroupClient{}
@@ -288,6 +288,114 @@ func (c instanceGroupClient) UpdateFromYaml(ctx context.Context, in *instancegro
 	return &InstanceGroupUpdateFromYamlOperation{*op}, nil
 }
 
+// InstanceGroupDeleteOperation is used to monitor the state of Delete operations.
+type InstanceGroupDeleteOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *InstanceGroupDeleteOperation) Metadata() *instancegroup.DeleteInstanceGroupMetadata {
+	return o.Operation.Metadata().(*instancegroup.DeleteInstanceGroupMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *InstanceGroupDeleteOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *InstanceGroupDeleteOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *InstanceGroupDeleteOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// Delete is an operation of Yandex.Cloud InstanceGroup InstanceGroup service.
+// It returns an object which should be used to monitor the operation state.
+func (c instanceGroupClient) Delete(ctx context.Context, in *instancegroup.DeleteInstanceGroupRequest, opts ...grpc.CallOption) (*InstanceGroupDeleteOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, InstanceGroupDelete, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := instancegroup.NewInstanceGroupServiceClient(connection).Delete(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*instancegroup.DeleteInstanceGroupMetadata).GetInstanceGroupId()
+		},
+		MetadataType: (*instancegroup.DeleteInstanceGroupMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &InstanceGroupDeleteOperation{*op}, nil
+}
+
+// InstanceGroupStartOperation is used to monitor the state of Start operations.
+type InstanceGroupStartOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *InstanceGroupStartOperation) Metadata() *instancegroup.StartInstanceGroupMetadata {
+	return o.Operation.Metadata().(*instancegroup.StartInstanceGroupMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *InstanceGroupStartOperation) Response() *instancegroup.InstanceGroup {
+	return o.Operation.Response().(*instancegroup.InstanceGroup)
+}
+
+// Wait polls the operation until it's done.
+func (o *InstanceGroupStartOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*instancegroup.InstanceGroup, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*instancegroup.InstanceGroup)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *InstanceGroupStartOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*instancegroup.InstanceGroup, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*instancegroup.InstanceGroup)
+	return response, err
+}
+
+// Start is an operation of Yandex.Cloud InstanceGroup InstanceGroup service.
+// It returns an object which should be used to monitor the operation state.
+func (c instanceGroupClient) Start(ctx context.Context, in *instancegroup.StartInstanceGroupRequest, opts ...grpc.CallOption) (*InstanceGroupStartOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, InstanceGroupStart, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := instancegroup.NewInstanceGroupServiceClient(connection).Start(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*instancegroup.StartInstanceGroupMetadata).GetInstanceGroupId()
+		},
+		MetadataType: (*instancegroup.StartInstanceGroupMetadata)(nil),
+		ResponseType: (*instancegroup.InstanceGroup)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &InstanceGroupStartOperation{*op}, nil
+}
+
 // InstanceGroupStopOperation is used to monitor the state of Stop operations.
 type InstanceGroupStopOperation struct {
 	sdkop.Operation
@@ -450,114 +558,6 @@ func (c instanceGroupClient) RollingRecreate(ctx context.Context, in *instancegr
 	return &InstanceGroupRollingRecreateOperation{*op}, nil
 }
 
-// InstanceGroupStartOperation is used to monitor the state of Start operations.
-type InstanceGroupStartOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *InstanceGroupStartOperation) Metadata() *instancegroup.StartInstanceGroupMetadata {
-	return o.Operation.Metadata().(*instancegroup.StartInstanceGroupMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *InstanceGroupStartOperation) Response() *instancegroup.InstanceGroup {
-	return o.Operation.Response().(*instancegroup.InstanceGroup)
-}
-
-// Wait polls the operation until it's done.
-func (o *InstanceGroupStartOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*instancegroup.InstanceGroup, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*instancegroup.InstanceGroup)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *InstanceGroupStartOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*instancegroup.InstanceGroup, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*instancegroup.InstanceGroup)
-	return response, err
-}
-
-// Start is an operation of Yandex.Cloud InstanceGroup InstanceGroup service.
-// It returns an object which should be used to monitor the operation state.
-func (c instanceGroupClient) Start(ctx context.Context, in *instancegroup.StartInstanceGroupRequest, opts ...grpc.CallOption) (*InstanceGroupStartOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, InstanceGroupStart, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := instancegroup.NewInstanceGroupServiceClient(connection).Start(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*instancegroup.StartInstanceGroupMetadata).GetInstanceGroupId()
-		},
-		MetadataType: (*instancegroup.StartInstanceGroupMetadata)(nil),
-		ResponseType: (*instancegroup.InstanceGroup)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &InstanceGroupStartOperation{*op}, nil
-}
-
-// InstanceGroupDeleteOperation is used to monitor the state of Delete operations.
-type InstanceGroupDeleteOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *InstanceGroupDeleteOperation) Metadata() *instancegroup.DeleteInstanceGroupMetadata {
-	return o.Operation.Metadata().(*instancegroup.DeleteInstanceGroupMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *InstanceGroupDeleteOperation) Response() *emptypb.Empty {
-	return o.Operation.Response().(*emptypb.Empty)
-}
-
-// Wait polls the operation until it's done.
-func (o *InstanceGroupDeleteOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*emptypb.Empty)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *InstanceGroupDeleteOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*emptypb.Empty)
-	return response, err
-}
-
-// Delete is an operation of Yandex.Cloud InstanceGroup InstanceGroup service.
-// It returns an object which should be used to monitor the operation state.
-func (c instanceGroupClient) Delete(ctx context.Context, in *instancegroup.DeleteInstanceGroupRequest, opts ...grpc.CallOption) (*InstanceGroupDeleteOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, InstanceGroupDelete, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := instancegroup.NewInstanceGroupServiceClient(connection).Delete(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*instancegroup.DeleteInstanceGroupMetadata).GetInstanceGroupId()
-		},
-		MetadataType: (*instancegroup.DeleteInstanceGroupMetadata)(nil),
-		ResponseType: (*emptypb.Empty)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &InstanceGroupDeleteOperation{*op}, nil
-}
-
 // ListInstances is an operation of Yandex.Cloud InstanceGroup InstanceGroup service.
 func (c instanceGroupClient) ListInstances(ctx context.Context, in *instancegroup.ListInstanceGroupInstancesRequest, opts ...grpc.CallOption) (*instancegroup.ListInstanceGroupInstancesResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, InstanceGroupListInstances, opts...)
@@ -673,135 +673,6 @@ func (c instanceGroupClient) StopInstances(ctx context.Context, in *instancegrou
 		return nil, err
 	}
 	return &InstanceGroupStopInstancesOperation{*op}, nil
-}
-
-// ListOperations is an operation of Yandex.Cloud InstanceGroup InstanceGroup service.
-func (c instanceGroupClient) ListOperations(ctx context.Context, in *instancegroup.ListInstanceGroupOperationsRequest, opts ...grpc.CallOption) (*instancegroup.ListInstanceGroupOperationsResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, InstanceGroupListOperations, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return instancegroup.NewInstanceGroupServiceClient(connection).ListOperations(ctx, in, opts...)
-}
-
-// ListLogRecords is an operation of Yandex.Cloud InstanceGroup InstanceGroup service.
-func (c instanceGroupClient) ListLogRecords(ctx context.Context, in *instancegroup.ListInstanceGroupLogRecordsRequest, opts ...grpc.CallOption) (*instancegroup.ListInstanceGroupLogRecordsResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, InstanceGroupListLogRecords, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return instancegroup.NewInstanceGroupServiceClient(connection).ListLogRecords(ctx, in, opts...)
-}
-
-// ListAccessBindings is an operation of Yandex.Cloud InstanceGroup InstanceGroup service.
-func (c instanceGroupClient) ListAccessBindings(ctx context.Context, in *access.ListAccessBindingsRequest, opts ...grpc.CallOption) (*access.ListAccessBindingsResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, InstanceGroupListAccessBindings, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return instancegroup.NewInstanceGroupServiceClient(connection).ListAccessBindings(ctx, in, opts...)
-}
-
-// InstanceGroupSetAccessBindingsOperation is used to monitor the state of SetAccessBindings operations.
-type InstanceGroupSetAccessBindingsOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *InstanceGroupSetAccessBindingsOperation) Metadata() *access.SetAccessBindingsMetadata {
-	return o.Operation.Metadata().(*access.SetAccessBindingsMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *InstanceGroupSetAccessBindingsOperation) Response() *emptypb.Empty {
-	return o.Operation.Response().(*emptypb.Empty)
-}
-
-// Wait polls the operation until it's done.
-func (o *InstanceGroupSetAccessBindingsOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*emptypb.Empty)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *InstanceGroupSetAccessBindingsOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*emptypb.Empty)
-	return response, err
-}
-
-// SetAccessBindings is an operation of Yandex.Cloud InstanceGroup InstanceGroup service.
-// It returns an object which should be used to monitor the operation state.
-func (c instanceGroupClient) SetAccessBindings(ctx context.Context, in *access.SetAccessBindingsRequest, opts ...grpc.CallOption) (*InstanceGroupSetAccessBindingsOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, InstanceGroupSetAccessBindings, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := instancegroup.NewInstanceGroupServiceClient(connection).SetAccessBindings(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll:         c.pollOperation,
-		MetadataType: (*access.SetAccessBindingsMetadata)(nil),
-		ResponseType: (*emptypb.Empty)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &InstanceGroupSetAccessBindingsOperation{*op}, nil
-}
-
-// InstanceGroupUpdateAccessBindingsOperation is used to monitor the state of UpdateAccessBindings operations.
-type InstanceGroupUpdateAccessBindingsOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *InstanceGroupUpdateAccessBindingsOperation) Metadata() *access.UpdateAccessBindingsMetadata {
-	return o.Operation.Metadata().(*access.UpdateAccessBindingsMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *InstanceGroupUpdateAccessBindingsOperation) Response() *emptypb.Empty {
-	return o.Operation.Response().(*emptypb.Empty)
-}
-
-// Wait polls the operation until it's done.
-func (o *InstanceGroupUpdateAccessBindingsOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*emptypb.Empty)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *InstanceGroupUpdateAccessBindingsOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*emptypb.Empty)
-	return response, err
-}
-
-// UpdateAccessBindings is an operation of Yandex.Cloud InstanceGroup InstanceGroup service.
-// It returns an object which should be used to monitor the operation state.
-func (c instanceGroupClient) UpdateAccessBindings(ctx context.Context, in *access.UpdateAccessBindingsRequest, opts ...grpc.CallOption) (*InstanceGroupUpdateAccessBindingsOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, InstanceGroupUpdateAccessBindings, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := instancegroup.NewInstanceGroupServiceClient(connection).UpdateAccessBindings(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll:         c.pollOperation,
-		MetadataType: (*access.UpdateAccessBindingsMetadata)(nil),
-		ResponseType: (*emptypb.Empty)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &InstanceGroupUpdateAccessBindingsOperation{*op}, nil
 }
 
 // InstanceGroupResumeProcessesOperation is used to monitor the state of ResumeProcesses operations.
@@ -1020,6 +891,135 @@ func (c instanceGroupClient) EnableZones(ctx context.Context, in *instancegroup.
 	return &InstanceGroupEnableZonesOperation{*op}, nil
 }
 
+// ListOperations is an operation of Yandex.Cloud InstanceGroup InstanceGroup service.
+func (c instanceGroupClient) ListOperations(ctx context.Context, in *instancegroup.ListInstanceGroupOperationsRequest, opts ...grpc.CallOption) (*instancegroup.ListInstanceGroupOperationsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, InstanceGroupListOperations, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return instancegroup.NewInstanceGroupServiceClient(connection).ListOperations(ctx, in, opts...)
+}
+
+// ListLogRecords is an operation of Yandex.Cloud InstanceGroup InstanceGroup service.
+func (c instanceGroupClient) ListLogRecords(ctx context.Context, in *instancegroup.ListInstanceGroupLogRecordsRequest, opts ...grpc.CallOption) (*instancegroup.ListInstanceGroupLogRecordsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, InstanceGroupListLogRecords, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return instancegroup.NewInstanceGroupServiceClient(connection).ListLogRecords(ctx, in, opts...)
+}
+
+// ListAccessBindings is an operation of Yandex.Cloud InstanceGroup InstanceGroup service.
+func (c instanceGroupClient) ListAccessBindings(ctx context.Context, in *access.ListAccessBindingsRequest, opts ...grpc.CallOption) (*access.ListAccessBindingsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, InstanceGroupListAccessBindings, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return instancegroup.NewInstanceGroupServiceClient(connection).ListAccessBindings(ctx, in, opts...)
+}
+
+// InstanceGroupSetAccessBindingsOperation is used to monitor the state of SetAccessBindings operations.
+type InstanceGroupSetAccessBindingsOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *InstanceGroupSetAccessBindingsOperation) Metadata() *access.SetAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.SetAccessBindingsMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *InstanceGroupSetAccessBindingsOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *InstanceGroupSetAccessBindingsOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *InstanceGroupSetAccessBindingsOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// SetAccessBindings is an operation of Yandex.Cloud InstanceGroup InstanceGroup service.
+// It returns an object which should be used to monitor the operation state.
+func (c instanceGroupClient) SetAccessBindings(ctx context.Context, in *access.SetAccessBindingsRequest, opts ...grpc.CallOption) (*InstanceGroupSetAccessBindingsOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, InstanceGroupSetAccessBindings, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := instancegroup.NewInstanceGroupServiceClient(connection).SetAccessBindings(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*access.SetAccessBindingsMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &InstanceGroupSetAccessBindingsOperation{*op}, nil
+}
+
+// InstanceGroupUpdateAccessBindingsOperation is used to monitor the state of UpdateAccessBindings operations.
+type InstanceGroupUpdateAccessBindingsOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *InstanceGroupUpdateAccessBindingsOperation) Metadata() *access.UpdateAccessBindingsMetadata {
+	return o.Operation.Metadata().(*access.UpdateAccessBindingsMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *InstanceGroupUpdateAccessBindingsOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *InstanceGroupUpdateAccessBindingsOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *InstanceGroupUpdateAccessBindingsOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// UpdateAccessBindings is an operation of Yandex.Cloud InstanceGroup InstanceGroup service.
+// It returns an object which should be used to monitor the operation state.
+func (c instanceGroupClient) UpdateAccessBindings(ctx context.Context, in *access.UpdateAccessBindingsRequest, opts ...grpc.CallOption) (*InstanceGroupUpdateAccessBindingsOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, InstanceGroupUpdateAccessBindings, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := instancegroup.NewInstanceGroupServiceClient(connection).UpdateAccessBindings(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*access.UpdateAccessBindingsMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &InstanceGroupUpdateAccessBindingsOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c instanceGroupClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, InstanceGroupOperationPoller, opts...)
@@ -1036,22 +1036,22 @@ var (
 	InstanceGroupCreateFromYaml       = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.CreateFromYaml")
 	InstanceGroupUpdate               = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.Update")
 	InstanceGroupUpdateFromYaml       = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.UpdateFromYaml")
+	InstanceGroupDelete               = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.Delete")
+	InstanceGroupStart                = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.Start")
 	InstanceGroupStop                 = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.Stop")
 	InstanceGroupRollingRestart       = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.RollingRestart")
 	InstanceGroupRollingRecreate      = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.RollingRecreate")
-	InstanceGroupStart                = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.Start")
-	InstanceGroupDelete               = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.Delete")
 	InstanceGroupListInstances        = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.ListInstances")
 	InstanceGroupDeleteInstances      = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.DeleteInstances")
 	InstanceGroupStopInstances        = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.StopInstances")
+	InstanceGroupResumeProcesses      = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.ResumeProcesses")
+	InstanceGroupPauseProcesses       = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.PauseProcesses")
+	InstanceGroupDisableZones         = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.DisableZones")
+	InstanceGroupEnableZones          = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.EnableZones")
 	InstanceGroupListOperations       = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.ListOperations")
 	InstanceGroupListLogRecords       = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.ListLogRecords")
 	InstanceGroupListAccessBindings   = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.ListAccessBindings")
 	InstanceGroupSetAccessBindings    = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.SetAccessBindings")
 	InstanceGroupUpdateAccessBindings = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.UpdateAccessBindings")
-	InstanceGroupResumeProcesses      = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.ResumeProcesses")
-	InstanceGroupPauseProcesses       = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.PauseProcesses")
-	InstanceGroupDisableZones         = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.DisableZones")
-	InstanceGroupEnableZones          = protoreflect.FullName("yandex.cloud.compute.v1.instancegroup.InstanceGroupService.EnableZones")
 	InstanceGroupOperationPoller      = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
