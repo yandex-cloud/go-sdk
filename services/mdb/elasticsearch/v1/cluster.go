@@ -22,19 +22,19 @@ type ClusterClient interface {
 	Create(context.Context, *elasticsearch.CreateClusterRequest, ...grpc.CallOption) (*ClusterCreateOperation, error)
 	Update(context.Context, *elasticsearch.UpdateClusterRequest, ...grpc.CallOption) (*ClusterUpdateOperation, error)
 	Delete(context.Context, *elasticsearch.DeleteClusterRequest, ...grpc.CallOption) (*ClusterDeleteOperation, error)
+	Backup(context.Context, *elasticsearch.BackupClusterRequest, ...grpc.CallOption) (*ClusterBackupOperation, error)
+	Restore(context.Context, *elasticsearch.RestoreClusterRequest, ...grpc.CallOption) (*ClusterRestoreOperation, error)
+	RescheduleMaintenance(context.Context, *elasticsearch.RescheduleMaintenanceRequest, ...grpc.CallOption) (*ClusterRescheduleMaintenanceOperation, error)
+	ListBackups(context.Context, *elasticsearch.ListClusterBackupsRequest, ...grpc.CallOption) (*elasticsearch.ListClusterBackupsResponse, error)
 	Move(context.Context, *elasticsearch.MoveClusterRequest, ...grpc.CallOption) (*ClusterMoveOperation, error)
 	Start(context.Context, *elasticsearch.StartClusterRequest, ...grpc.CallOption) (*ClusterStartOperation, error)
 	Stop(context.Context, *elasticsearch.StopClusterRequest, ...grpc.CallOption) (*ClusterStopOperation, error)
-	Backup(context.Context, *elasticsearch.BackupClusterRequest, ...grpc.CallOption) (*ClusterBackupOperation, error)
-	ListBackups(context.Context, *elasticsearch.ListClusterBackupsRequest, ...grpc.CallOption) (*elasticsearch.ListClusterBackupsResponse, error)
-	Restore(context.Context, *elasticsearch.RestoreClusterRequest, ...grpc.CallOption) (*ClusterRestoreOperation, error)
 	ListLogs(context.Context, *elasticsearch.ListClusterLogsRequest, ...grpc.CallOption) (*elasticsearch.ListClusterLogsResponse, error)
 	StreamLogs(context.Context, *elasticsearch.StreamClusterLogsRequest, ...grpc.CallOption) (elasticsearch.ClusterService_StreamLogsClient, error)
 	ListOperations(context.Context, *elasticsearch.ListClusterOperationsRequest, ...grpc.CallOption) (*elasticsearch.ListClusterOperationsResponse, error)
 	ListHosts(context.Context, *elasticsearch.ListClusterHostsRequest, ...grpc.CallOption) (*elasticsearch.ListClusterHostsResponse, error)
 	AddHosts(context.Context, *elasticsearch.AddClusterHostsRequest, ...grpc.CallOption) (*ClusterAddHostsOperation, error)
 	DeleteHosts(context.Context, *elasticsearch.DeleteClusterHostsRequest, ...grpc.CallOption) (*ClusterDeleteHostsOperation, error)
-	RescheduleMaintenance(context.Context, *elasticsearch.RescheduleMaintenanceRequest, ...grpc.CallOption) (*ClusterRescheduleMaintenanceOperation, error)
 }
 
 var _ ClusterClient = clusterClient{}
@@ -228,6 +228,177 @@ func (c clusterClient) Delete(ctx context.Context, in *elasticsearch.DeleteClust
 	return &ClusterDeleteOperation{*op}, nil
 }
 
+// ClusterBackupOperation is used to monitor the state of Backup operations.
+type ClusterBackupOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ClusterBackupOperation) Metadata() *elasticsearch.BackupClusterMetadata {
+	return o.Operation.Metadata().(*elasticsearch.BackupClusterMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ClusterBackupOperation) Response() *elasticsearch.Cluster {
+	return o.Operation.Response().(*elasticsearch.Cluster)
+}
+
+// Wait polls the operation until it's done.
+func (o *ClusterBackupOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*elasticsearch.Cluster, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*elasticsearch.Cluster)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ClusterBackupOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*elasticsearch.Cluster, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*elasticsearch.Cluster)
+	return response, err
+}
+
+// Backup is an operation of Yandex.Cloud Elasticsearch Cluster service.
+// It returns an object which should be used to monitor the operation state.
+func (c clusterClient) Backup(ctx context.Context, in *elasticsearch.BackupClusterRequest, opts ...grpc.CallOption) (*ClusterBackupOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ClusterBackup, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := elasticsearch.NewClusterServiceClient(connection).Backup(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*elasticsearch.BackupClusterMetadata).GetClusterId()
+		},
+		MetadataType: (*elasticsearch.BackupClusterMetadata)(nil),
+		ResponseType: (*elasticsearch.Cluster)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ClusterBackupOperation{*op}, nil
+}
+
+// ClusterRestoreOperation is used to monitor the state of Restore operations.
+type ClusterRestoreOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ClusterRestoreOperation) Metadata() *elasticsearch.RestoreClusterMetadata {
+	return o.Operation.Metadata().(*elasticsearch.RestoreClusterMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ClusterRestoreOperation) Response() *elasticsearch.Cluster {
+	return o.Operation.Response().(*elasticsearch.Cluster)
+}
+
+// Wait polls the operation until it's done.
+func (o *ClusterRestoreOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*elasticsearch.Cluster, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*elasticsearch.Cluster)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ClusterRestoreOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*elasticsearch.Cluster, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*elasticsearch.Cluster)
+	return response, err
+}
+
+// Restore is an operation of Yandex.Cloud Elasticsearch Cluster service.
+// It returns an object which should be used to monitor the operation state.
+func (c clusterClient) Restore(ctx context.Context, in *elasticsearch.RestoreClusterRequest, opts ...grpc.CallOption) (*ClusterRestoreOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ClusterRestore, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := elasticsearch.NewClusterServiceClient(connection).Restore(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*elasticsearch.RestoreClusterMetadata).GetClusterId()
+		},
+		MetadataType: (*elasticsearch.RestoreClusterMetadata)(nil),
+		ResponseType: (*elasticsearch.Cluster)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ClusterRestoreOperation{*op}, nil
+}
+
+// ClusterRescheduleMaintenanceOperation is used to monitor the state of RescheduleMaintenance operations.
+type ClusterRescheduleMaintenanceOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ClusterRescheduleMaintenanceOperation) Metadata() *elasticsearch.RescheduleMaintenanceMetadata {
+	return o.Operation.Metadata().(*elasticsearch.RescheduleMaintenanceMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ClusterRescheduleMaintenanceOperation) Response() *elasticsearch.Cluster {
+	return o.Operation.Response().(*elasticsearch.Cluster)
+}
+
+// Wait polls the operation until it's done.
+func (o *ClusterRescheduleMaintenanceOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*elasticsearch.Cluster, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*elasticsearch.Cluster)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ClusterRescheduleMaintenanceOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*elasticsearch.Cluster, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*elasticsearch.Cluster)
+	return response, err
+}
+
+// RescheduleMaintenance is an operation of Yandex.Cloud Elasticsearch Cluster service.
+// It returns an object which should be used to monitor the operation state.
+func (c clusterClient) RescheduleMaintenance(ctx context.Context, in *elasticsearch.RescheduleMaintenanceRequest, opts ...grpc.CallOption) (*ClusterRescheduleMaintenanceOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ClusterRescheduleMaintenance, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := elasticsearch.NewClusterServiceClient(connection).RescheduleMaintenance(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*elasticsearch.RescheduleMaintenanceMetadata).GetClusterId()
+		},
+		MetadataType: (*elasticsearch.RescheduleMaintenanceMetadata)(nil),
+		ResponseType: (*elasticsearch.Cluster)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ClusterRescheduleMaintenanceOperation{*op}, nil
+}
+
+// ListBackups is an operation of Yandex.Cloud Elasticsearch Cluster service.
+func (c clusterClient) ListBackups(ctx context.Context, in *elasticsearch.ListClusterBackupsRequest, opts ...grpc.CallOption) (*elasticsearch.ListClusterBackupsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, ClusterListBackups, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return elasticsearch.NewClusterServiceClient(connection).ListBackups(ctx, in, opts...)
+}
+
 // ClusterMoveOperation is used to monitor the state of Move operations.
 type ClusterMoveOperation struct {
 	sdkop.Operation
@@ -390,123 +561,6 @@ func (c clusterClient) Stop(ctx context.Context, in *elasticsearch.StopClusterRe
 	return &ClusterStopOperation{*op}, nil
 }
 
-// ClusterBackupOperation is used to monitor the state of Backup operations.
-type ClusterBackupOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *ClusterBackupOperation) Metadata() *elasticsearch.BackupClusterMetadata {
-	return o.Operation.Metadata().(*elasticsearch.BackupClusterMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *ClusterBackupOperation) Response() *elasticsearch.Cluster {
-	return o.Operation.Response().(*elasticsearch.Cluster)
-}
-
-// Wait polls the operation until it's done.
-func (o *ClusterBackupOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*elasticsearch.Cluster, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*elasticsearch.Cluster)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *ClusterBackupOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*elasticsearch.Cluster, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*elasticsearch.Cluster)
-	return response, err
-}
-
-// Backup is an operation of Yandex.Cloud Elasticsearch Cluster service.
-// It returns an object which should be used to monitor the operation state.
-func (c clusterClient) Backup(ctx context.Context, in *elasticsearch.BackupClusterRequest, opts ...grpc.CallOption) (*ClusterBackupOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, ClusterBackup, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := elasticsearch.NewClusterServiceClient(connection).Backup(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*elasticsearch.BackupClusterMetadata).GetClusterId()
-		},
-		MetadataType: (*elasticsearch.BackupClusterMetadata)(nil),
-		ResponseType: (*elasticsearch.Cluster)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &ClusterBackupOperation{*op}, nil
-}
-
-// ListBackups is an operation of Yandex.Cloud Elasticsearch Cluster service.
-func (c clusterClient) ListBackups(ctx context.Context, in *elasticsearch.ListClusterBackupsRequest, opts ...grpc.CallOption) (*elasticsearch.ListClusterBackupsResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, ClusterListBackups, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return elasticsearch.NewClusterServiceClient(connection).ListBackups(ctx, in, opts...)
-}
-
-// ClusterRestoreOperation is used to monitor the state of Restore operations.
-type ClusterRestoreOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *ClusterRestoreOperation) Metadata() *elasticsearch.RestoreClusterMetadata {
-	return o.Operation.Metadata().(*elasticsearch.RestoreClusterMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *ClusterRestoreOperation) Response() *elasticsearch.Cluster {
-	return o.Operation.Response().(*elasticsearch.Cluster)
-}
-
-// Wait polls the operation until it's done.
-func (o *ClusterRestoreOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*elasticsearch.Cluster, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*elasticsearch.Cluster)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *ClusterRestoreOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*elasticsearch.Cluster, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*elasticsearch.Cluster)
-	return response, err
-}
-
-// Restore is an operation of Yandex.Cloud Elasticsearch Cluster service.
-// It returns an object which should be used to monitor the operation state.
-func (c clusterClient) Restore(ctx context.Context, in *elasticsearch.RestoreClusterRequest, opts ...grpc.CallOption) (*ClusterRestoreOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, ClusterRestore, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := elasticsearch.NewClusterServiceClient(connection).Restore(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*elasticsearch.RestoreClusterMetadata).GetClusterId()
-		},
-		MetadataType: (*elasticsearch.RestoreClusterMetadata)(nil),
-		ResponseType: (*elasticsearch.Cluster)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &ClusterRestoreOperation{*op}, nil
-}
-
 // ListLogs is an operation of Yandex.Cloud Elasticsearch Cluster service.
 func (c clusterClient) ListLogs(ctx context.Context, in *elasticsearch.ListClusterLogsRequest, opts ...grpc.CallOption) (*elasticsearch.ListClusterLogsResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, ClusterListLogs, opts...)
@@ -651,60 +705,6 @@ func (c clusterClient) DeleteHosts(ctx context.Context, in *elasticsearch.Delete
 	return &ClusterDeleteHostsOperation{*op}, nil
 }
 
-// ClusterRescheduleMaintenanceOperation is used to monitor the state of RescheduleMaintenance operations.
-type ClusterRescheduleMaintenanceOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *ClusterRescheduleMaintenanceOperation) Metadata() *elasticsearch.RescheduleMaintenanceMetadata {
-	return o.Operation.Metadata().(*elasticsearch.RescheduleMaintenanceMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *ClusterRescheduleMaintenanceOperation) Response() *elasticsearch.Cluster {
-	return o.Operation.Response().(*elasticsearch.Cluster)
-}
-
-// Wait polls the operation until it's done.
-func (o *ClusterRescheduleMaintenanceOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*elasticsearch.Cluster, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*elasticsearch.Cluster)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *ClusterRescheduleMaintenanceOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*elasticsearch.Cluster, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*elasticsearch.Cluster)
-	return response, err
-}
-
-// RescheduleMaintenance is an operation of Yandex.Cloud Elasticsearch Cluster service.
-// It returns an object which should be used to monitor the operation state.
-func (c clusterClient) RescheduleMaintenance(ctx context.Context, in *elasticsearch.RescheduleMaintenanceRequest, opts ...grpc.CallOption) (*ClusterRescheduleMaintenanceOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, ClusterRescheduleMaintenance, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := elasticsearch.NewClusterServiceClient(connection).RescheduleMaintenance(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*elasticsearch.RescheduleMaintenanceMetadata).GetClusterId()
-		},
-		MetadataType: (*elasticsearch.RescheduleMaintenanceMetadata)(nil),
-		ResponseType: (*elasticsearch.Cluster)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &ClusterRescheduleMaintenanceOperation{*op}, nil
-}
-
 // pollOperation returns the current state of the polled operation.
 func (c clusterClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, ClusterOperationPoller, opts...)
@@ -720,18 +720,18 @@ var (
 	ClusterCreate                = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.Create")
 	ClusterUpdate                = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.Update")
 	ClusterDelete                = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.Delete")
+	ClusterBackup                = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.Backup")
+	ClusterRestore               = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.Restore")
+	ClusterRescheduleMaintenance = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.RescheduleMaintenance")
+	ClusterListBackups           = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.ListBackups")
 	ClusterMove                  = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.Move")
 	ClusterStart                 = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.Start")
 	ClusterStop                  = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.Stop")
-	ClusterBackup                = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.Backup")
-	ClusterListBackups           = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.ListBackups")
-	ClusterRestore               = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.Restore")
 	ClusterListLogs              = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.ListLogs")
 	ClusterStreamLogs            = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.StreamLogs")
 	ClusterListOperations        = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.ListOperations")
 	ClusterListHosts             = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.ListHosts")
 	ClusterAddHosts              = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.AddHosts")
 	ClusterDeleteHosts           = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.DeleteHosts")
-	ClusterRescheduleMaintenance = protoreflect.FullName("yandex.cloud.mdb.elasticsearch.v1.ClusterService.RescheduleMaintenance")
 	ClusterOperationPoller       = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

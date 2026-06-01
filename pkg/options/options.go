@@ -2,9 +2,11 @@ package options
 
 import (
 	"crypto/tls"
+	"time"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
 
 	"github.com/yandex-cloud/go-sdk/v2/credentials"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/authentication"
@@ -14,6 +16,16 @@ import (
 
 // defaultEndpoint specifies the default gRPC endpoint for connecting to the Yandex Cloud API.
 const defaultEndpoint = "api.cloud.yandex.net:443"
+
+// defaultKeepalive prevents intermediate load balancers from closing idle
+// HTTP/2 streams during long-running server-streaming RPCs (e.g. operation
+// progress streams). Tuned conservatively to stay well above typical server
+// MinTime policies.
+var defaultKeepalive = keepalive.ClientParameters{
+	Time:                30 * time.Second,
+	Timeout:             10 * time.Second,
+	PermitWithoutStream: true,
+}
 
 // Option defines a function that modifies the configuration of an Options instance.
 type Option func(*Options)
@@ -44,12 +56,18 @@ type Options struct {
 	CustomDialOpts      []grpc.DialOption
 	RetryOptions        []retry.RetryOption
 	DefaultRetryOptions bool
+
+	// Keepalive configures client-side HTTP/2 keepalive pings on every
+	// gRPC connection in the pool. Nil disables keepalive entirely.
+	Keepalive *keepalive.ClientParameters
 }
 
 // DefaultOptions initializes and returns an Options struct with default configuration for endpoint and connection timeout.
 func DefaultOptions() *Options {
+	ka := defaultKeepalive
 	return &Options{
 		DiscoveryEndpoint: defaultEndpoint,
+		Keepalive:         &ka,
 	}
 }
 
@@ -123,5 +141,21 @@ func WithCustomDialOptions(opts ...grpc.DialOption) Option {
 func WithLogger(logger *zap.Logger) Option {
 	return func(o *Options) {
 		o.Logger = logger
+	}
+}
+
+// WithKeepalive overrides the default client-side HTTP/2 keepalive parameters
+// applied to every gRPC connection. Use this to tune ping cadence for very
+// long-running streams or to comply with stricter server policies.
+func WithKeepalive(params keepalive.ClientParameters) Option {
+	return func(o *Options) {
+		o.Keepalive = &params
+	}
+}
+
+// WithoutKeepalive disables client-side HTTP/2 keepalive pings.
+func WithoutKeepalive() Option {
+	return func(o *Options) {
+		o.Keepalive = nil
 	}
 }

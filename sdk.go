@@ -85,6 +85,10 @@ func Build(ctx context.Context, opts ...options.Option) (*SDK, error) {
 		grpc.WithUserAgent(userAgent()),
 	}
 
+	if buildOptions.Keepalive != nil {
+		dialOpts = append(dialOpts, grpc.WithKeepaliveParams(*buildOptions.Keepalive))
+	}
+
 	if _, ok := buildOptions.Credentials.(*credentials.NoCredentials); !ok {
 		tokenMiddleware := transportauth.NewIAMTokenMiddleware(buildOptions.Authenticator, transportauth.WithLogger(logger))
 		dialOpts = append(dialOpts,
@@ -208,7 +212,7 @@ func (sdk *SDK) GetEndpoint(method protoreflect.FullName) (*endpoints.Endpoint, 
 func (sdk *SDK) WithEndpoints(endpoints *endpoints.PrefixEndpointsResolver) *SDK {
 	return &SDK{
 		ctx:              sdk.ctx,
-		conn:             sdk.conn,
+		conn:             transport.NewConnector(endpoints, sdk.connPool),
 		endpointResolver: endpoints,
 		connPool:         sdk.connPool,
 		authenticator:    sdk.authenticator,
@@ -218,8 +222,31 @@ func (sdk *SDK) WithEndpoints(endpoints *endpoints.PrefixEndpointsResolver) *SDK
 func (sdk *SDK) WithEnpointsResolver(endpointsResolver endpoints.EndpointsResolver) *SDK {
 	return &SDK{
 		ctx:              sdk.ctx,
-		conn:             sdk.conn,
+		conn:             transport.NewConnector(endpointsResolver, sdk.connPool),
 		endpointResolver: endpointsResolver,
+		connPool:         sdk.connPool,
+		authenticator:    sdk.authenticator,
+	}
+}
+
+// WithEndpoint returns a new SDK that overrides a single endpoint by proto prefix,
+// keeping all other endpoints from the current resolver intact. Falls back to a
+// resolver containing only the override if the current resolver is not prefix-based.
+func (sdk *SDK) WithEndpoint(prefix protoreflect.FullName, params *endpoints.EndpointParams) *SDK {
+	override := endpoints.PrefixToEndpoint{prefix: params}
+
+	var merged endpoints.PrefixToEndpoint
+	if base, ok := sdk.endpointResolver.(*endpoints.PrefixEndpointsResolver); ok {
+		merged = base.PrefixToEndpoint().Merge(override)
+	} else {
+		merged = override
+	}
+	resolver := endpoints.NewPrefixEndpointsResolver(merged)
+
+	return &SDK{
+		ctx:              sdk.ctx,
+		conn:             transport.NewConnector(resolver, sdk.connPool),
+		endpointResolver: resolver,
 		connPool:         sdk.connPool,
 		authenticator:    sdk.authenticator,
 	}
