@@ -249,11 +249,14 @@ func (c *metadataServiceCredentialProvider) Available(ctx context.Context) bool 
 	}
 
 	c.logger.Debug("Checking metadata service availability")
-	dialer := net.Dialer{Timeout: 50 * time.Millisecond}
+	dialer := net.Dialer{Timeout: time.Second}
 
-	conn, err := dialer.Dial("tcp", c.metadataServiceAddr)
+	conn, err := dialer.DialContext(ctx, "tcp", c.metadataServiceAddr)
 	if err != nil {
-		c.logger.Error("Failed to connect to metadata service", zap.Error(err))
+		// Debug, not Error: underlay metadata is expected to be missing on
+		// most hosts, and overlay misses are surfaced to the user via a
+		// dedicated message in cli-v2 creds.go. Avoid scaring the logs.
+		c.logger.Debug("Failed to connect to metadata service", zap.Error(err))
 		return false
 	}
 
