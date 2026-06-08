@@ -331,11 +331,14 @@ func getCappedExpiresAt(actualExpirationTime time.Time) time.Time {
 func (c *metadataServiceCredentialProvider) YandexCloudAPICredentials() {}
 
 // GetMetadataServiceAddr returns the address of Metadata Service, gets the value from InstanceMetadataOverrideEnvVar
-// env variable if it is set, otherwise uses the default address from InstanceMetadataAddr.
+// env variable if it is set, otherwise uses the default address from InstanceMetadataAddr joined with port 80.
+// InstanceMetadataAddr is host-only by convention (mirrors legacy sdk/instance_metadata.go); the port must be
+// appended here so that Available()'s raw TCP dial succeeds — net.Dial requires a host:port form, unlike net/http
+// which would default to :80 for the http scheme.
 func GetMetadataServiceAddr() string {
 	if nonDefaultAddr := os.Getenv(InstanceMetadataOverrideEnvVar); nonDefaultAddr != "" {
 		return nonDefaultAddr
 	}
 
-	return InstanceMetadataAddr
+	return net.JoinHostPort(InstanceMetadataAddr, "80")
 }

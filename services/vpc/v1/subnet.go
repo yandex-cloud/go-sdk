@@ -23,10 +23,10 @@ type SubnetClient interface {
 	Update(context.Context, *vpc.UpdateSubnetRequest, ...grpc.CallOption) (*SubnetUpdateOperation, error)
 	AddCidrBlocks(context.Context, *vpc.AddSubnetCidrBlocksRequest, ...grpc.CallOption) (*SubnetAddCidrBlocksOperation, error)
 	RemoveCidrBlocks(context.Context, *vpc.RemoveSubnetCidrBlocksRequest, ...grpc.CallOption) (*SubnetRemoveCidrBlocksOperation, error)
+	Relocate(context.Context, *vpc.RelocateSubnetRequest, ...grpc.CallOption) (*SubnetRelocateOperation, error)
 	Delete(context.Context, *vpc.DeleteSubnetRequest, ...grpc.CallOption) (*SubnetDeleteOperation, error)
 	ListOperations(context.Context, *vpc.ListSubnetOperationsRequest, ...grpc.CallOption) (*vpc.ListSubnetOperationsResponse, error)
 	Move(context.Context, *vpc.MoveSubnetRequest, ...grpc.CallOption) (*SubnetMoveOperation, error)
-	Relocate(context.Context, *vpc.RelocateSubnetRequest, ...grpc.CallOption) (*SubnetRelocateOperation, error)
 	ListUsedAddresses(context.Context, *vpc.ListUsedAddressesRequest, ...grpc.CallOption) (*vpc.ListUsedAddressesResponse, error)
 }
 
@@ -275,6 +275,60 @@ func (c subnetClient) RemoveCidrBlocks(ctx context.Context, in *vpc.RemoveSubnet
 	return &SubnetRemoveCidrBlocksOperation{*op}, nil
 }
 
+// SubnetRelocateOperation is used to monitor the state of Relocate operations.
+type SubnetRelocateOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *SubnetRelocateOperation) Metadata() *vpc.RelocateSubnetMetadata {
+	return o.Operation.Metadata().(*vpc.RelocateSubnetMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *SubnetRelocateOperation) Response() *vpc.Subnet {
+	return o.Operation.Response().(*vpc.Subnet)
+}
+
+// Wait polls the operation until it's done.
+func (o *SubnetRelocateOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*vpc.Subnet, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*vpc.Subnet)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *SubnetRelocateOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*vpc.Subnet, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*vpc.Subnet)
+	return response, err
+}
+
+// Relocate is an operation of Yandex.Cloud VPC Subnet service.
+// It returns an object which should be used to monitor the operation state.
+func (c subnetClient) Relocate(ctx context.Context, in *vpc.RelocateSubnetRequest, opts ...grpc.CallOption) (*SubnetRelocateOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, SubnetRelocate, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := vpc.NewSubnetServiceClient(connection).Relocate(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*vpc.RelocateSubnetMetadata).GetSubnetId()
+		},
+		MetadataType: (*vpc.RelocateSubnetMetadata)(nil),
+		ResponseType: (*vpc.Subnet)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &SubnetRelocateOperation{*op}, nil
+}
+
 // SubnetDeleteOperation is used to monitor the state of Delete operations.
 type SubnetDeleteOperation struct {
 	sdkop.Operation
@@ -392,60 +446,6 @@ func (c subnetClient) Move(ctx context.Context, in *vpc.MoveSubnetRequest, opts 
 	return &SubnetMoveOperation{*op}, nil
 }
 
-// SubnetRelocateOperation is used to monitor the state of Relocate operations.
-type SubnetRelocateOperation struct {
-	sdkop.Operation
-}
-
-// Metadata retrieves the operation metadata.
-func (o *SubnetRelocateOperation) Metadata() *vpc.RelocateSubnetMetadata {
-	return o.Operation.Metadata().(*vpc.RelocateSubnetMetadata)
-}
-
-// Response retrieves the operation response.
-func (o *SubnetRelocateOperation) Response() *vpc.Subnet {
-	return o.Operation.Response().(*vpc.Subnet)
-}
-
-// Wait polls the operation until it's done.
-func (o *SubnetRelocateOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*vpc.Subnet, error) {
-	abstract, err := o.Operation.Wait(ctx, opts...)
-	response, _ := abstract.(*vpc.Subnet)
-	return response, err
-}
-
-// WaitInterval polls the operation until it's done with custom interval.
-func (o *SubnetRelocateOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*vpc.Subnet, error) {
-	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
-	response, _ := abstract.(*vpc.Subnet)
-	return response, err
-}
-
-// Relocate is an operation of Yandex.Cloud VPC Subnet service.
-// It returns an object which should be used to monitor the operation state.
-func (c subnetClient) Relocate(ctx context.Context, in *vpc.RelocateSubnetRequest, opts ...grpc.CallOption) (*SubnetRelocateOperation, error) {
-	connection, err := c.connector.GetConnection(ctx, SubnetRelocate, opts...)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := vpc.NewSubnetServiceClient(connection).Relocate(ctx, in, opts...)
-	if err != nil {
-		return nil, err
-	}
-	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
-		Poll: c.pollOperation,
-		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*vpc.RelocateSubnetMetadata).GetSubnetId()
-		},
-		MetadataType: (*vpc.RelocateSubnetMetadata)(nil),
-		ResponseType: (*vpc.Subnet)(nil),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &SubnetRelocateOperation{*op}, nil
-}
-
 // ListUsedAddresses is an operation of Yandex.Cloud VPC Subnet service.
 func (c subnetClient) ListUsedAddresses(ctx context.Context, in *vpc.ListUsedAddressesRequest, opts ...grpc.CallOption) (*vpc.ListUsedAddressesResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, SubnetListUsedAddresses, opts...)
@@ -471,10 +471,10 @@ var (
 	SubnetUpdate            = protoreflect.FullName("yandex.cloud.vpc.v1.SubnetService.Update")
 	SubnetAddCidrBlocks     = protoreflect.FullName("yandex.cloud.vpc.v1.SubnetService.AddCidrBlocks")
 	SubnetRemoveCidrBlocks  = protoreflect.FullName("yandex.cloud.vpc.v1.SubnetService.RemoveCidrBlocks")
+	SubnetRelocate          = protoreflect.FullName("yandex.cloud.vpc.v1.SubnetService.Relocate")
 	SubnetDelete            = protoreflect.FullName("yandex.cloud.vpc.v1.SubnetService.Delete")
 	SubnetListOperations    = protoreflect.FullName("yandex.cloud.vpc.v1.SubnetService.ListOperations")
 	SubnetMove              = protoreflect.FullName("yandex.cloud.vpc.v1.SubnetService.Move")
-	SubnetRelocate          = protoreflect.FullName("yandex.cloud.vpc.v1.SubnetService.Relocate")
 	SubnetListUsedAddresses = protoreflect.FullName("yandex.cloud.vpc.v1.SubnetService.ListUsedAddresses")
 	SubnetOperationPoller   = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
