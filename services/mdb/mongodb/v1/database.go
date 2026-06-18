@@ -19,6 +19,7 @@ type DatabaseClient interface {
 	Get(context.Context, *mongodb.GetDatabaseRequest, ...grpc.CallOption) (*mongodb.Database, error)
 	List(context.Context, *mongodb.ListDatabasesRequest, ...grpc.CallOption) (*mongodb.ListDatabasesResponse, error)
 	Create(context.Context, *mongodb.CreateDatabaseRequest, ...grpc.CallOption) (*DatabaseCreateOperation, error)
+	Update(context.Context, *mongodb.UpdateDatabaseRequest, ...grpc.CallOption) (*DatabaseUpdateOperation, error)
 	Delete(context.Context, *mongodb.DeleteDatabaseRequest, ...grpc.CallOption) (*DatabaseDeleteOperation, error)
 }
 
@@ -102,6 +103,57 @@ func (c databaseClient) Create(ctx context.Context, in *mongodb.CreateDatabaseRe
 	return &DatabaseCreateOperation{*op}, nil
 }
 
+// DatabaseUpdateOperation is used to monitor the state of Update operations.
+type DatabaseUpdateOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *DatabaseUpdateOperation) Metadata() *mongodb.UpdateDatabaseMetadata {
+	return o.Operation.Metadata().(*mongodb.UpdateDatabaseMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *DatabaseUpdateOperation) Response() *mongodb.Database {
+	return o.Operation.Response().(*mongodb.Database)
+}
+
+// Wait polls the operation until it's done.
+func (o *DatabaseUpdateOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*mongodb.Database, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*mongodb.Database)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *DatabaseUpdateOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*mongodb.Database, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*mongodb.Database)
+	return response, err
+}
+
+// Update is an operation of Yandex.Cloud MongoDB Database service.
+// It returns an object which should be used to monitor the operation state.
+func (c databaseClient) Update(ctx context.Context, in *mongodb.UpdateDatabaseRequest, opts ...grpc.CallOption) (*DatabaseUpdateOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, DatabaseUpdate, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := mongodb.NewDatabaseServiceClient(connection).Update(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*mongodb.UpdateDatabaseMetadata)(nil),
+		ResponseType: (*mongodb.Database)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &DatabaseUpdateOperation{*op}, nil
+}
+
 // DatabaseDeleteOperation is used to monitor the state of Delete operations.
 type DatabaseDeleteOperation struct {
 	sdkop.Operation
@@ -166,6 +218,7 @@ var (
 	DatabaseGet             = protoreflect.FullName("yandex.cloud.mdb.mongodb.v1.DatabaseService.Get")
 	DatabaseList            = protoreflect.FullName("yandex.cloud.mdb.mongodb.v1.DatabaseService.List")
 	DatabaseCreate          = protoreflect.FullName("yandex.cloud.mdb.mongodb.v1.DatabaseService.Create")
+	DatabaseUpdate          = protoreflect.FullName("yandex.cloud.mdb.mongodb.v1.DatabaseService.Update")
 	DatabaseDelete          = protoreflect.FullName("yandex.cloud.mdb.mongodb.v1.DatabaseService.Delete")
 	DatabaseOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
