@@ -23,6 +23,11 @@ func (m *MongoDB) Backup() *BackupServiceClient {
 	return &BackupServiceClient{getConn: m.getConn}
 }
 
+// BackupRetentionPolicy gets BackupRetentionPolicyService client
+func (m *MongoDB) BackupRetentionPolicy() *BackupRetentionPolicyServiceClient {
+	return &BackupRetentionPolicyServiceClient{getConn: m.getConn}
+}
+
 // Cluster gets ClusterService client
 func (m *MongoDB) Cluster() *ClusterServiceClient {
 	return &ClusterServiceClient{getConn: m.getConn}

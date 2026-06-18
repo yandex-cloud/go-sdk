@@ -33,6 +33,11 @@ func (r *Redis) Backup() *BackupServiceClient {
 	return &BackupServiceClient{getConn: r.getConn}
 }
 
+// BackupRetentionPolicy gets BackupRetentionPolicyService client
+func (r *Redis) BackupRetentionPolicy() *BackupRetentionPolicyServiceClient {
+	return &BackupRetentionPolicyServiceClient{getConn: r.getConn}
+}
+
 // User gets UserService client
 func (r *Redis) User() *UserServiceClient {
 	return &UserServiceClient{getConn: r.getConn}

@@ -396,6 +396,15 @@ func (it *ServiceAccountOperationsIterator) Error() error {
 	return it.err
 }
 
+// Reactivate implements iam.ServiceAccountServiceClient
+func (c *ServiceAccountServiceClient) Reactivate(ctx context.Context, in *iam.ReactivateServiceAccountRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return iam.NewServiceAccountServiceClient(conn).Reactivate(ctx, in, opts...)
+}
+
 // SetAccessBindings implements iam.ServiceAccountServiceClient
 func (c *ServiceAccountServiceClient) SetAccessBindings(ctx context.Context, in *access.SetAccessBindingsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -403,6 +412,15 @@ func (c *ServiceAccountServiceClient) SetAccessBindings(ctx context.Context, in 
 		return nil, err
 	}
 	return iam.NewServiceAccountServiceClient(conn).SetAccessBindings(ctx, in, opts...)
+}
+
+// Suspend implements iam.ServiceAccountServiceClient
+func (c *ServiceAccountServiceClient) Suspend(ctx context.Context, in *iam.SuspendServiceAccountRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return iam.NewServiceAccountServiceClient(conn).Suspend(ctx, in, opts...)
 }
 
 // Update implements iam.ServiceAccountServiceClient
