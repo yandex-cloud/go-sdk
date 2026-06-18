@@ -1,10 +1,10 @@
 module github.com/yandex-cloud/go-sdk/services/marketplace/stacklandlicenseapi
 
-go 1.24.13
+go 1.25.10
 
 require (
-	github.com/yandex-cloud/go-genproto v0.87.0
-	github.com/yandex-cloud/go-sdk/v2 v2.118.0
+	github.com/yandex-cloud/go-genproto v0.88.0
+	github.com/yandex-cloud/go-sdk/v2 v2.120.0
 	google.golang.org/grpc v1.74.0-dev
 	google.golang.org/protobuf v1.36.6
 )

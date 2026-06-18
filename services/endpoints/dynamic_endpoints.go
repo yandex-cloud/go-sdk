@@ -26,6 +26,7 @@ var DynamicEndpoints = map[protoreflect.FullName]string{
 	protoreflect.FullName("yandex.cloud.backup.agent.v1"):                                                    "backup",
 	protoreflect.FullName("yandex.cloud.backup.v1"):                                                          "backup",
 	protoreflect.FullName("yandex.cloud.baremetal.v1alpha"):                                                  "baremetal",
+	protoreflect.FullName("yandex.cloud.baremetal.v2"):                                                       "baremetal",
 	protoreflect.FullName("yandex.cloud.billing.v1"):                                                         "billing",
 	protoreflect.FullName("yandex.cloud.cdn.v1"):                                                             "cdn",
 	protoreflect.FullName("yandex.cloud.certificatemanager.v1.CertificateContentService"):                    "certificate-manager-data",

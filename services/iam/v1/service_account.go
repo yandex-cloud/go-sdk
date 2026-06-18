@@ -27,6 +27,8 @@ type ServiceAccountClient interface {
 	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*ServiceAccountSetAccessBindingsOperation, error)
 	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*ServiceAccountUpdateAccessBindingsOperation, error)
 	ListOperations(context.Context, *iam.ListServiceAccountOperationsRequest, ...grpc.CallOption) (*iam.ListServiceAccountOperationsResponse, error)
+	Suspend(context.Context, *iam.SuspendServiceAccountRequest, ...grpc.CallOption) (*ServiceAccountSuspendOperation, error)
+	Reactivate(context.Context, *iam.ReactivateServiceAccountRequest, ...grpc.CallOption) (*ServiceAccountReactivateOperation, error)
 }
 
 var _ ServiceAccountClient = serviceAccountClient{}
@@ -340,6 +342,114 @@ func (c serviceAccountClient) ListOperations(ctx context.Context, in *iam.ListSe
 	return iam.NewServiceAccountServiceClient(connection).ListOperations(ctx, in, opts...)
 }
 
+// ServiceAccountSuspendOperation is used to monitor the state of Suspend operations.
+type ServiceAccountSuspendOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ServiceAccountSuspendOperation) Metadata() *iam.SuspendServiceAccountMetadata {
+	return o.Operation.Metadata().(*iam.SuspendServiceAccountMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ServiceAccountSuspendOperation) Response() *iam.SuspendServiceAccountResponse {
+	return o.Operation.Response().(*iam.SuspendServiceAccountResponse)
+}
+
+// Wait polls the operation until it's done.
+func (o *ServiceAccountSuspendOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*iam.SuspendServiceAccountResponse, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*iam.SuspendServiceAccountResponse)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ServiceAccountSuspendOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*iam.SuspendServiceAccountResponse, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*iam.SuspendServiceAccountResponse)
+	return response, err
+}
+
+// Suspend is an operation of Yandex.Cloud IAM ServiceAccount service.
+// It returns an object which should be used to monitor the operation state.
+func (c serviceAccountClient) Suspend(ctx context.Context, in *iam.SuspendServiceAccountRequest, opts ...grpc.CallOption) (*ServiceAccountSuspendOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ServiceAccountSuspend, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := iam.NewServiceAccountServiceClient(connection).Suspend(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*iam.SuspendServiceAccountMetadata).GetServiceAccountId()
+		},
+		MetadataType: (*iam.SuspendServiceAccountMetadata)(nil),
+		ResponseType: (*iam.SuspendServiceAccountResponse)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ServiceAccountSuspendOperation{*op}, nil
+}
+
+// ServiceAccountReactivateOperation is used to monitor the state of Reactivate operations.
+type ServiceAccountReactivateOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ServiceAccountReactivateOperation) Metadata() *iam.ReactivateServiceAccountMetadata {
+	return o.Operation.Metadata().(*iam.ReactivateServiceAccountMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ServiceAccountReactivateOperation) Response() *iam.ReactivateServiceAccountResponse {
+	return o.Operation.Response().(*iam.ReactivateServiceAccountResponse)
+}
+
+// Wait polls the operation until it's done.
+func (o *ServiceAccountReactivateOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*iam.ReactivateServiceAccountResponse, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*iam.ReactivateServiceAccountResponse)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ServiceAccountReactivateOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*iam.ReactivateServiceAccountResponse, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*iam.ReactivateServiceAccountResponse)
+	return response, err
+}
+
+// Reactivate is an operation of Yandex.Cloud IAM ServiceAccount service.
+// It returns an object which should be used to monitor the operation state.
+func (c serviceAccountClient) Reactivate(ctx context.Context, in *iam.ReactivateServiceAccountRequest, opts ...grpc.CallOption) (*ServiceAccountReactivateOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ServiceAccountReactivate, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := iam.NewServiceAccountServiceClient(connection).Reactivate(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*iam.ReactivateServiceAccountMetadata).GetServiceAccountId()
+		},
+		MetadataType: (*iam.ReactivateServiceAccountMetadata)(nil),
+		ResponseType: (*iam.ReactivateServiceAccountResponse)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ServiceAccountReactivateOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c serviceAccountClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, ServiceAccountOperationPoller, opts...)
@@ -359,5 +469,7 @@ var (
 	ServiceAccountSetAccessBindings    = protoreflect.FullName("yandex.cloud.iam.v1.ServiceAccountService.SetAccessBindings")
 	ServiceAccountUpdateAccessBindings = protoreflect.FullName("yandex.cloud.iam.v1.ServiceAccountService.UpdateAccessBindings")
 	ServiceAccountListOperations       = protoreflect.FullName("yandex.cloud.iam.v1.ServiceAccountService.ListOperations")
+	ServiceAccountSuspend              = protoreflect.FullName("yandex.cloud.iam.v1.ServiceAccountService.Suspend")
+	ServiceAccountReactivate           = protoreflect.FullName("yandex.cloud.iam.v1.ServiceAccountService.Reactivate")
 	ServiceAccountOperationPoller      = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
