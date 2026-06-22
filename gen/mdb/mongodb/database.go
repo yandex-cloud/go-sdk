@@ -162,3 +162,12 @@ func (it *DatabaseIterator) Value() *mongodb.Database {
 func (it *DatabaseIterator) Error() error {
 	return it.err
 }
+
+// Update implements mongodb.DatabaseServiceClient
+func (c *DatabaseServiceClient) Update(ctx context.Context, in *mongodb.UpdateDatabaseRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return mongodb.NewDatabaseServiceClient(conn).Update(ctx, in, opts...)
+}

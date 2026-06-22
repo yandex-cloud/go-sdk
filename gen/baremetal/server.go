@@ -297,6 +297,15 @@ func (c *ServerServiceClient) PowerOn(ctx context.Context, in *baremetal.PowerOn
 	return baremetal.NewServerServiceClient(conn).PowerOn(ctx, in, opts...)
 }
 
+// ProlongateEndedRent implements baremetal.ServerServiceClient
+func (c *ServerServiceClient) ProlongateEndedRent(ctx context.Context, in *baremetal.ProlongateEndedRentRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return baremetal.NewServerServiceClient(conn).ProlongateEndedRent(ctx, in, opts...)
+}
+
 // Reboot implements baremetal.ServerServiceClient
 func (c *ServerServiceClient) Reboot(ctx context.Context, in *baremetal.RebootServerRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)

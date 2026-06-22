@@ -23,6 +23,11 @@ func (m *MySQL) Backup() *BackupServiceClient {
 	return &BackupServiceClient{getConn: m.getConn}
 }
 
+// BackupRetentionPolicy gets BackupRetentionPolicyService client
+func (m *MySQL) BackupRetentionPolicy() *BackupRetentionPolicyServiceClient {
+	return &BackupRetentionPolicyServiceClient{getConn: m.getConn}
+}
+
 // Cluster gets ClusterService client
 func (m *MySQL) Cluster() *ClusterServiceClient {
 	return &ClusterServiceClient{getConn: m.getConn}

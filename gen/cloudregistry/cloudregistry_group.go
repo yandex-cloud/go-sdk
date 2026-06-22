@@ -42,3 +42,8 @@ func (c *CloudRegistry) ScanPolicy() *ScanPolicyServiceClient {
 func (c *CloudRegistry) Scanner() *ScannerServiceClient {
 	return &ScannerServiceClient{getConn: c.getConn}
 }
+
+// Migration gets MigrationService client
+func (c *CloudRegistry) Migration() *MigrationServiceClient {
+	return &MigrationServiceClient{getConn: c.getConn}
+}
