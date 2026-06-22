@@ -29,6 +29,7 @@ type ServerClient interface {
 	ListOperations(context.Context, *baremetal.ListServerOperationsRequest, ...grpc.CallOption) (*baremetal.ListServerOperationsResponse, error)
 	StartProlongation(context.Context, *baremetal.StartProlongationRequest, ...grpc.CallOption) (*ServerStartProlongationOperation, error)
 	StopProlongation(context.Context, *baremetal.StopProlongationRequest, ...grpc.CallOption) (*ServerStopProlongationOperation, error)
+	ProlongateEndedRent(context.Context, *baremetal.ProlongateEndedRentRequest, ...grpc.CallOption) (*ServerProlongateEndedRentOperation, error)
 }
 
 var _ ServerClient = serverClient{}
@@ -552,6 +553,60 @@ func (c serverClient) StopProlongation(ctx context.Context, in *baremetal.StopPr
 	return &ServerStopProlongationOperation{*op}, nil
 }
 
+// ServerProlongateEndedRentOperation is used to monitor the state of ProlongateEndedRent operations.
+type ServerProlongateEndedRentOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ServerProlongateEndedRentOperation) Metadata() *baremetal.ProlongateEndedRentMetadata {
+	return o.Operation.Metadata().(*baremetal.ProlongateEndedRentMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ServerProlongateEndedRentOperation) Response() *baremetal.Server {
+	return o.Operation.Response().(*baremetal.Server)
+}
+
+// Wait polls the operation until it's done.
+func (o *ServerProlongateEndedRentOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*baremetal.Server, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*baremetal.Server)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ServerProlongateEndedRentOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*baremetal.Server, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*baremetal.Server)
+	return response, err
+}
+
+// ProlongateEndedRent is an operation of Yandex.Cloud Baremetal Server service.
+// It returns an object which should be used to monitor the operation state.
+func (c serverClient) ProlongateEndedRent(ctx context.Context, in *baremetal.ProlongateEndedRentRequest, opts ...grpc.CallOption) (*ServerProlongateEndedRentOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ServerProlongateEndedRent, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := baremetal.NewServerServiceClient(connection).ProlongateEndedRent(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*baremetal.ProlongateEndedRentMetadata).GetServerId()
+		},
+		MetadataType: (*baremetal.ProlongateEndedRentMetadata)(nil),
+		ResponseType: (*baremetal.Server)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ServerProlongateEndedRentOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c serverClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, ServerOperationPoller, opts...)
@@ -562,17 +617,18 @@ func (c serverClient) pollOperation(ctx context.Context, operationId string, opt
 }
 
 var (
-	ServerGet               = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.Get")
-	ServerList              = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.List")
-	ServerCreate            = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.Create")
-	ServerBatchCreate       = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.BatchCreate")
-	ServerUpdate            = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.Update")
-	ServerPowerOff          = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.PowerOff")
-	ServerPowerOn           = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.PowerOn")
-	ServerReboot            = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.Reboot")
-	ServerReinstall         = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.Reinstall")
-	ServerListOperations    = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.ListOperations")
-	ServerStartProlongation = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.StartProlongation")
-	ServerStopProlongation  = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.StopProlongation")
-	ServerOperationPoller   = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
+	ServerGet                 = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.Get")
+	ServerList                = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.List")
+	ServerCreate              = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.Create")
+	ServerBatchCreate         = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.BatchCreate")
+	ServerUpdate              = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.Update")
+	ServerPowerOff            = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.PowerOff")
+	ServerPowerOn             = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.PowerOn")
+	ServerReboot              = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.Reboot")
+	ServerReinstall           = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.Reinstall")
+	ServerListOperations      = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.ListOperations")
+	ServerStartProlongation   = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.StartProlongation")
+	ServerStopProlongation    = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.StopProlongation")
+	ServerProlongateEndedRent = protoreflect.FullName("yandex.cloud.baremetal.v1alpha.ServerService.ProlongateEndedRent")
+	ServerOperationPoller     = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

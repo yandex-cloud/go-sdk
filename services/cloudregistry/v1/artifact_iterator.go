@@ -5,12 +5,33 @@ import (
 	"context"
 
 	access "github.com/yandex-cloud/go-genproto/yandex/cloud/access"
+	cloudregistry "github.com/yandex-cloud/go-genproto/yandex/cloud/cloudregistry/v1"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/iterator"
 	"google.golang.org/grpc"
 )
 
 type ArtifactClientIterator interface {
+	Iterator(context.Context, *cloudregistry.ListArtifactsWithFiltersRequest, ...grpc.CallOption) *iterator.Iterator[*cloudregistry.ListArtifactsWithFiltersRequest, *cloudregistry.Artifact]
 	AccessBindingsIterator(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) *iterator.Iterator[*access.ListAccessBindingsRequest, *access.AccessBinding]
+}
+
+type artifactServiceListInternal struct {
+	*cloudregistry.ListArtifactsWithFiltersResponse
+}
+
+func (r artifactServiceListInternal) Items() []*cloudregistry.Artifact {
+	return r.ListArtifactsWithFiltersResponse.Artifacts
+}
+
+func (c artifactClient) Iterator(ctx context.Context, req *cloudregistry.ListArtifactsWithFiltersRequest, opts ...grpc.CallOption) *iterator.Iterator[*cloudregistry.ListArtifactsWithFiltersRequest, *cloudregistry.Artifact] {
+	return iterator.NewIterator[*cloudregistry.ListArtifactsWithFiltersRequest, *cloudregistry.Artifact](ctx, req,
+		func(ctx context.Context, req *cloudregistry.ListArtifactsWithFiltersRequest, opts ...grpc.CallOption) (iterator.PageResponse[*cloudregistry.Artifact], error) {
+			resp, err := c.List(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return artifactServiceListInternal{resp}, nil
+		})
 }
 
 type artifactServiceListAccessBindingsInternal struct {
