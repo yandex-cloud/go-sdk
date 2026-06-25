@@ -18,6 +18,7 @@ type OAuthClientClient interface {
 	OAuthClientClientIterator
 	Get(context.Context, *iam.GetOAuthClientRequest, ...grpc.CallOption) (*iam.OAuthClient, error)
 	List(context.Context, *iam.ListOAuthClientsRequest, ...grpc.CallOption) (*iam.ListOAuthClientsResponse, error)
+	ListProfiles(context.Context, *iam.ListProfilesRequest, ...grpc.CallOption) (*iam.ListProfilesResponse, error)
 	Create(context.Context, *iam.CreateOAuthClientRequest, ...grpc.CallOption) (*OAuthClientCreateOperation, error)
 	Update(context.Context, *iam.UpdateOAuthClientRequest, ...grpc.CallOption) (*OAuthClientUpdateOperation, error)
 	Delete(context.Context, *iam.DeleteOAuthClientRequest, ...grpc.CallOption) (*OAuthClientDeleteOperation, error)
@@ -50,6 +51,15 @@ func (c oAuthClientClient) List(ctx context.Context, in *iam.ListOAuthClientsReq
 		return nil, err
 	}
 	return iam.NewOAuthClientServiceClient(connection).List(ctx, in, opts...)
+}
+
+// ListProfiles is an operation of Yandex.Cloud IAM OAuthClient service.
+func (c oAuthClientClient) ListProfiles(ctx context.Context, in *iam.ListProfilesRequest, opts ...grpc.CallOption) (*iam.ListProfilesResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, OAuthClientListProfiles, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return iam.NewOAuthClientServiceClient(connection).ListProfiles(ctx, in, opts...)
 }
 
 // OAuthClientCreateOperation is used to monitor the state of Create operations.
@@ -217,6 +227,7 @@ func (c oAuthClientClient) pollOperation(ctx context.Context, operationId string
 var (
 	OAuthClientGet             = protoreflect.FullName("yandex.cloud.iam.v1.OAuthClientService.Get")
 	OAuthClientList            = protoreflect.FullName("yandex.cloud.iam.v1.OAuthClientService.List")
+	OAuthClientListProfiles    = protoreflect.FullName("yandex.cloud.iam.v1.OAuthClientService.ListProfiles")
 	OAuthClientCreate          = protoreflect.FullName("yandex.cloud.iam.v1.OAuthClientService.Create")
 	OAuthClientUpdate          = protoreflect.FullName("yandex.cloud.iam.v1.OAuthClientService.Update")
 	OAuthClientDelete          = protoreflect.FullName("yandex.cloud.iam.v1.OAuthClientService.Delete")

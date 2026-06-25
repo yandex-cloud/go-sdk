@@ -11,6 +11,7 @@ import (
 
 type OAuthClientClientIterator interface {
 	Iterator(context.Context, *iam.ListOAuthClientsRequest, ...grpc.CallOption) *iterator.Iterator[*iam.ListOAuthClientsRequest, *iam.OAuthClientListView]
+	ProfilesIterator(context.Context, *iam.ListProfilesRequest, ...grpc.CallOption) *iterator.SimpleIterator[*iam.ListProfilesRequest, *iam.Profile]
 }
 
 type oAuthClientServiceListInternal struct {
@@ -29,5 +30,24 @@ func (c oAuthClientClient) Iterator(ctx context.Context, req *iam.ListOAuthClien
 				return nil, err
 			}
 			return oAuthClientServiceListInternal{resp}, nil
+		})
+}
+
+type oAuthClientServiceListProfilesInternal struct {
+	*iam.ListProfilesResponse
+}
+
+func (r oAuthClientServiceListProfilesInternal) Items() []*iam.Profile {
+	return r.ListProfilesResponse.Profiles
+}
+
+func (c oAuthClientClient) ProfilesIterator(ctx context.Context, req *iam.ListProfilesRequest, opts ...grpc.CallOption) *iterator.SimpleIterator[*iam.ListProfilesRequest, *iam.Profile] {
+	return iterator.NewSimpleIterator[*iam.ListProfilesRequest, *iam.Profile](ctx, req,
+		func(ctx context.Context, req *iam.ListProfilesRequest, opts ...grpc.CallOption) (iterator.SimpleResponse[*iam.Profile], error) {
+			resp, err := c.ListProfiles(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return oAuthClientServiceListProfilesInternal{resp}, nil
 		})
 }
