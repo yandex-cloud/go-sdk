@@ -3,8 +3,8 @@ module github.com/yandex-cloud/go-sdk/services/k8s/marketplace
 go 1.25.10
 
 require (
-	github.com/yandex-cloud/go-genproto v0.90.0
-	github.com/yandex-cloud/go-sdk/v2 v2.124.0
+	github.com/yandex-cloud/go-genproto v0.91.0
+	github.com/yandex-cloud/go-sdk/v2 v2.126.0
 	google.golang.org/grpc v1.74.0-dev
 	google.golang.org/protobuf v1.36.6
 )
