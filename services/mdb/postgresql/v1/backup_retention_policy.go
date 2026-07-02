@@ -13,6 +13,7 @@ import (
 // BackupRetentionPolicyClient provides methods for managing BackupRetentionPolicy resources of Yandex.Cloud PostgreSQL.
 type BackupRetentionPolicyClient interface {
 	BackupRetentionPolicyClientIterator
+	Get(context.Context, *postgresql.GetBackupRetentionPolicyRequest, ...grpc.CallOption) (*postgresql.BackupRetentionPolicy, error)
 	List(context.Context, *postgresql.ListBackupRetentionPoliciesRequest, ...grpc.CallOption) (*postgresql.ListBackupRetentionPoliciesResponse, error)
 	Create(context.Context, *postgresql.CreateBackupRetentionPolicyRequest, ...grpc.CallOption) (*postgresql.CreateBackupRetentionPolicyResponse, error)
 	Delete(context.Context, *postgresql.DeleteBackupRetentionPolicyRequest, ...grpc.CallOption) (*postgresql.DeleteBackupRetentionPolicyResponse, error)
@@ -27,6 +28,15 @@ type backupRetentionPolicyClient struct {
 // NewBackupRetentionPolicyClient returns BackupRetentionPolicyClient implementation.
 func NewBackupRetentionPolicyClient(connector transport.Connector) BackupRetentionPolicyClient {
 	return backupRetentionPolicyClient{connector}
+}
+
+// Get is an operation of Yandex.Cloud PostgreSQL BackupRetentionPolicy service.
+func (c backupRetentionPolicyClient) Get(ctx context.Context, in *postgresql.GetBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*postgresql.BackupRetentionPolicy, error) {
+	connection, err := c.connector.GetConnection(ctx, BackupRetentionPolicyGet, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return postgresql.NewBackupRetentionPolicyServiceClient(connection).Get(ctx, in, opts...)
 }
 
 // List is an operation of Yandex.Cloud PostgreSQL BackupRetentionPolicy service.
@@ -57,6 +67,7 @@ func (c backupRetentionPolicyClient) Delete(ctx context.Context, in *postgresql.
 }
 
 var (
+	BackupRetentionPolicyGet    = protoreflect.FullName("yandex.cloud.mdb.postgresql.v1.BackupRetentionPolicyService.Get")
 	BackupRetentionPolicyList   = protoreflect.FullName("yandex.cloud.mdb.postgresql.v1.BackupRetentionPolicyService.List")
 	BackupRetentionPolicyCreate = protoreflect.FullName("yandex.cloud.mdb.postgresql.v1.BackupRetentionPolicyService.Create")
 	BackupRetentionPolicyDelete = protoreflect.FullName("yandex.cloud.mdb.postgresql.v1.BackupRetentionPolicyService.Delete")

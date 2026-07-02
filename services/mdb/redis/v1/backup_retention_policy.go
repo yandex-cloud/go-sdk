@@ -5,6 +5,7 @@ import (
 	"context"
 
 	redis "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/redis/v1"
+	mdb "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/v1"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/transport"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -13,6 +14,7 @@ import (
 // BackupRetentionPolicyClient provides methods for managing BackupRetentionPolicy resources of Yandex.Cloud Redis.
 type BackupRetentionPolicyClient interface {
 	BackupRetentionPolicyClientIterator
+	Get(context.Context, *redis.GetBackupRetentionPolicyRequest, ...grpc.CallOption) (*mdb.BackupRetentionPolicy, error)
 	List(context.Context, *redis.ListBackupRetentionPoliciesRequest, ...grpc.CallOption) (*redis.ListBackupRetentionPoliciesResponse, error)
 	ListByFolder(context.Context, *redis.ListBackupRetentionPoliciesByFolderRequest, ...grpc.CallOption) (*redis.ListBackupRetentionPoliciesResponse, error)
 	Create(context.Context, *redis.CreateBackupRetentionPolicyRequest, ...grpc.CallOption) (*redis.CreateBackupRetentionPolicyResponse, error)
@@ -28,6 +30,15 @@ type backupRetentionPolicyClient struct {
 // NewBackupRetentionPolicyClient returns BackupRetentionPolicyClient implementation.
 func NewBackupRetentionPolicyClient(connector transport.Connector) BackupRetentionPolicyClient {
 	return backupRetentionPolicyClient{connector}
+}
+
+// Get is an operation of Yandex.Cloud Redis BackupRetentionPolicy service.
+func (c backupRetentionPolicyClient) Get(ctx context.Context, in *redis.GetBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*mdb.BackupRetentionPolicy, error) {
+	connection, err := c.connector.GetConnection(ctx, BackupRetentionPolicyGet, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return redis.NewBackupRetentionPolicyServiceClient(connection).Get(ctx, in, opts...)
 }
 
 // List is an operation of Yandex.Cloud Redis BackupRetentionPolicy service.
@@ -67,6 +78,7 @@ func (c backupRetentionPolicyClient) Delete(ctx context.Context, in *redis.Delet
 }
 
 var (
+	BackupRetentionPolicyGet          = protoreflect.FullName("yandex.cloud.mdb.redis.v1.BackupRetentionPolicyService.Get")
 	BackupRetentionPolicyList         = protoreflect.FullName("yandex.cloud.mdb.redis.v1.BackupRetentionPolicyService.List")
 	BackupRetentionPolicyListByFolder = protoreflect.FullName("yandex.cloud.mdb.redis.v1.BackupRetentionPolicyService.ListByFolder")
 	BackupRetentionPolicyCreate       = protoreflect.FullName("yandex.cloud.mdb.redis.v1.BackupRetentionPolicyService.Create")
