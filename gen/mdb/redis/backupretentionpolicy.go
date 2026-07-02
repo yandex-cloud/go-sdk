@@ -38,6 +38,15 @@ func (c *BackupRetentionPolicyServiceClient) Delete(ctx context.Context, in *red
 	return redis.NewBackupRetentionPolicyServiceClient(conn).Delete(ctx, in, opts...)
 }
 
+// Get implements redis.BackupRetentionPolicyServiceClient
+func (c *BackupRetentionPolicyServiceClient) Get(ctx context.Context, in *redis.GetBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*mdb.BackupRetentionPolicy, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return redis.NewBackupRetentionPolicyServiceClient(conn).Get(ctx, in, opts...)
+}
+
 // List implements redis.BackupRetentionPolicyServiceClient
 func (c *BackupRetentionPolicyServiceClient) List(ctx context.Context, in *redis.ListBackupRetentionPoliciesRequest, opts ...grpc.CallOption) (*redis.ListBackupRetentionPoliciesResponse, error) {
 	conn, err := c.getConn(ctx)

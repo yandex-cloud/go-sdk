@@ -38,6 +38,15 @@ func (c *BackupRetentionPolicyServiceClient) Delete(ctx context.Context, in *mys
 	return mysql.NewBackupRetentionPolicyServiceClient(conn).Delete(ctx, in, opts...)
 }
 
+// Get implements mysql.BackupRetentionPolicyServiceClient
+func (c *BackupRetentionPolicyServiceClient) Get(ctx context.Context, in *mysql.GetBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*mdb.BackupRetentionPolicy, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return mysql.NewBackupRetentionPolicyServiceClient(conn).Get(ctx, in, opts...)
+}
+
 // List implements mysql.BackupRetentionPolicyServiceClient
 func (c *BackupRetentionPolicyServiceClient) List(ctx context.Context, in *mysql.ListBackupRetentionPoliciesRequest, opts ...grpc.CallOption) (*mysql.ListBackupRetentionPoliciesResponse, error) {
 	conn, err := c.getConn(ctx)

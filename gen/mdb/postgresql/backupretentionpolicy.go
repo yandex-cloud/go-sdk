@@ -37,6 +37,15 @@ func (c *BackupRetentionPolicyServiceClient) Delete(ctx context.Context, in *pos
 	return postgresql.NewBackupRetentionPolicyServiceClient(conn).Delete(ctx, in, opts...)
 }
 
+// Get implements postgresql.BackupRetentionPolicyServiceClient
+func (c *BackupRetentionPolicyServiceClient) Get(ctx context.Context, in *postgresql.GetBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*postgresql.BackupRetentionPolicy, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return postgresql.NewBackupRetentionPolicyServiceClient(conn).Get(ctx, in, opts...)
+}
+
 // List implements postgresql.BackupRetentionPolicyServiceClient
 func (c *BackupRetentionPolicyServiceClient) List(ctx context.Context, in *postgresql.ListBackupRetentionPoliciesRequest, opts ...grpc.CallOption) (*postgresql.ListBackupRetentionPoliciesResponse, error) {
 	conn, err := c.getConn(ctx)
