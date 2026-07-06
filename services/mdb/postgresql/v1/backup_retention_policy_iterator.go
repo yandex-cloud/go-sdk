@@ -5,25 +5,26 @@ import (
 	"context"
 
 	postgresql "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/postgresql/v1"
+	mdb "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/v1"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/iterator"
 	"google.golang.org/grpc"
 )
 
 type BackupRetentionPolicyClientIterator interface {
-	Iterator(context.Context, *postgresql.ListBackupRetentionPoliciesRequest, ...grpc.CallOption) *iterator.Iterator[*postgresql.ListBackupRetentionPoliciesRequest, *postgresql.BackupRetentionPolicy]
+	Iterator(context.Context, *postgresql.ListBackupRetentionPoliciesRequest, ...grpc.CallOption) *iterator.Iterator[*postgresql.ListBackupRetentionPoliciesRequest, *mdb.BackupRetentionPolicy]
 }
 
 type backupRetentionPolicyServiceListInternal struct {
 	*postgresql.ListBackupRetentionPoliciesResponse
 }
 
-func (r backupRetentionPolicyServiceListInternal) Items() []*postgresql.BackupRetentionPolicy {
+func (r backupRetentionPolicyServiceListInternal) Items() []*mdb.BackupRetentionPolicy {
 	return r.ListBackupRetentionPoliciesResponse.Policies
 }
 
-func (c backupRetentionPolicyClient) Iterator(ctx context.Context, req *postgresql.ListBackupRetentionPoliciesRequest, opts ...grpc.CallOption) *iterator.Iterator[*postgresql.ListBackupRetentionPoliciesRequest, *postgresql.BackupRetentionPolicy] {
-	return iterator.NewIterator[*postgresql.ListBackupRetentionPoliciesRequest, *postgresql.BackupRetentionPolicy](ctx, req,
-		func(ctx context.Context, req *postgresql.ListBackupRetentionPoliciesRequest, opts ...grpc.CallOption) (iterator.PageResponse[*postgresql.BackupRetentionPolicy], error) {
+func (c backupRetentionPolicyClient) Iterator(ctx context.Context, req *postgresql.ListBackupRetentionPoliciesRequest, opts ...grpc.CallOption) *iterator.Iterator[*postgresql.ListBackupRetentionPoliciesRequest, *mdb.BackupRetentionPolicy] {
+	return iterator.NewIterator[*postgresql.ListBackupRetentionPoliciesRequest, *mdb.BackupRetentionPolicy](ctx, req,
+		func(ctx context.Context, req *postgresql.ListBackupRetentionPoliciesRequest, opts ...grpc.CallOption) (iterator.PageResponse[*mdb.BackupRetentionPolicy], error) {
 			resp, err := c.List(ctx, req, opts...)
 			if err != nil {
 				return nil, err
