@@ -9,6 +9,8 @@ import (
 	"google.golang.org/grpc"
 
 	postgresql "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/postgresql/v1"
+	mdb "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/v1"
+	"github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 )
 
 //revive:disable
@@ -20,7 +22,7 @@ type BackupRetentionPolicyServiceClient struct {
 }
 
 // Create implements postgresql.BackupRetentionPolicyServiceClient
-func (c *BackupRetentionPolicyServiceClient) Create(ctx context.Context, in *postgresql.CreateBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*postgresql.CreateBackupRetentionPolicyResponse, error) {
+func (c *BackupRetentionPolicyServiceClient) Create(ctx context.Context, in *postgresql.CreateBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
 	if err != nil {
 		return nil, err
@@ -29,7 +31,7 @@ func (c *BackupRetentionPolicyServiceClient) Create(ctx context.Context, in *pos
 }
 
 // Delete implements postgresql.BackupRetentionPolicyServiceClient
-func (c *BackupRetentionPolicyServiceClient) Delete(ctx context.Context, in *postgresql.DeleteBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*postgresql.DeleteBackupRetentionPolicyResponse, error) {
+func (c *BackupRetentionPolicyServiceClient) Delete(ctx context.Context, in *postgresql.DeleteBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
 	if err != nil {
 		return nil, err
@@ -38,7 +40,7 @@ func (c *BackupRetentionPolicyServiceClient) Delete(ctx context.Context, in *pos
 }
 
 // Get implements postgresql.BackupRetentionPolicyServiceClient
-func (c *BackupRetentionPolicyServiceClient) Get(ctx context.Context, in *postgresql.GetBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*postgresql.BackupRetentionPolicy, error) {
+func (c *BackupRetentionPolicyServiceClient) Get(ctx context.Context, in *postgresql.GetBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*mdb.BackupRetentionPolicy, error) {
 	conn, err := c.getConn(ctx)
 	if err != nil {
 		return nil, err
@@ -67,7 +69,7 @@ type BackupRetentionPolicyIterator struct {
 	client  *BackupRetentionPolicyServiceClient
 	request *postgresql.ListBackupRetentionPoliciesRequest
 
-	items []*postgresql.BackupRetentionPolicy
+	items []*mdb.BackupRetentionPolicy
 }
 
 func (c *BackupRetentionPolicyServiceClient) BackupRetentionPolicyIterator(ctx context.Context, req *postgresql.ListBackupRetentionPoliciesRequest, opts ...grpc.CallOption) *BackupRetentionPolicyIterator {
@@ -119,7 +121,7 @@ func (it *BackupRetentionPolicyIterator) Next() bool {
 	return len(it.items) > 0
 }
 
-func (it *BackupRetentionPolicyIterator) Take(size int64) ([]*postgresql.BackupRetentionPolicy, error) {
+func (it *BackupRetentionPolicyIterator) Take(size int64) ([]*mdb.BackupRetentionPolicy, error) {
 	if it.err != nil {
 		return nil, it.err
 	}
@@ -133,7 +135,7 @@ func (it *BackupRetentionPolicyIterator) Take(size int64) ([]*postgresql.BackupR
 		it.requestedSize = 0
 	}()
 
-	var result []*postgresql.BackupRetentionPolicy
+	var result []*mdb.BackupRetentionPolicy
 
 	for it.requestedSize > 0 && it.Next() {
 		it.requestedSize--
@@ -147,11 +149,11 @@ func (it *BackupRetentionPolicyIterator) Take(size int64) ([]*postgresql.BackupR
 	return result, nil
 }
 
-func (it *BackupRetentionPolicyIterator) TakeAll() ([]*postgresql.BackupRetentionPolicy, error) {
+func (it *BackupRetentionPolicyIterator) TakeAll() ([]*mdb.BackupRetentionPolicy, error) {
 	return it.Take(0)
 }
 
-func (it *BackupRetentionPolicyIterator) Value() *postgresql.BackupRetentionPolicy {
+func (it *BackupRetentionPolicyIterator) Value() *mdb.BackupRetentionPolicy {
 	if len(it.items) == 0 {
 		panic("calling Value on empty iterator")
 	}

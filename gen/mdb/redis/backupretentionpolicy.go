@@ -10,6 +10,7 @@ import (
 
 	redis "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/redis/v1"
 	mdb "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/v1"
+	"github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 )
 
 //revive:disable
@@ -21,7 +22,7 @@ type BackupRetentionPolicyServiceClient struct {
 }
 
 // Create implements redis.BackupRetentionPolicyServiceClient
-func (c *BackupRetentionPolicyServiceClient) Create(ctx context.Context, in *redis.CreateBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*redis.CreateBackupRetentionPolicyResponse, error) {
+func (c *BackupRetentionPolicyServiceClient) Create(ctx context.Context, in *redis.CreateBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
 	if err != nil {
 		return nil, err
@@ -30,7 +31,7 @@ func (c *BackupRetentionPolicyServiceClient) Create(ctx context.Context, in *red
 }
 
 // Delete implements redis.BackupRetentionPolicyServiceClient
-func (c *BackupRetentionPolicyServiceClient) Delete(ctx context.Context, in *redis.DeleteBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*redis.DeleteBackupRetentionPolicyResponse, error) {
+func (c *BackupRetentionPolicyServiceClient) Delete(ctx context.Context, in *redis.DeleteBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
 	if err != nil {
 		return nil, err

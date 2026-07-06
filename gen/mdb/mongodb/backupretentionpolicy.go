@@ -10,6 +10,7 @@ import (
 
 	mongodb "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/mongodb/v1"
 	mdb "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/v1"
+	"github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 )
 
 //revive:disable
@@ -21,7 +22,7 @@ type BackupRetentionPolicyServiceClient struct {
 }
 
 // Create implements mongodb.BackupRetentionPolicyServiceClient
-func (c *BackupRetentionPolicyServiceClient) Create(ctx context.Context, in *mongodb.CreateBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*mongodb.CreateBackupRetentionPolicyResponse, error) {
+func (c *BackupRetentionPolicyServiceClient) Create(ctx context.Context, in *mongodb.CreateBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
 	if err != nil {
 		return nil, err
@@ -30,7 +31,7 @@ func (c *BackupRetentionPolicyServiceClient) Create(ctx context.Context, in *mon
 }
 
 // Delete implements mongodb.BackupRetentionPolicyServiceClient
-func (c *BackupRetentionPolicyServiceClient) Delete(ctx context.Context, in *mongodb.DeleteBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*mongodb.DeleteBackupRetentionPolicyResponse, error) {
+func (c *BackupRetentionPolicyServiceClient) Delete(ctx context.Context, in *mongodb.DeleteBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
 	if err != nil {
 		return nil, err

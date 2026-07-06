@@ -10,6 +10,7 @@ import (
 
 	mysql "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/mysql/v1"
 	mdb "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/v1"
+	"github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 )
 
 //revive:disable
@@ -21,7 +22,7 @@ type BackupRetentionPolicyServiceClient struct {
 }
 
 // Create implements mysql.BackupRetentionPolicyServiceClient
-func (c *BackupRetentionPolicyServiceClient) Create(ctx context.Context, in *mysql.CreateBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*mysql.CreateBackupRetentionPolicyResponse, error) {
+func (c *BackupRetentionPolicyServiceClient) Create(ctx context.Context, in *mysql.CreateBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
 	if err != nil {
 		return nil, err
@@ -30,7 +31,7 @@ func (c *BackupRetentionPolicyServiceClient) Create(ctx context.Context, in *mys
 }
 
 // Delete implements mysql.BackupRetentionPolicyServiceClient
-func (c *BackupRetentionPolicyServiceClient) Delete(ctx context.Context, in *mysql.DeleteBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*mysql.DeleteBackupRetentionPolicyResponse, error) {
+func (c *BackupRetentionPolicyServiceClient) Delete(ctx context.Context, in *mysql.DeleteBackupRetentionPolicyRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
 	if err != nil {
 		return nil, err
