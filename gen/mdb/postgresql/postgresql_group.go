@@ -38,6 +38,11 @@ func (p *PostgreSQL) Database() *DatabaseServiceClient {
 	return &DatabaseServiceClient{getConn: p.getConn}
 }
 
+// ManagedRepack gets ManagedRepackService client
+func (p *PostgreSQL) ManagedRepack() *ManagedRepackServiceClient {
+	return &ManagedRepackServiceClient{getConn: p.getConn}
+}
+
 // ResourcePreset gets ResourcePresetService client
 func (p *PostgreSQL) ResourcePreset() *ResourcePresetServiceClient {
 	return &ResourcePresetServiceClient{getConn: p.getConn}
