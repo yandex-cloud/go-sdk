@@ -28,11 +28,11 @@ type ClusterClient interface {
 	Stop(context.Context, *greenplum.StopClusterRequest, ...grpc.CallOption) (*ClusterStopOperation, error)
 	Move(context.Context, *greenplum.MoveClusterRequest, ...grpc.CallOption) (*ClusterMoveOperation, error)
 	RescheduleMaintenance(context.Context, *greenplum.RescheduleMaintenanceRequest, ...grpc.CallOption) (*ClusterRescheduleMaintenanceOperation, error)
+	ListLogs(context.Context, *greenplum.ListClusterLogsRequest, ...grpc.CallOption) (*greenplum.ListClusterLogsResponse, error)
+	StreamLogs(context.Context, *greenplum.StreamClusterLogsRequest, ...grpc.CallOption) (greenplum.ClusterService_StreamLogsClient, error)
 	ListOperations(context.Context, *greenplum.ListClusterOperationsRequest, ...grpc.CallOption) (*greenplum.ListClusterOperationsResponse, error)
 	ListMasterHosts(context.Context, *greenplum.ListClusterHostsRequest, ...grpc.CallOption) (*greenplum.ListClusterHostsResponse, error)
 	ListSegmentHosts(context.Context, *greenplum.ListClusterHostsRequest, ...grpc.CallOption) (*greenplum.ListClusterHostsResponse, error)
-	ListLogs(context.Context, *greenplum.ListClusterLogsRequest, ...grpc.CallOption) (*greenplum.ListClusterLogsResponse, error)
-	StreamLogs(context.Context, *greenplum.StreamClusterLogsRequest, ...grpc.CallOption) (greenplum.ClusterService_StreamLogsClient, error)
 	ListBackups(context.Context, *greenplum.ListClusterBackupsRequest, ...grpc.CallOption) (*greenplum.ListClusterBackupsResponse, error)
 	Backup(context.Context, *greenplum.BackupClusterRequest, ...grpc.CallOption) (*ClusterBackupOperation, error)
 	Restore(context.Context, *greenplum.RestoreClusterRequest, ...grpc.CallOption) (*ClusterRestoreOperation, error)
@@ -502,6 +502,24 @@ func (c clusterClient) RescheduleMaintenance(ctx context.Context, in *greenplum.
 	return &ClusterRescheduleMaintenanceOperation{*op}, nil
 }
 
+// ListLogs is an operation of Yandex.Cloud Greenplum Cluster service.
+func (c clusterClient) ListLogs(ctx context.Context, in *greenplum.ListClusterLogsRequest, opts ...grpc.CallOption) (*greenplum.ListClusterLogsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, ClusterListLogs, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return greenplum.NewClusterServiceClient(connection).ListLogs(ctx, in, opts...)
+}
+
+// StreamLogs is an operation of Yandex.Cloud Greenplum Cluster service.
+func (c clusterClient) StreamLogs(ctx context.Context, in *greenplum.StreamClusterLogsRequest, opts ...grpc.CallOption) (greenplum.ClusterService_StreamLogsClient, error) {
+	connection, err := c.connector.GetConnection(ctx, ClusterStreamLogs, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return greenplum.NewClusterServiceClient(connection).StreamLogs(ctx, in, opts...)
+}
+
 // ListOperations is an operation of Yandex.Cloud Greenplum Cluster service.
 func (c clusterClient) ListOperations(ctx context.Context, in *greenplum.ListClusterOperationsRequest, opts ...grpc.CallOption) (*greenplum.ListClusterOperationsResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, ClusterListOperations, opts...)
@@ -527,24 +545,6 @@ func (c clusterClient) ListSegmentHosts(ctx context.Context, in *greenplum.ListC
 		return nil, err
 	}
 	return greenplum.NewClusterServiceClient(connection).ListSegmentHosts(ctx, in, opts...)
-}
-
-// ListLogs is an operation of Yandex.Cloud Greenplum Cluster service.
-func (c clusterClient) ListLogs(ctx context.Context, in *greenplum.ListClusterLogsRequest, opts ...grpc.CallOption) (*greenplum.ListClusterLogsResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, ClusterListLogs, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return greenplum.NewClusterServiceClient(connection).ListLogs(ctx, in, opts...)
-}
-
-// StreamLogs is an operation of Yandex.Cloud Greenplum Cluster service.
-func (c clusterClient) StreamLogs(ctx context.Context, in *greenplum.StreamClusterLogsRequest, opts ...grpc.CallOption) (greenplum.ClusterService_StreamLogsClient, error) {
-	connection, err := c.connector.GetConnection(ctx, ClusterStreamLogs, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return greenplum.NewClusterServiceClient(connection).StreamLogs(ctx, in, opts...)
 }
 
 // ListBackups is an operation of Yandex.Cloud Greenplum Cluster service.
@@ -795,11 +795,11 @@ var (
 	ClusterStop                  = protoreflect.FullName("yandex.cloud.mdb.greenplum.v1.ClusterService.Stop")
 	ClusterMove                  = protoreflect.FullName("yandex.cloud.mdb.greenplum.v1.ClusterService.Move")
 	ClusterRescheduleMaintenance = protoreflect.FullName("yandex.cloud.mdb.greenplum.v1.ClusterService.RescheduleMaintenance")
+	ClusterListLogs              = protoreflect.FullName("yandex.cloud.mdb.greenplum.v1.ClusterService.ListLogs")
+	ClusterStreamLogs            = protoreflect.FullName("yandex.cloud.mdb.greenplum.v1.ClusterService.StreamLogs")
 	ClusterListOperations        = protoreflect.FullName("yandex.cloud.mdb.greenplum.v1.ClusterService.ListOperations")
 	ClusterListMasterHosts       = protoreflect.FullName("yandex.cloud.mdb.greenplum.v1.ClusterService.ListMasterHosts")
 	ClusterListSegmentHosts      = protoreflect.FullName("yandex.cloud.mdb.greenplum.v1.ClusterService.ListSegmentHosts")
-	ClusterListLogs              = protoreflect.FullName("yandex.cloud.mdb.greenplum.v1.ClusterService.ListLogs")
-	ClusterStreamLogs            = protoreflect.FullName("yandex.cloud.mdb.greenplum.v1.ClusterService.StreamLogs")
 	ClusterListBackups           = protoreflect.FullName("yandex.cloud.mdb.greenplum.v1.ClusterService.ListBackups")
 	ClusterBackup                = protoreflect.FullName("yandex.cloud.mdb.greenplum.v1.ClusterService.Backup")
 	ClusterRestore               = protoreflect.FullName("yandex.cloud.mdb.greenplum.v1.ClusterService.Restore")

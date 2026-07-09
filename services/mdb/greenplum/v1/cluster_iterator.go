@@ -13,10 +13,10 @@ import (
 
 type ClusterClientIterator interface {
 	Iterator(context.Context, *greenplum.ListClustersRequest, ...grpc.CallOption) *iterator.Iterator[*greenplum.ListClustersRequest, *greenplum.Cluster]
+	LogsIterator(context.Context, *greenplum.ListClusterLogsRequest, ...grpc.CallOption) *iterator.Iterator[*greenplum.ListClusterLogsRequest, *greenplum.LogRecord]
 	OperationsIterator(context.Context, *greenplum.ListClusterOperationsRequest, ...grpc.CallOption) *iterator.Iterator[*greenplum.ListClusterOperationsRequest, *operation.Operation]
 	MasterHostsIterator(context.Context, *greenplum.ListClusterHostsRequest, ...grpc.CallOption) *iterator.Iterator[*greenplum.ListClusterHostsRequest, *greenplum.Host]
 	SegmentHostsIterator(context.Context, *greenplum.ListClusterHostsRequest, ...grpc.CallOption) *iterator.Iterator[*greenplum.ListClusterHostsRequest, *greenplum.Host]
-	LogsIterator(context.Context, *greenplum.ListClusterLogsRequest, ...grpc.CallOption) *iterator.Iterator[*greenplum.ListClusterLogsRequest, *greenplum.LogRecord]
 	BackupsIterator(context.Context, *greenplum.ListClusterBackupsRequest, ...grpc.CallOption) *iterator.Iterator[*greenplum.ListClusterBackupsRequest, *greenplum.Backup]
 	AccessBindingsIterator(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) *iterator.Iterator[*access.ListAccessBindingsRequest, *access.AccessBinding]
 }
@@ -37,6 +37,25 @@ func (c clusterClient) Iterator(ctx context.Context, req *greenplum.ListClusters
 				return nil, err
 			}
 			return clusterServiceListInternal{resp}, nil
+		})
+}
+
+type clusterServiceListLogsInternal struct {
+	*greenplum.ListClusterLogsResponse
+}
+
+func (r clusterServiceListLogsInternal) Items() []*greenplum.LogRecord {
+	return r.ListClusterLogsResponse.Logs
+}
+
+func (c clusterClient) LogsIterator(ctx context.Context, req *greenplum.ListClusterLogsRequest, opts ...grpc.CallOption) *iterator.Iterator[*greenplum.ListClusterLogsRequest, *greenplum.LogRecord] {
+	return iterator.NewIterator[*greenplum.ListClusterLogsRequest, *greenplum.LogRecord](ctx, req,
+		func(ctx context.Context, req *greenplum.ListClusterLogsRequest, opts ...grpc.CallOption) (iterator.PageResponse[*greenplum.LogRecord], error) {
+			resp, err := c.ListLogs(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return clusterServiceListLogsInternal{resp}, nil
 		})
 }
 
@@ -94,25 +113,6 @@ func (c clusterClient) SegmentHostsIterator(ctx context.Context, req *greenplum.
 				return nil, err
 			}
 			return clusterServiceListSegmentHostsInternal{resp}, nil
-		})
-}
-
-type clusterServiceListLogsInternal struct {
-	*greenplum.ListClusterLogsResponse
-}
-
-func (r clusterServiceListLogsInternal) Items() []*greenplum.LogRecord {
-	return r.ListClusterLogsResponse.Logs
-}
-
-func (c clusterClient) LogsIterator(ctx context.Context, req *greenplum.ListClusterLogsRequest, opts ...grpc.CallOption) *iterator.Iterator[*greenplum.ListClusterLogsRequest, *greenplum.LogRecord] {
-	return iterator.NewIterator[*greenplum.ListClusterLogsRequest, *greenplum.LogRecord](ctx, req,
-		func(ctx context.Context, req *greenplum.ListClusterLogsRequest, opts ...grpc.CallOption) (iterator.PageResponse[*greenplum.LogRecord], error) {
-			resp, err := c.ListLogs(ctx, req, opts...)
-			if err != nil {
-				return nil, err
-			}
-			return clusterServiceListLogsInternal{resp}, nil
 		})
 }
 
