@@ -27,6 +27,7 @@ type SecretClient interface {
 	Deactivate(context.Context, *lockbox.DeactivateSecretRequest, ...grpc.CallOption) (*SecretDeactivateOperation, error)
 	ListVersions(context.Context, *lockbox.ListVersionsRequest, ...grpc.CallOption) (*lockbox.ListVersionsResponse, error)
 	AddVersion(context.Context, *lockbox.AddVersionRequest, ...grpc.CallOption) (*SecretAddVersionOperation, error)
+	SetCurrentVersion(context.Context, *lockbox.SetCurrentVersionRequest, ...grpc.CallOption) (*SecretSetCurrentVersionOperation, error)
 	ScheduleVersionDestruction(context.Context, *lockbox.ScheduleVersionDestructionRequest, ...grpc.CallOption) (*SecretScheduleVersionDestructionOperation, error)
 	CancelVersionDestruction(context.Context, *lockbox.CancelVersionDestructionRequest, ...grpc.CallOption) (*SecretCancelVersionDestructionOperation, error)
 	ListOperations(context.Context, *lockbox.ListSecretOperationsRequest, ...grpc.CallOption) (*lockbox.ListSecretOperationsResponse, error)
@@ -397,6 +398,60 @@ func (c secretClient) AddVersion(ctx context.Context, in *lockbox.AddVersionRequ
 	return &SecretAddVersionOperation{*op}, nil
 }
 
+// SecretSetCurrentVersionOperation is used to monitor the state of SetCurrentVersion operations.
+type SecretSetCurrentVersionOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *SecretSetCurrentVersionOperation) Metadata() *lockbox.SetCurrentVersionMetadata {
+	return o.Operation.Metadata().(*lockbox.SetCurrentVersionMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *SecretSetCurrentVersionOperation) Response() *lockbox.Version {
+	return o.Operation.Response().(*lockbox.Version)
+}
+
+// Wait polls the operation until it's done.
+func (o *SecretSetCurrentVersionOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*lockbox.Version, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*lockbox.Version)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *SecretSetCurrentVersionOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*lockbox.Version, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*lockbox.Version)
+	return response, err
+}
+
+// SetCurrentVersion is an operation of Yandex.Cloud Lockbox Secret service.
+// It returns an object which should be used to monitor the operation state.
+func (c secretClient) SetCurrentVersion(ctx context.Context, in *lockbox.SetCurrentVersionRequest, opts ...grpc.CallOption) (*SecretSetCurrentVersionOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, SecretSetCurrentVersion, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := lockbox.NewSecretServiceClient(connection).SetCurrentVersion(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*lockbox.SetCurrentVersionMetadata).GetSecretId()
+		},
+		MetadataType: (*lockbox.SetCurrentVersionMetadata)(nil),
+		ResponseType: (*lockbox.Version)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &SecretSetCurrentVersionOperation{*op}, nil
+}
+
 // SecretScheduleVersionDestructionOperation is used to monitor the state of ScheduleVersionDestruction operations.
 type SecretScheduleVersionDestructionOperation struct {
 	sdkop.Operation
@@ -644,6 +699,7 @@ var (
 	SecretDeactivate                 = protoreflect.FullName("yandex.cloud.lockbox.v1.SecretService.Deactivate")
 	SecretListVersions               = protoreflect.FullName("yandex.cloud.lockbox.v1.SecretService.ListVersions")
 	SecretAddVersion                 = protoreflect.FullName("yandex.cloud.lockbox.v1.SecretService.AddVersion")
+	SecretSetCurrentVersion          = protoreflect.FullName("yandex.cloud.lockbox.v1.SecretService.SetCurrentVersion")
 	SecretScheduleVersionDestruction = protoreflect.FullName("yandex.cloud.lockbox.v1.SecretService.ScheduleVersionDestruction")
 	SecretCancelVersionDestruction   = protoreflect.FullName("yandex.cloud.lockbox.v1.SecretService.CancelVersionDestruction")
 	SecretListOperations             = protoreflect.FullName("yandex.cloud.lockbox.v1.SecretService.ListOperations")
