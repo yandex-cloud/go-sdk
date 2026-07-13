@@ -566,6 +566,15 @@ func (c *SecretServiceClient) SetAccessBindings(ctx context.Context, in *access.
 	return lockbox.NewSecretServiceClient(conn).SetAccessBindings(ctx, in, opts...)
 }
 
+// SetCurrentVersion implements lockbox.SecretServiceClient
+func (c *SecretServiceClient) SetCurrentVersion(ctx context.Context, in *lockbox.SetCurrentVersionRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return lockbox.NewSecretServiceClient(conn).SetCurrentVersion(ctx, in, opts...)
+}
+
 // Update implements lockbox.SecretServiceClient
 func (c *SecretServiceClient) Update(ctx context.Context, in *lockbox.UpdateSecretRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
