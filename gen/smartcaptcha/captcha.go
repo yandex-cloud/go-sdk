@@ -47,6 +47,15 @@ func (c *CaptchaServiceClient) Get(ctx context.Context, in *smartcaptcha.GetCapt
 	return smartcaptcha.NewCaptchaServiceClient(conn).Get(ctx, in, opts...)
 }
 
+// GetKeys implements smartcaptcha.CaptchaServiceClient
+func (c *CaptchaServiceClient) GetKeys(ctx context.Context, in *smartcaptcha.GetCaptchaRequest, opts ...grpc.CallOption) (*smartcaptcha.CaptchaKeys, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return smartcaptcha.NewCaptchaServiceClient(conn).GetKeys(ctx, in, opts...)
+}
+
 // GetSecretKey implements smartcaptcha.CaptchaServiceClient
 func (c *CaptchaServiceClient) GetSecretKey(ctx context.Context, in *smartcaptcha.GetCaptchaRequest, opts ...grpc.CallOption) (*smartcaptcha.CaptchaSecretKey, error) {
 	conn, err := c.getConn(ctx)
