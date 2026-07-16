@@ -3,8 +3,8 @@ module github.com/yandex-cloud/go-sdk/services/mdb/clickhouse
 go 1.25.10
 
 require (
-	github.com/yandex-cloud/go-genproto v0.95.0
-	github.com/yandex-cloud/go-sdk/v2 v2.134.0
+	github.com/yandex-cloud/go-genproto v0.96.0
+	github.com/yandex-cloud/go-sdk/v2 v2.136.0
 	google.golang.org/grpc v1.74.0-dev
 	google.golang.org/protobuf v1.36.6
 )

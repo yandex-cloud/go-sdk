@@ -14,8 +14,8 @@ import (
 type ClusterClientIterator interface {
 	Iterator(context.Context, *k8s.ListClustersRequest, ...grpc.CallOption) *iterator.Iterator[*k8s.ListClustersRequest, *k8s.Cluster]
 	NodeGroupsIterator(context.Context, *k8s.ListClusterNodeGroupsRequest, ...grpc.CallOption) *iterator.Iterator[*k8s.ListClusterNodeGroupsRequest, *k8s.NodeGroup]
-	OperationsIterator(context.Context, *k8s.ListClusterOperationsRequest, ...grpc.CallOption) *iterator.Iterator[*k8s.ListClusterOperationsRequest, *operation.Operation]
 	NodesIterator(context.Context, *k8s.ListClusterNodesRequest, ...grpc.CallOption) *iterator.Iterator[*k8s.ListClusterNodesRequest, *k8s.Node]
+	OperationsIterator(context.Context, *k8s.ListClusterOperationsRequest, ...grpc.CallOption) *iterator.Iterator[*k8s.ListClusterOperationsRequest, *operation.Operation]
 	AccessBindingsIterator(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) *iterator.Iterator[*access.ListAccessBindingsRequest, *access.AccessBinding]
 }
 
@@ -55,6 +55,23 @@ func (c clusterClient) NodeGroupsIterator(ctx context.Context, req *k8s.ListClus
 		})
 }
 
+type clusterServiceListNodesInternal struct {
+	*k8s.ListClusterNodesResponse
+}
+
+func (r clusterServiceListNodesInternal) Items() []*k8s.Node { return r.ListClusterNodesResponse.Nodes }
+
+func (c clusterClient) NodesIterator(ctx context.Context, req *k8s.ListClusterNodesRequest, opts ...grpc.CallOption) *iterator.Iterator[*k8s.ListClusterNodesRequest, *k8s.Node] {
+	return iterator.NewIterator[*k8s.ListClusterNodesRequest, *k8s.Node](ctx, req,
+		func(ctx context.Context, req *k8s.ListClusterNodesRequest, opts ...grpc.CallOption) (iterator.PageResponse[*k8s.Node], error) {
+			resp, err := c.ListNodes(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return clusterServiceListNodesInternal{resp}, nil
+		})
+}
+
 type clusterServiceListOperationsInternal struct {
 	*k8s.ListClusterOperationsResponse
 }
@@ -71,23 +88,6 @@ func (c clusterClient) OperationsIterator(ctx context.Context, req *k8s.ListClus
 				return nil, err
 			}
 			return clusterServiceListOperationsInternal{resp}, nil
-		})
-}
-
-type clusterServiceListNodesInternal struct {
-	*k8s.ListClusterNodesResponse
-}
-
-func (r clusterServiceListNodesInternal) Items() []*k8s.Node { return r.ListClusterNodesResponse.Nodes }
-
-func (c clusterClient) NodesIterator(ctx context.Context, req *k8s.ListClusterNodesRequest, opts ...grpc.CallOption) *iterator.Iterator[*k8s.ListClusterNodesRequest, *k8s.Node] {
-	return iterator.NewIterator[*k8s.ListClusterNodesRequest, *k8s.Node](ctx, req,
-		func(ctx context.Context, req *k8s.ListClusterNodesRequest, opts ...grpc.CallOption) (iterator.PageResponse[*k8s.Node], error) {
-			resp, err := c.ListNodes(ctx, req, opts...)
-			if err != nil {
-				return nil, err
-			}
-			return clusterServiceListNodesInternal{resp}, nil
 		})
 }
 

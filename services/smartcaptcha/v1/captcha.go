@@ -18,6 +18,7 @@ type CaptchaClient interface {
 	CaptchaClientIterator
 	Get(context.Context, *smartcaptcha.GetCaptchaRequest, ...grpc.CallOption) (*smartcaptcha.Captcha, error)
 	GetSecretKey(context.Context, *smartcaptcha.GetCaptchaRequest, ...grpc.CallOption) (*smartcaptcha.CaptchaSecretKey, error)
+	GetKeys(context.Context, *smartcaptcha.GetCaptchaRequest, ...grpc.CallOption) (*smartcaptcha.CaptchaKeys, error)
 	Create(context.Context, *smartcaptcha.CreateCaptchaRequest, ...grpc.CallOption) (*CaptchaCreateOperation, error)
 	Delete(context.Context, *smartcaptcha.DeleteCaptchaRequest, ...grpc.CallOption) (*CaptchaDeleteOperation, error)
 	Update(context.Context, *smartcaptcha.UpdateCaptchaRequest, ...grpc.CallOption) (*CaptchaUpdateOperation, error)
@@ -51,6 +52,15 @@ func (c captchaClient) GetSecretKey(ctx context.Context, in *smartcaptcha.GetCap
 		return nil, err
 	}
 	return smartcaptcha.NewCaptchaServiceClient(connection).GetSecretKey(ctx, in, opts...)
+}
+
+// GetKeys is an operation of Yandex.Cloud Smartcaptcha Captcha service.
+func (c captchaClient) GetKeys(ctx context.Context, in *smartcaptcha.GetCaptchaRequest, opts ...grpc.CallOption) (*smartcaptcha.CaptchaKeys, error) {
+	connection, err := c.connector.GetConnection(ctx, CaptchaGetKeys, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return smartcaptcha.NewCaptchaServiceClient(connection).GetKeys(ctx, in, opts...)
 }
 
 // CaptchaCreateOperation is used to monitor the state of Create operations.
@@ -236,6 +246,7 @@ func (c captchaClient) pollOperation(ctx context.Context, operationId string, op
 var (
 	CaptchaGet             = protoreflect.FullName("yandex.cloud.smartcaptcha.v1.CaptchaService.Get")
 	CaptchaGetSecretKey    = protoreflect.FullName("yandex.cloud.smartcaptcha.v1.CaptchaService.GetSecretKey")
+	CaptchaGetKeys         = protoreflect.FullName("yandex.cloud.smartcaptcha.v1.CaptchaService.GetKeys")
 	CaptchaCreate          = protoreflect.FullName("yandex.cloud.smartcaptcha.v1.CaptchaService.Create")
 	CaptchaDelete          = protoreflect.FullName("yandex.cloud.smartcaptcha.v1.CaptchaService.Delete")
 	CaptchaUpdate          = protoreflect.FullName("yandex.cloud.smartcaptcha.v1.CaptchaService.Update")

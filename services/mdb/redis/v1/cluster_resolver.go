@@ -44,8 +44,8 @@ func ClusterLogsResolver(name string, client ClusterClient, opts ...sdkresolvers
 func (r *clusterLogsResolver) Run(ctx context.Context) error {
 	resp := r.client.LogsIterator(ctx, &redis.ListClusterLogsRequest{
 		ClusterId: r.ClusterID(),
-
-		PageSize: sdkresolvers.DefaultResolverPageSize,
+		Filter:    sdkresolvers.CreateResolverFilter("name", r.Name),
+		PageSize:  sdkresolvers.DefaultResolverPageSize,
 	})
 	return r.FindName(resp.TakeAll())
 }

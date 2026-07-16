@@ -50,27 +50,6 @@ func (r *clusterNodeGroupsResolver) Run(ctx context.Context) error {
 	return r.FindName(resp.TakeAll())
 }
 
-type clusterOperationsResolver struct {
-	client ClusterClient
-	sdkresolvers.BaseNameResolver
-}
-
-func ClusterOperationsResolver(name string, client ClusterClient, opts ...sdkresolvers.ResolveOption) sdkresolvers.Resolver {
-	return &clusterOperationsResolver{
-		client:           client,
-		BaseNameResolver: sdkresolvers.NewBaseNameResolver(name, "ClusterOperations", opts...),
-	}
-}
-
-func (r *clusterOperationsResolver) Run(ctx context.Context) error {
-	resp := r.client.OperationsIterator(ctx, &k8s.ListClusterOperationsRequest{
-		ClusterId: r.ClusterID(),
-		Filter:    sdkresolvers.CreateResolverFilter("name", r.Name),
-		PageSize:  sdkresolvers.DefaultResolverPageSize,
-	})
-	return r.FindName(resp.TakeAll())
-}
-
 type clusterNodesResolver struct {
 	client ClusterClient
 	sdkresolvers.BaseNameResolver
@@ -88,6 +67,27 @@ func (r *clusterNodesResolver) Run(ctx context.Context) error {
 		ClusterId: r.ClusterID(),
 
 		PageSize: sdkresolvers.DefaultResolverPageSize,
+	})
+	return r.FindName(resp.TakeAll())
+}
+
+type clusterOperationsResolver struct {
+	client ClusterClient
+	sdkresolvers.BaseNameResolver
+}
+
+func ClusterOperationsResolver(name string, client ClusterClient, opts ...sdkresolvers.ResolveOption) sdkresolvers.Resolver {
+	return &clusterOperationsResolver{
+		client:           client,
+		BaseNameResolver: sdkresolvers.NewBaseNameResolver(name, "ClusterOperations", opts...),
+	}
+}
+
+func (r *clusterOperationsResolver) Run(ctx context.Context) error {
+	resp := r.client.OperationsIterator(ctx, &k8s.ListClusterOperationsRequest{
+		ClusterId: r.ClusterID(),
+		Filter:    sdkresolvers.CreateResolverFilter("name", r.Name),
+		PageSize:  sdkresolvers.DefaultResolverPageSize,
 	})
 	return r.FindName(resp.TakeAll())
 }

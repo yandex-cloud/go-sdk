@@ -27,8 +27,8 @@ type ClusterClient interface {
 	Start(context.Context, *k8s.StartClusterRequest, ...grpc.CallOption) (*ClusterStartOperation, error)
 	RescheduleMaintenance(context.Context, *k8s.RescheduleMaintenanceRequest, ...grpc.CallOption) (*ClusterRescheduleMaintenanceOperation, error)
 	ListNodeGroups(context.Context, *k8s.ListClusterNodeGroupsRequest, ...grpc.CallOption) (*k8s.ListClusterNodeGroupsResponse, error)
-	ListOperations(context.Context, *k8s.ListClusterOperationsRequest, ...grpc.CallOption) (*k8s.ListClusterOperationsResponse, error)
 	ListNodes(context.Context, *k8s.ListClusterNodesRequest, ...grpc.CallOption) (*k8s.ListClusterNodesResponse, error)
+	ListOperations(context.Context, *k8s.ListClusterOperationsRequest, ...grpc.CallOption) (*k8s.ListClusterOperationsResponse, error)
 	ListAccessBindings(context.Context, *access.ListAccessBindingsRequest, ...grpc.CallOption) (*access.ListAccessBindingsResponse, error)
 	SetAccessBindings(context.Context, *access.SetAccessBindingsRequest, ...grpc.CallOption) (*ClusterSetAccessBindingsOperation, error)
 	UpdateAccessBindings(context.Context, *access.UpdateAccessBindingsRequest, ...grpc.CallOption) (*ClusterUpdateAccessBindingsOperation, error)
@@ -396,15 +396,6 @@ func (c clusterClient) ListNodeGroups(ctx context.Context, in *k8s.ListClusterNo
 	return k8s.NewClusterServiceClient(connection).ListNodeGroups(ctx, in, opts...)
 }
 
-// ListOperations is an operation of Yandex.Cloud K8s Cluster service.
-func (c clusterClient) ListOperations(ctx context.Context, in *k8s.ListClusterOperationsRequest, opts ...grpc.CallOption) (*k8s.ListClusterOperationsResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, ClusterListOperations, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return k8s.NewClusterServiceClient(connection).ListOperations(ctx, in, opts...)
-}
-
 // ListNodes is an operation of Yandex.Cloud K8s Cluster service.
 func (c clusterClient) ListNodes(ctx context.Context, in *k8s.ListClusterNodesRequest, opts ...grpc.CallOption) (*k8s.ListClusterNodesResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, ClusterListNodes, opts...)
@@ -412,6 +403,15 @@ func (c clusterClient) ListNodes(ctx context.Context, in *k8s.ListClusterNodesRe
 		return nil, err
 	}
 	return k8s.NewClusterServiceClient(connection).ListNodes(ctx, in, opts...)
+}
+
+// ListOperations is an operation of Yandex.Cloud K8s Cluster service.
+func (c clusterClient) ListOperations(ctx context.Context, in *k8s.ListClusterOperationsRequest, opts ...grpc.CallOption) (*k8s.ListClusterOperationsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, ClusterListOperations, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return k8s.NewClusterServiceClient(connection).ListOperations(ctx, in, opts...)
 }
 
 // ListAccessBindings is an operation of Yandex.Cloud K8s Cluster service.
@@ -544,8 +544,8 @@ var (
 	ClusterStart                 = protoreflect.FullName("yandex.cloud.k8s.v1.ClusterService.Start")
 	ClusterRescheduleMaintenance = protoreflect.FullName("yandex.cloud.k8s.v1.ClusterService.RescheduleMaintenance")
 	ClusterListNodeGroups        = protoreflect.FullName("yandex.cloud.k8s.v1.ClusterService.ListNodeGroups")
-	ClusterListOperations        = protoreflect.FullName("yandex.cloud.k8s.v1.ClusterService.ListOperations")
 	ClusterListNodes             = protoreflect.FullName("yandex.cloud.k8s.v1.ClusterService.ListNodes")
+	ClusterListOperations        = protoreflect.FullName("yandex.cloud.k8s.v1.ClusterService.ListOperations")
 	ClusterListAccessBindings    = protoreflect.FullName("yandex.cloud.k8s.v1.ClusterService.ListAccessBindings")
 	ClusterSetAccessBindings     = protoreflect.FullName("yandex.cloud.k8s.v1.ClusterService.SetAccessBindings")
 	ClusterUpdateAccessBindings  = protoreflect.FullName("yandex.cloud.k8s.v1.ClusterService.UpdateAccessBindings")
