@@ -18,6 +18,7 @@ type SynchronizationClient interface {
 	SynchronizationClientIterator
 	SetReplicationToken(context.Context, *idp.SetReplicationTokenRequest, ...grpc.CallOption) (*SynchronizationSetReplicationTokenOperation, error)
 	ResetReplicationToken(context.Context, *idp.ResetReplicationTokenRequest, ...grpc.CallOption) (*SynchronizationResetReplicationTokenOperation, error)
+	GetReplicationToken(context.Context, *idp.GetReplicationTokenRequest, ...grpc.CallOption) (*idp.GetReplicationTokenResponse, error)
 	CreateSynchronizationSettings(context.Context, *idp.CreateSynchronizationSettingsRequest, ...grpc.CallOption) (*SynchronizationCreateSynchronizationSettingsOperation, error)
 	UpdateSynchronizationSettings(context.Context, *idp.UpdateSynchronizationSettingsRequest, ...grpc.CallOption) (*SynchronizationUpdateSynchronizationSettingsOperation, error)
 	DeleteSynchronizationSettings(context.Context, *idp.DeleteSynchronizationSettingsRequest, ...grpc.CallOption) (*SynchronizationDeleteSynchronizationSettingsOperation, error)
@@ -136,6 +137,15 @@ func (c synchronizationClient) ResetReplicationToken(ctx context.Context, in *id
 		return nil, err
 	}
 	return &SynchronizationResetReplicationTokenOperation{*op}, nil
+}
+
+// GetReplicationToken is an operation of Yandex.Cloud Idp Synchronization service.
+func (c synchronizationClient) GetReplicationToken(ctx context.Context, in *idp.GetReplicationTokenRequest, opts ...grpc.CallOption) (*idp.GetReplicationTokenResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, SynchronizationGetReplicationToken, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return idp.NewSynchronizationServiceClient(connection).GetReplicationToken(ctx, in, opts...)
 }
 
 // SynchronizationCreateSynchronizationSettingsOperation is used to monitor the state of CreateSynchronizationSettings operations.
@@ -321,6 +331,7 @@ func (c synchronizationClient) pollOperation(ctx context.Context, operationId st
 var (
 	SynchronizationSetReplicationToken           = protoreflect.FullName("yandex.cloud.organizationmanager.v1.idp.SynchronizationService.SetReplicationToken")
 	SynchronizationResetReplicationToken         = protoreflect.FullName("yandex.cloud.organizationmanager.v1.idp.SynchronizationService.ResetReplicationToken")
+	SynchronizationGetReplicationToken           = protoreflect.FullName("yandex.cloud.organizationmanager.v1.idp.SynchronizationService.GetReplicationToken")
 	SynchronizationCreateSynchronizationSettings = protoreflect.FullName("yandex.cloud.organizationmanager.v1.idp.SynchronizationService.CreateSynchronizationSettings")
 	SynchronizationUpdateSynchronizationSettings = protoreflect.FullName("yandex.cloud.organizationmanager.v1.idp.SynchronizationService.UpdateSynchronizationSettings")
 	SynchronizationDeleteSynchronizationSettings = protoreflect.FullName("yandex.cloud.organizationmanager.v1.idp.SynchronizationService.DeleteSynchronizationSettings")
