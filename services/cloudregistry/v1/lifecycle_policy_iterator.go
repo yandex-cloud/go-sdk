@@ -11,6 +11,8 @@ import (
 
 type LifecyclePolicyClientIterator interface {
 	Iterator(context.Context, *cloudregistry.ListLifecyclePolicyRequest, ...grpc.CallOption) *iterator.Iterator[*cloudregistry.ListLifecyclePolicyRequest, *cloudregistry.LifecyclePolicy]
+	DryRunResultsIterator(context.Context, *cloudregistry.ListDryRunLifecyclePolicyResultsRequest, ...grpc.CallOption) *iterator.Iterator[*cloudregistry.ListDryRunLifecyclePolicyResultsRequest, *cloudregistry.DryRunLifecyclePolicyResponse]
+	DryRunArtifactsIterator(context.Context, *cloudregistry.ListDryRunLifecyclePolicyArtifactsRequest, ...grpc.CallOption) *iterator.Iterator[*cloudregistry.ListDryRunLifecyclePolicyArtifactsRequest, *cloudregistry.AffectedArtifact]
 }
 
 type lifecyclePolicyServiceListInternal struct {
@@ -29,5 +31,43 @@ func (c lifecyclePolicyClient) Iterator(ctx context.Context, req *cloudregistry.
 				return nil, err
 			}
 			return lifecyclePolicyServiceListInternal{resp}, nil
+		})
+}
+
+type lifecyclePolicyServiceListDryRunResultsInternal struct {
+	*cloudregistry.ListDryRunLifecyclePolicyResultsResponse
+}
+
+func (r lifecyclePolicyServiceListDryRunResultsInternal) Items() []*cloudregistry.DryRunLifecyclePolicyResponse {
+	return r.ListDryRunLifecyclePolicyResultsResponse.Results
+}
+
+func (c lifecyclePolicyClient) DryRunResultsIterator(ctx context.Context, req *cloudregistry.ListDryRunLifecyclePolicyResultsRequest, opts ...grpc.CallOption) *iterator.Iterator[*cloudregistry.ListDryRunLifecyclePolicyResultsRequest, *cloudregistry.DryRunLifecyclePolicyResponse] {
+	return iterator.NewIterator[*cloudregistry.ListDryRunLifecyclePolicyResultsRequest, *cloudregistry.DryRunLifecyclePolicyResponse](ctx, req,
+		func(ctx context.Context, req *cloudregistry.ListDryRunLifecyclePolicyResultsRequest, opts ...grpc.CallOption) (iterator.PageResponse[*cloudregistry.DryRunLifecyclePolicyResponse], error) {
+			resp, err := c.ListDryRunResults(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return lifecyclePolicyServiceListDryRunResultsInternal{resp}, nil
+		})
+}
+
+type lifecyclePolicyServiceListDryRunArtifactsInternal struct {
+	*cloudregistry.ListDryRunLifecyclePolicyArtifactsResponse
+}
+
+func (r lifecyclePolicyServiceListDryRunArtifactsInternal) Items() []*cloudregistry.AffectedArtifact {
+	return r.ListDryRunLifecyclePolicyArtifactsResponse.Artifacts
+}
+
+func (c lifecyclePolicyClient) DryRunArtifactsIterator(ctx context.Context, req *cloudregistry.ListDryRunLifecyclePolicyArtifactsRequest, opts ...grpc.CallOption) *iterator.Iterator[*cloudregistry.ListDryRunLifecyclePolicyArtifactsRequest, *cloudregistry.AffectedArtifact] {
+	return iterator.NewIterator[*cloudregistry.ListDryRunLifecyclePolicyArtifactsRequest, *cloudregistry.AffectedArtifact](ctx, req,
+		func(ctx context.Context, req *cloudregistry.ListDryRunLifecyclePolicyArtifactsRequest, opts ...grpc.CallOption) (iterator.PageResponse[*cloudregistry.AffectedArtifact], error) {
+			resp, err := c.ListDryRunArtifacts(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return lifecyclePolicyServiceListDryRunArtifactsInternal{resp}, nil
 		})
 }

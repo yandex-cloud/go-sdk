@@ -23,6 +23,9 @@ type LifecyclePolicyClient interface {
 	List(context.Context, *cloudregistry.ListLifecyclePolicyRequest, ...grpc.CallOption) (*cloudregistry.ListLifecyclePolicyResponse, error)
 	ChangeState(context.Context, *cloudregistry.ChangeLifecyclePolicyStateRequest, ...grpc.CallOption) (*emptypb.Empty, error)
 	DryRun(context.Context, *cloudregistry.DryRunLifecyclePolicyRequest, ...grpc.CallOption) (*LifecyclePolicyDryRunOperation, error)
+	GetDryRunResult(context.Context, *cloudregistry.GetDryRunLifecyclePolicyResultRequest, ...grpc.CallOption) (*cloudregistry.DryRunLifecyclePolicyResponse, error)
+	ListDryRunResults(context.Context, *cloudregistry.ListDryRunLifecyclePolicyResultsRequest, ...grpc.CallOption) (*cloudregistry.ListDryRunLifecyclePolicyResultsResponse, error)
+	ListDryRunArtifacts(context.Context, *cloudregistry.ListDryRunLifecyclePolicyArtifactsRequest, ...grpc.CallOption) (*cloudregistry.ListDryRunLifecyclePolicyArtifactsResponse, error)
 }
 
 var _ LifecyclePolicyClient = lifecyclePolicyClient{}
@@ -267,6 +270,33 @@ func (c lifecyclePolicyClient) DryRun(ctx context.Context, in *cloudregistry.Dry
 	return &LifecyclePolicyDryRunOperation{*op}, nil
 }
 
+// GetDryRunResult is an operation of Yandex.Cloud Cloudregistry LifecyclePolicy service.
+func (c lifecyclePolicyClient) GetDryRunResult(ctx context.Context, in *cloudregistry.GetDryRunLifecyclePolicyResultRequest, opts ...grpc.CallOption) (*cloudregistry.DryRunLifecyclePolicyResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, LifecyclePolicyGetDryRunResult, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return cloudregistry.NewLifecyclePolicyServiceClient(connection).GetDryRunResult(ctx, in, opts...)
+}
+
+// ListDryRunResults is an operation of Yandex.Cloud Cloudregistry LifecyclePolicy service.
+func (c lifecyclePolicyClient) ListDryRunResults(ctx context.Context, in *cloudregistry.ListDryRunLifecyclePolicyResultsRequest, opts ...grpc.CallOption) (*cloudregistry.ListDryRunLifecyclePolicyResultsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, LifecyclePolicyListDryRunResults, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return cloudregistry.NewLifecyclePolicyServiceClient(connection).ListDryRunResults(ctx, in, opts...)
+}
+
+// ListDryRunArtifacts is an operation of Yandex.Cloud Cloudregistry LifecyclePolicy service.
+func (c lifecyclePolicyClient) ListDryRunArtifacts(ctx context.Context, in *cloudregistry.ListDryRunLifecyclePolicyArtifactsRequest, opts ...grpc.CallOption) (*cloudregistry.ListDryRunLifecyclePolicyArtifactsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, LifecyclePolicyListDryRunArtifacts, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return cloudregistry.NewLifecyclePolicyServiceClient(connection).ListDryRunArtifacts(ctx, in, opts...)
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c lifecyclePolicyClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, LifecyclePolicyOperationPoller, opts...)
@@ -277,12 +307,15 @@ func (c lifecyclePolicyClient) pollOperation(ctx context.Context, operationId st
 }
 
 var (
-	LifecyclePolicyCreate          = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.Create")
-	LifecyclePolicyUpdate          = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.Update")
-	LifecyclePolicyDelete          = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.Delete")
-	LifecyclePolicyGet             = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.Get")
-	LifecyclePolicyList            = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.List")
-	LifecyclePolicyChangeState     = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.ChangeState")
-	LifecyclePolicyDryRun          = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.DryRun")
-	LifecyclePolicyOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
+	LifecyclePolicyCreate              = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.Create")
+	LifecyclePolicyUpdate              = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.Update")
+	LifecyclePolicyDelete              = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.Delete")
+	LifecyclePolicyGet                 = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.Get")
+	LifecyclePolicyList                = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.List")
+	LifecyclePolicyChangeState         = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.ChangeState")
+	LifecyclePolicyDryRun              = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.DryRun")
+	LifecyclePolicyGetDryRunResult     = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.GetDryRunResult")
+	LifecyclePolicyListDryRunResults   = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.ListDryRunResults")
+	LifecyclePolicyListDryRunArtifacts = protoreflect.FullName("yandex.cloud.cloudregistry.v1.LifecyclePolicyService.ListDryRunArtifacts")
+	LifecyclePolicyOperationPoller     = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
