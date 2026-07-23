@@ -66,6 +66,15 @@ func (c *LifecyclePolicyServiceClient) Get(ctx context.Context, in *cloudregistr
 	return cloudregistry.NewLifecyclePolicyServiceClient(conn).Get(ctx, in, opts...)
 }
 
+// GetDryRunResult implements cloudregistry.LifecyclePolicyServiceClient
+func (c *LifecyclePolicyServiceClient) GetDryRunResult(ctx context.Context, in *cloudregistry.GetDryRunLifecyclePolicyResultRequest, opts ...grpc.CallOption) (*cloudregistry.DryRunLifecyclePolicyResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudregistry.NewLifecyclePolicyServiceClient(conn).GetDryRunResult(ctx, in, opts...)
+}
+
 // List implements cloudregistry.LifecyclePolicyServiceClient
 func (c *LifecyclePolicyServiceClient) List(ctx context.Context, in *cloudregistry.ListLifecyclePolicyRequest, opts ...grpc.CallOption) (*cloudregistry.ListLifecyclePolicyResponse, error) {
 	conn, err := c.getConn(ctx)
@@ -179,6 +188,238 @@ func (it *LifecyclePolicyIterator) Value() *cloudregistry.LifecyclePolicy {
 }
 
 func (it *LifecyclePolicyIterator) Error() error {
+	return it.err
+}
+
+// ListDryRunArtifacts implements cloudregistry.LifecyclePolicyServiceClient
+func (c *LifecyclePolicyServiceClient) ListDryRunArtifacts(ctx context.Context, in *cloudregistry.ListDryRunLifecyclePolicyArtifactsRequest, opts ...grpc.CallOption) (*cloudregistry.ListDryRunLifecyclePolicyArtifactsResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudregistry.NewLifecyclePolicyServiceClient(conn).ListDryRunArtifacts(ctx, in, opts...)
+}
+
+type LifecyclePolicyDryRunArtifactsIterator struct {
+	ctx  context.Context
+	opts []grpc.CallOption
+
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
+
+	client  *LifecyclePolicyServiceClient
+	request *cloudregistry.ListDryRunLifecyclePolicyArtifactsRequest
+
+	items []*cloudregistry.AffectedArtifact
+}
+
+func (c *LifecyclePolicyServiceClient) LifecyclePolicyDryRunArtifactsIterator(ctx context.Context, req *cloudregistry.ListDryRunLifecyclePolicyArtifactsRequest, opts ...grpc.CallOption) *LifecyclePolicyDryRunArtifactsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
+	return &LifecyclePolicyDryRunArtifactsIterator{
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
+	}
+}
+
+func (it *LifecyclePolicyDryRunArtifactsIterator) Next() bool {
+	if it.err != nil {
+		return false
+	}
+	if len(it.items) > 1 {
+		it.items[0] = nil
+		it.items = it.items[1:]
+		return true
+	}
+	it.items = nil // consume last item, if any
+
+	if it.started && it.request.PageToken == "" {
+		return false
+	}
+	it.started = true
+
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
+	response, err := it.client.ListDryRunArtifacts(it.ctx, it.request, it.opts...)
+	it.err = err
+	if err != nil {
+		return false
+	}
+
+	it.items = response.Artifacts
+	it.request.PageToken = response.NextPageToken
+	return len(it.items) > 0
+}
+
+func (it *LifecyclePolicyDryRunArtifactsIterator) Take(size int64) ([]*cloudregistry.AffectedArtifact, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*cloudregistry.AffectedArtifact
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *LifecyclePolicyDryRunArtifactsIterator) TakeAll() ([]*cloudregistry.AffectedArtifact, error) {
+	return it.Take(0)
+}
+
+func (it *LifecyclePolicyDryRunArtifactsIterator) Value() *cloudregistry.AffectedArtifact {
+	if len(it.items) == 0 {
+		panic("calling Value on empty iterator")
+	}
+	return it.items[0]
+}
+
+func (it *LifecyclePolicyDryRunArtifactsIterator) Error() error {
+	return it.err
+}
+
+// ListDryRunResults implements cloudregistry.LifecyclePolicyServiceClient
+func (c *LifecyclePolicyServiceClient) ListDryRunResults(ctx context.Context, in *cloudregistry.ListDryRunLifecyclePolicyResultsRequest, opts ...grpc.CallOption) (*cloudregistry.ListDryRunLifecyclePolicyResultsResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudregistry.NewLifecyclePolicyServiceClient(conn).ListDryRunResults(ctx, in, opts...)
+}
+
+type LifecyclePolicyDryRunResultsIterator struct {
+	ctx  context.Context
+	opts []grpc.CallOption
+
+	err           error
+	started       bool
+	requestedSize int64
+	pageSize      int64
+
+	client  *LifecyclePolicyServiceClient
+	request *cloudregistry.ListDryRunLifecyclePolicyResultsRequest
+
+	items []*cloudregistry.DryRunLifecyclePolicyResponse
+}
+
+func (c *LifecyclePolicyServiceClient) LifecyclePolicyDryRunResultsIterator(ctx context.Context, req *cloudregistry.ListDryRunLifecyclePolicyResultsRequest, opts ...grpc.CallOption) *LifecyclePolicyDryRunResultsIterator {
+	var pageSize int64
+	const defaultPageSize = 1000
+	pageSize = req.PageSize
+	if pageSize == 0 {
+		pageSize = defaultPageSize
+	}
+	return &LifecyclePolicyDryRunResultsIterator{
+		ctx:      ctx,
+		opts:     opts,
+		client:   c,
+		request:  req,
+		pageSize: pageSize,
+	}
+}
+
+func (it *LifecyclePolicyDryRunResultsIterator) Next() bool {
+	if it.err != nil {
+		return false
+	}
+	if len(it.items) > 1 {
+		it.items[0] = nil
+		it.items = it.items[1:]
+		return true
+	}
+	it.items = nil // consume last item, if any
+
+	if it.started && it.request.PageToken == "" {
+		return false
+	}
+	it.started = true
+
+	if it.requestedSize == 0 || it.requestedSize > it.pageSize {
+		it.request.PageSize = it.pageSize
+	} else {
+		it.request.PageSize = it.requestedSize
+	}
+
+	response, err := it.client.ListDryRunResults(it.ctx, it.request, it.opts...)
+	it.err = err
+	if err != nil {
+		return false
+	}
+
+	it.items = response.Results
+	it.request.PageToken = response.NextPageToken
+	return len(it.items) > 0
+}
+
+func (it *LifecyclePolicyDryRunResultsIterator) Take(size int64) ([]*cloudregistry.DryRunLifecyclePolicyResponse, error) {
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	if size == 0 {
+		size = 1 << 32 // something insanely large
+	}
+	it.requestedSize = size
+	defer func() {
+		// reset iterator for future calls.
+		it.requestedSize = 0
+	}()
+
+	var result []*cloudregistry.DryRunLifecyclePolicyResponse
+
+	for it.requestedSize > 0 && it.Next() {
+		it.requestedSize--
+		result = append(result, it.Value())
+	}
+
+	if it.err != nil {
+		return nil, it.err
+	}
+
+	return result, nil
+}
+
+func (it *LifecyclePolicyDryRunResultsIterator) TakeAll() ([]*cloudregistry.DryRunLifecyclePolicyResponse, error) {
+	return it.Take(0)
+}
+
+func (it *LifecyclePolicyDryRunResultsIterator) Value() *cloudregistry.DryRunLifecyclePolicyResponse {
+	if len(it.items) == 0 {
+		panic("calling Value on empty iterator")
+	}
+	return it.items[0]
+}
+
+func (it *LifecyclePolicyDryRunResultsIterator) Error() error {
 	return it.err
 }
 
