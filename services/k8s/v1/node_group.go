@@ -19,11 +19,11 @@ type NodeGroupClient interface {
 	NodeGroupClientIterator
 	Get(context.Context, *k8s.GetNodeGroupRequest, ...grpc.CallOption) (*k8s.NodeGroup, error)
 	List(context.Context, *k8s.ListNodeGroupsRequest, ...grpc.CallOption) (*k8s.ListNodeGroupsResponse, error)
+	ListNodes(context.Context, *k8s.ListNodeGroupNodesRequest, ...grpc.CallOption) (*k8s.ListNodeGroupNodesResponse, error)
 	Create(context.Context, *k8s.CreateNodeGroupRequest, ...grpc.CallOption) (*NodeGroupCreateOperation, error)
 	Update(context.Context, *k8s.UpdateNodeGroupRequest, ...grpc.CallOption) (*NodeGroupUpdateOperation, error)
 	Delete(context.Context, *k8s.DeleteNodeGroupRequest, ...grpc.CallOption) (*NodeGroupDeleteOperation, error)
 	ListOperations(context.Context, *k8s.ListNodeGroupOperationsRequest, ...grpc.CallOption) (*k8s.ListNodeGroupOperationsResponse, error)
-	ListNodes(context.Context, *k8s.ListNodeGroupNodesRequest, ...grpc.CallOption) (*k8s.ListNodeGroupNodesResponse, error)
 }
 
 var _ NodeGroupClient = nodeGroupClient{}
@@ -53,6 +53,15 @@ func (c nodeGroupClient) List(ctx context.Context, in *k8s.ListNodeGroupsRequest
 		return nil, err
 	}
 	return k8s.NewNodeGroupServiceClient(connection).List(ctx, in, opts...)
+}
+
+// ListNodes is an operation of Yandex.Cloud K8s NodeGroup service.
+func (c nodeGroupClient) ListNodes(ctx context.Context, in *k8s.ListNodeGroupNodesRequest, opts ...grpc.CallOption) (*k8s.ListNodeGroupNodesResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, NodeGroupListNodes, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return k8s.NewNodeGroupServiceClient(connection).ListNodes(ctx, in, opts...)
 }
 
 // NodeGroupCreateOperation is used to monitor the state of Create operations.
@@ -226,15 +235,6 @@ func (c nodeGroupClient) ListOperations(ctx context.Context, in *k8s.ListNodeGro
 	return k8s.NewNodeGroupServiceClient(connection).ListOperations(ctx, in, opts...)
 }
 
-// ListNodes is an operation of Yandex.Cloud K8s NodeGroup service.
-func (c nodeGroupClient) ListNodes(ctx context.Context, in *k8s.ListNodeGroupNodesRequest, opts ...grpc.CallOption) (*k8s.ListNodeGroupNodesResponse, error) {
-	connection, err := c.connector.GetConnection(ctx, NodeGroupListNodes, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return k8s.NewNodeGroupServiceClient(connection).ListNodes(ctx, in, opts...)
-}
-
 // pollOperation returns the current state of the polled operation.
 func (c nodeGroupClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, NodeGroupOperationPoller, opts...)
@@ -247,10 +247,10 @@ func (c nodeGroupClient) pollOperation(ctx context.Context, operationId string, 
 var (
 	NodeGroupGet             = protoreflect.FullName("yandex.cloud.k8s.v1.NodeGroupService.Get")
 	NodeGroupList            = protoreflect.FullName("yandex.cloud.k8s.v1.NodeGroupService.List")
+	NodeGroupListNodes       = protoreflect.FullName("yandex.cloud.k8s.v1.NodeGroupService.ListNodes")
 	NodeGroupCreate          = protoreflect.FullName("yandex.cloud.k8s.v1.NodeGroupService.Create")
 	NodeGroupUpdate          = protoreflect.FullName("yandex.cloud.k8s.v1.NodeGroupService.Update")
 	NodeGroupDelete          = protoreflect.FullName("yandex.cloud.k8s.v1.NodeGroupService.Delete")
 	NodeGroupListOperations  = protoreflect.FullName("yandex.cloud.k8s.v1.NodeGroupService.ListOperations")
-	NodeGroupListNodes       = protoreflect.FullName("yandex.cloud.k8s.v1.NodeGroupService.ListNodes")
 	NodeGroupOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

@@ -12,8 +12,8 @@ import (
 
 type NodeGroupClientIterator interface {
 	Iterator(context.Context, *k8s.ListNodeGroupsRequest, ...grpc.CallOption) *iterator.Iterator[*k8s.ListNodeGroupsRequest, *k8s.NodeGroup]
-	OperationsIterator(context.Context, *k8s.ListNodeGroupOperationsRequest, ...grpc.CallOption) *iterator.Iterator[*k8s.ListNodeGroupOperationsRequest, *operation.Operation]
 	NodesIterator(context.Context, *k8s.ListNodeGroupNodesRequest, ...grpc.CallOption) *iterator.Iterator[*k8s.ListNodeGroupNodesRequest, *k8s.Node]
+	OperationsIterator(context.Context, *k8s.ListNodeGroupOperationsRequest, ...grpc.CallOption) *iterator.Iterator[*k8s.ListNodeGroupOperationsRequest, *operation.Operation]
 }
 
 type nodeGroupServiceListInternal struct {
@@ -35,25 +35,6 @@ func (c nodeGroupClient) Iterator(ctx context.Context, req *k8s.ListNodeGroupsRe
 		})
 }
 
-type nodeGroupServiceListOperationsInternal struct {
-	*k8s.ListNodeGroupOperationsResponse
-}
-
-func (r nodeGroupServiceListOperationsInternal) Items() []*operation.Operation {
-	return r.ListNodeGroupOperationsResponse.Operations
-}
-
-func (c nodeGroupClient) OperationsIterator(ctx context.Context, req *k8s.ListNodeGroupOperationsRequest, opts ...grpc.CallOption) *iterator.Iterator[*k8s.ListNodeGroupOperationsRequest, *operation.Operation] {
-	return iterator.NewIterator[*k8s.ListNodeGroupOperationsRequest, *operation.Operation](ctx, req,
-		func(ctx context.Context, req *k8s.ListNodeGroupOperationsRequest, opts ...grpc.CallOption) (iterator.PageResponse[*operation.Operation], error) {
-			resp, err := c.ListOperations(ctx, req, opts...)
-			if err != nil {
-				return nil, err
-			}
-			return nodeGroupServiceListOperationsInternal{resp}, nil
-		})
-}
-
 type nodeGroupServiceListNodesInternal struct {
 	*k8s.ListNodeGroupNodesResponse
 }
@@ -70,5 +51,24 @@ func (c nodeGroupClient) NodesIterator(ctx context.Context, req *k8s.ListNodeGro
 				return nil, err
 			}
 			return nodeGroupServiceListNodesInternal{resp}, nil
+		})
+}
+
+type nodeGroupServiceListOperationsInternal struct {
+	*k8s.ListNodeGroupOperationsResponse
+}
+
+func (r nodeGroupServiceListOperationsInternal) Items() []*operation.Operation {
+	return r.ListNodeGroupOperationsResponse.Operations
+}
+
+func (c nodeGroupClient) OperationsIterator(ctx context.Context, req *k8s.ListNodeGroupOperationsRequest, opts ...grpc.CallOption) *iterator.Iterator[*k8s.ListNodeGroupOperationsRequest, *operation.Operation] {
+	return iterator.NewIterator[*k8s.ListNodeGroupOperationsRequest, *operation.Operation](ctx, req,
+		func(ctx context.Context, req *k8s.ListNodeGroupOperationsRequest, opts ...grpc.CallOption) (iterator.PageResponse[*operation.Operation], error) {
+			resp, err := c.ListOperations(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return nodeGroupServiceListOperationsInternal{resp}, nil
 		})
 }
