@@ -43,6 +43,11 @@ func (p *PostgreSQL) ManagedRepack() *ManagedRepackServiceClient {
 	return &ManagedRepackServiceClient{getConn: p.getConn}
 }
 
+// PerformanceDiagnostics gets PerformanceDiagnosticsService client
+func (p *PostgreSQL) PerformanceDiagnostics() *PerformanceDiagnosticsServiceClient {
+	return &PerformanceDiagnosticsServiceClient{getConn: p.getConn}
+}
+
 // ResourcePreset gets ResourcePresetService client
 func (p *PostgreSQL) ResourcePreset() *ResourcePresetServiceClient {
 	return &ResourcePresetServiceClient{getConn: p.getConn}
