@@ -27,3 +27,13 @@ func (o *OrganizationManagerIdp) Userpool() *UserpoolServiceClient {
 func (o *OrganizationManagerIdp) User() *UserServiceClient {
 	return &UserServiceClient{getConn: o.getConn}
 }
+
+// Synchronization gets SynchronizationService client
+func (o *OrganizationManagerIdp) Synchronization() *SynchronizationServiceClient {
+	return &SynchronizationServiceClient{getConn: o.getConn}
+}
+
+// SynchronizationSession gets SynchronizationSessionService client
+func (o *OrganizationManagerIdp) SynchronizationSession() *SynchronizationSessionServiceClient {
+	return &SynchronizationSessionServiceClient{getConn: o.getConn}
+}
