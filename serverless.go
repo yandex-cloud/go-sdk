@@ -9,6 +9,7 @@ import (
 	"github.com/yandex-cloud/go-sdk/gen/mcpgateway"
 	"github.com/yandex-cloud/go-sdk/gen/mdbproxy"
 	"github.com/yandex-cloud/go-sdk/gen/triggers"
+	triggersv2 "github.com/yandex-cloud/go-sdk/gen/triggers/v2"
 	"github.com/yandex-cloud/go-sdk/gen/workflows"
 )
 
@@ -35,6 +36,10 @@ func (s *Serverless) Functions() *functions.Function {
 
 func (s *Serverless) Triggers() *triggers.Trigger {
 	return triggers.NewTrigger(s.sdk.getConn(TriggerServiceID))
+}
+
+func (s *Serverless) TriggersV2() *triggersv2.Trigger {
+	return triggersv2.NewTrigger(s.sdk.getConn(TriggerServiceID))
 }
 
 func (s *Serverless) APIGateway() *apigateway.Apigateway {
