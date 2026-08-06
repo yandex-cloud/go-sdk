@@ -23,6 +23,7 @@ type ServerClient interface {
 	BatchCreateServers(context.Context, *baremetal.BatchCreateServersRequest, ...grpc.CallOption) (*ServerBatchCreateServersOperation, error)
 	UpdateServer(context.Context, *baremetal.UpdateServerRequest, ...grpc.CallOption) (*ServerUpdateServerOperation, error)
 	DeleteServer(context.Context, *baremetal.DeleteServerRequest, ...grpc.CallOption) (*ServerDeleteServerOperation, error)
+	SkipQuarantineServer(context.Context, *baremetal.SkipQuarantineServerRequest, ...grpc.CallOption) (*ServerSkipQuarantineServerOperation, error)
 	PowerOffServer(context.Context, *baremetal.PowerOffServerRequest, ...grpc.CallOption) (*ServerPowerOffServerOperation, error)
 	PowerOnServer(context.Context, *baremetal.PowerOnServerRequest, ...grpc.CallOption) (*ServerPowerOnServerOperation, error)
 	RebootServer(context.Context, *baremetal.RebootServerRequest, ...grpc.CallOption) (*ServerRebootServerOperation, error)
@@ -271,6 +272,60 @@ func (c serverClient) DeleteServer(ctx context.Context, in *baremetal.DeleteServ
 		return nil, err
 	}
 	return &ServerDeleteServerOperation{*op}, nil
+}
+
+// ServerSkipQuarantineServerOperation is used to monitor the state of SkipQuarantineServer operations.
+type ServerSkipQuarantineServerOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ServerSkipQuarantineServerOperation) Metadata() *baremetal.QuarantineServerMetadata {
+	return o.Operation.Metadata().(*baremetal.QuarantineServerMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ServerSkipQuarantineServerOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *ServerSkipQuarantineServerOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ServerSkipQuarantineServerOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// SkipQuarantineServer is an operation of Yandex.Cloud Baremetal Server service.
+// It returns an object which should be used to monitor the operation state.
+func (c serverClient) SkipQuarantineServer(ctx context.Context, in *baremetal.SkipQuarantineServerRequest, opts ...grpc.CallOption) (*ServerSkipQuarantineServerOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ServerSkipQuarantineServer, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := baremetal.NewServerServiceClient(connection).SkipQuarantineServer(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*baremetal.QuarantineServerMetadata).GetServerId()
+		},
+		MetadataType: (*baremetal.QuarantineServerMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ServerSkipQuarantineServerOperation{*op}, nil
 }
 
 // ServerPowerOffServerOperation is used to monitor the state of PowerOffServer operations.
@@ -568,6 +623,7 @@ var (
 	ServerBatchCreateServers   = protoreflect.FullName("yandex.cloud.baremetal.v2.ServerService.BatchCreateServers")
 	ServerUpdateServer         = protoreflect.FullName("yandex.cloud.baremetal.v2.ServerService.UpdateServer")
 	ServerDeleteServer         = protoreflect.FullName("yandex.cloud.baremetal.v2.ServerService.DeleteServer")
+	ServerSkipQuarantineServer = protoreflect.FullName("yandex.cloud.baremetal.v2.ServerService.SkipQuarantineServer")
 	ServerPowerOffServer       = protoreflect.FullName("yandex.cloud.baremetal.v2.ServerService.PowerOffServer")
 	ServerPowerOnServer        = protoreflect.FullName("yandex.cloud.baremetal.v2.ServerService.PowerOnServer")
 	ServerRebootServer         = protoreflect.FullName("yandex.cloud.baremetal.v2.ServerService.RebootServer")
