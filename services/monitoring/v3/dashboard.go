@@ -23,6 +23,7 @@ type DashboardClient interface {
 	Update(context.Context, *monitoring.UpdateDashboardRequest, ...grpc.CallOption) (*DashboardUpdateOperation, error)
 	Delete(context.Context, *monitoring.DeleteDashboardRequest, ...grpc.CallOption) (*DashboardDeleteOperation, error)
 	ListOperations(context.Context, *monitoring.ListDashboardOperationsRequest, ...grpc.CallOption) (*monitoring.ListDashboardOperationsResponse, error)
+	ConvertFromGrafana(context.Context, *monitoring.ConvertFromGrafanaRequest, ...grpc.CallOption) (*monitoring.ConvertFromGrafanaResponse, error)
 }
 
 var _ DashboardClient = dashboardClient{}
@@ -225,6 +226,15 @@ func (c dashboardClient) ListOperations(ctx context.Context, in *monitoring.List
 	return monitoring.NewDashboardServiceClient(connection).ListOperations(ctx, in, opts...)
 }
 
+// ConvertFromGrafana is an operation of Yandex.Cloud Monitoring Dashboard service.
+func (c dashboardClient) ConvertFromGrafana(ctx context.Context, in *monitoring.ConvertFromGrafanaRequest, opts ...grpc.CallOption) (*monitoring.ConvertFromGrafanaResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, DashboardConvertFromGrafana, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return monitoring.NewDashboardServiceClient(connection).ConvertFromGrafana(ctx, in, opts...)
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c dashboardClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, DashboardOperationPoller, opts...)
@@ -235,11 +245,12 @@ func (c dashboardClient) pollOperation(ctx context.Context, operationId string, 
 }
 
 var (
-	DashboardGet             = protoreflect.FullName("yandex.cloud.monitoring.v3.DashboardService.Get")
-	DashboardList            = protoreflect.FullName("yandex.cloud.monitoring.v3.DashboardService.List")
-	DashboardCreate          = protoreflect.FullName("yandex.cloud.monitoring.v3.DashboardService.Create")
-	DashboardUpdate          = protoreflect.FullName("yandex.cloud.monitoring.v3.DashboardService.Update")
-	DashboardDelete          = protoreflect.FullName("yandex.cloud.monitoring.v3.DashboardService.Delete")
-	DashboardListOperations  = protoreflect.FullName("yandex.cloud.monitoring.v3.DashboardService.ListOperations")
-	DashboardOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
+	DashboardGet                = protoreflect.FullName("yandex.cloud.monitoring.v3.DashboardService.Get")
+	DashboardList               = protoreflect.FullName("yandex.cloud.monitoring.v3.DashboardService.List")
+	DashboardCreate             = protoreflect.FullName("yandex.cloud.monitoring.v3.DashboardService.Create")
+	DashboardUpdate             = protoreflect.FullName("yandex.cloud.monitoring.v3.DashboardService.Update")
+	DashboardDelete             = protoreflect.FullName("yandex.cloud.monitoring.v3.DashboardService.Delete")
+	DashboardListOperations     = protoreflect.FullName("yandex.cloud.monitoring.v3.DashboardService.ListOperations")
+	DashboardConvertFromGrafana = protoreflect.FullName("yandex.cloud.monitoring.v3.DashboardService.ConvertFromGrafana")
+	DashboardOperationPoller    = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
