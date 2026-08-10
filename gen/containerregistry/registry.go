@@ -39,6 +39,15 @@ func (c *RegistryServiceClient) Delete(ctx context.Context, in *containerregistr
 	return containerregistry.NewRegistryServiceClient(conn).Delete(ctx, in, opts...)
 }
 
+// ForceDelete implements containerregistry.RegistryServiceClient
+func (c *RegistryServiceClient) ForceDelete(ctx context.Context, in *containerregistry.DeleteRegistryRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return containerregistry.NewRegistryServiceClient(conn).ForceDelete(ctx, in, opts...)
+}
+
 // Get implements containerregistry.RegistryServiceClient
 func (c *RegistryServiceClient) Get(ctx context.Context, in *containerregistry.GetRegistryRequest, opts ...grpc.CallOption) (*containerregistry.Registry, error) {
 	conn, err := c.getConn(ctx)

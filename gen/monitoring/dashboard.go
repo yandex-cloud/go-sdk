@@ -20,6 +20,15 @@ type DashboardServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
 }
 
+// ConvertFromGrafana implements monitoring.DashboardServiceClient
+func (c *DashboardServiceClient) ConvertFromGrafana(ctx context.Context, in *monitoring.ConvertFromGrafanaRequest, opts ...grpc.CallOption) (*monitoring.ConvertFromGrafanaResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return monitoring.NewDashboardServiceClient(conn).ConvertFromGrafana(ctx, in, opts...)
+}
+
 // Create implements monitoring.DashboardServiceClient
 func (c *DashboardServiceClient) Create(ctx context.Context, in *monitoring.CreateDashboardRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
