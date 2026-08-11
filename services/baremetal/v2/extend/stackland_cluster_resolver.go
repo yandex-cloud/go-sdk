@@ -28,3 +28,24 @@ func (r *stacklandClusterStacklandClustersResolver) Run(ctx context.Context) err
 	})
 	return r.FindName(resp.TakeAll())
 }
+
+type stacklandClusterStacklandClusterOperationsResolver struct {
+	client StacklandClusterClient
+	sdkresolvers.BaseNameResolver
+}
+
+func StacklandClusterStacklandClusterOperationsResolver(name string, client StacklandClusterClient, opts ...sdkresolvers.ResolveOption) sdkresolvers.Resolver {
+	return &stacklandClusterStacklandClusterOperationsResolver{
+		client:           client,
+		BaseNameResolver: sdkresolvers.NewBaseNameResolver(name, "StacklandClusterStacklandClusterOperations", opts...),
+	}
+}
+
+func (r *stacklandClusterStacklandClusterOperationsResolver) Run(ctx context.Context) error {
+	resp := r.client.StacklandClusterOperationsIterator(ctx, &extend.ListStacklandClusterOperationsRequest{
+		CloudId: r.CloudID(),
+
+		PageSize: sdkresolvers.DefaultResolverPageSize,
+	})
+	return r.FindName(resp.TakeAll())
+}

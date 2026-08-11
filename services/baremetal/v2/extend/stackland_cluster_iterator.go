@@ -5,12 +5,14 @@ import (
 	"context"
 
 	extend "github.com/yandex-cloud/go-genproto/yandex/cloud/baremetal/v2/extend"
+	operation "github.com/yandex-cloud/go-genproto/yandex/cloud/operation"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/iterator"
 	"google.golang.org/grpc"
 )
 
 type StacklandClusterClientIterator interface {
 	StacklandClustersIterator(context.Context, *extend.ListStacklandClustersRequest, ...grpc.CallOption) *iterator.Iterator[*extend.ListStacklandClustersRequest, *extend.StacklandCluster]
+	StacklandClusterOperationsIterator(context.Context, *extend.ListStacklandClusterOperationsRequest, ...grpc.CallOption) *iterator.Iterator[*extend.ListStacklandClusterOperationsRequest, *operation.Operation]
 }
 
 type stacklandClusterServiceListStacklandClustersInternal struct {
@@ -29,5 +31,24 @@ func (c stacklandClusterClient) StacklandClustersIterator(ctx context.Context, r
 				return nil, err
 			}
 			return stacklandClusterServiceListStacklandClustersInternal{resp}, nil
+		})
+}
+
+type stacklandClusterServiceListStacklandClusterOperationsInternal struct {
+	*extend.ListStacklandClusterOperationsResponse
+}
+
+func (r stacklandClusterServiceListStacklandClusterOperationsInternal) Items() []*operation.Operation {
+	return r.ListStacklandClusterOperationsResponse.Operations
+}
+
+func (c stacklandClusterClient) StacklandClusterOperationsIterator(ctx context.Context, req *extend.ListStacklandClusterOperationsRequest, opts ...grpc.CallOption) *iterator.Iterator[*extend.ListStacklandClusterOperationsRequest, *operation.Operation] {
+	return iterator.NewIterator[*extend.ListStacklandClusterOperationsRequest, *operation.Operation](ctx, req,
+		func(ctx context.Context, req *extend.ListStacklandClusterOperationsRequest, opts ...grpc.CallOption) (iterator.PageResponse[*operation.Operation], error) {
+			resp, err := c.ListStacklandClusterOperations(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return stacklandClusterServiceListStacklandClusterOperationsInternal{resp}, nil
 		})
 }
