@@ -13,6 +13,7 @@ import (
 	"github.com/yandex-cloud/go-sdk/gen/mdb/postgresql"
 	"github.com/yandex-cloud/go-sdk/gen/mdb/redis"
 	"github.com/yandex-cloud/go-sdk/gen/mdb/spqr"
+	"github.com/yandex-cloud/go-sdk/gen/mdb/zonalshift"
 )
 
 const (
@@ -25,6 +26,7 @@ const (
 	MDBGreenplumServiceID  Endpoint = "managed-greenplum"
 	MDBOpenSearchID        Endpoint = "managed-opensearch"
 	MDBSPQRID              Endpoint = "managed-spqr"
+	MDBZonalShiftServiceID Endpoint = "managed-zonalshift"
 )
 
 type MDB struct {
@@ -65,4 +67,8 @@ func (m *MDB) OpenSearch() *opensearch.OpenSearch {
 
 func (m *MDB) SPQR() *spqr.SPQR {
 	return spqr.NewSPQR(m.sdk.getConn(MDBSPQRID))
+}
+
+func (m *MDB) ZonalShift() *zonalshift.ZonalShift {
+	return zonalshift.NewZonalShift(m.sdk.getConn(MDBZonalShiftServiceID))
 }
