@@ -16,8 +16,8 @@ github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOf
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 github.com/yandex-cloud/go-genproto v0.112.0 h1:wbhIUMX6lgBNXktBXrtGpAofOiwFW8/ghqeQfsV1eac=
 github.com/yandex-cloud/go-genproto v0.112.0/go.mod h1:0LDD/IZLIUIV4iPH+YcF+jysO3jkSvADFGm4dCAuwQo=
-github.com/yandex-cloud/go-sdk/v2 v2.156.0 h1:dtZJa8n0LuGpE/IyT3S+xmlKNjOfNedVKZjVJoe6ozc=
-github.com/yandex-cloud/go-sdk/v2 v2.156.0/go.mod h1:5RFwVrhx6gHMxFpBahwQ8uAQx4u9zAPo4xGx/wChYVM=
+github.com/yandex-cloud/go-sdk/v2 v2.158.0 h1:3RfSQqouOWG7yBzOV7qsjG0GAWhozmVkBBGxKgU33Y8=
+github.com/yandex-cloud/go-sdk/v2 v2.158.0/go.mod h1:F8W/R/2W9TIBbvnixNBdCWMEmZ+ELLmjO3rnBjEdfV0=
 go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJySYA=
 go.opentelemetry.io/auto/sdk v1.1.0/go.mod h1:3wSPjt5PWp2RhlCcmmOial7AvC4DQqZb7a7wCow3W8A=
 go.opentelemetry.io/otel v1.35.0 h1:xKWKPxrxB6OtMCbmMY021CqC45J+3Onta9MqjhnusiQ=
