@@ -1219,6 +1219,15 @@ func (it *ClusterShardsIterator) Error() error {
 	return it.err
 }
 
+// MigrateToKeeper implements clickhouse.ClusterServiceClient
+func (c *ClusterServiceClient) MigrateToKeeper(ctx context.Context, in *clickhouse.MigrateClusterToKeeperRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return clickhouse.NewClusterServiceClient(conn).MigrateToKeeper(ctx, in, opts...)
+}
+
 // Move implements clickhouse.ClusterServiceClient
 func (c *ClusterServiceClient) Move(ctx context.Context, in *clickhouse.MoveClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
