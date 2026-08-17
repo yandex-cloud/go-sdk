@@ -24,6 +24,7 @@ type ClusterClient interface {
 	Update(context.Context, *clickhouse.UpdateClusterRequest, ...grpc.CallOption) (*ClusterUpdateOperation, error)
 	Delete(context.Context, *clickhouse.DeleteClusterRequest, ...grpc.CallOption) (*ClusterDeleteOperation, error)
 	AddZookeeper(context.Context, *clickhouse.AddClusterZookeeperRequest, ...grpc.CallOption) (*ClusterAddZookeeperOperation, error)
+	MigrateToKeeper(context.Context, *clickhouse.MigrateClusterToKeeperRequest, ...grpc.CallOption) (*ClusterMigrateToKeeperOperation, error)
 	Start(context.Context, *clickhouse.StartClusterRequest, ...grpc.CallOption) (*ClusterStartOperation, error)
 	Stop(context.Context, *clickhouse.StopClusterRequest, ...grpc.CallOption) (*ClusterStopOperation, error)
 	Move(context.Context, *clickhouse.MoveClusterRequest, ...grpc.CallOption) (*ClusterMoveOperation, error)
@@ -303,6 +304,60 @@ func (c clusterClient) AddZookeeper(ctx context.Context, in *clickhouse.AddClust
 		return nil, err
 	}
 	return &ClusterAddZookeeperOperation{*op}, nil
+}
+
+// ClusterMigrateToKeeperOperation is used to monitor the state of MigrateToKeeper operations.
+type ClusterMigrateToKeeperOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *ClusterMigrateToKeeperOperation) Metadata() *clickhouse.MigrateClusterToKeeperMetadata {
+	return o.Operation.Metadata().(*clickhouse.MigrateClusterToKeeperMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *ClusterMigrateToKeeperOperation) Response() *clickhouse.Cluster {
+	return o.Operation.Response().(*clickhouse.Cluster)
+}
+
+// Wait polls the operation until it's done.
+func (o *ClusterMigrateToKeeperOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*clickhouse.Cluster, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*clickhouse.Cluster)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *ClusterMigrateToKeeperOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*clickhouse.Cluster, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*clickhouse.Cluster)
+	return response, err
+}
+
+// MigrateToKeeper is an operation of Yandex.Cloud Clickhouse Cluster service.
+// It returns an object which should be used to monitor the operation state.
+func (c clusterClient) MigrateToKeeper(ctx context.Context, in *clickhouse.MigrateClusterToKeeperRequest, opts ...grpc.CallOption) (*ClusterMigrateToKeeperOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, ClusterMigrateToKeeper, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := clickhouse.NewClusterServiceClient(connection).MigrateToKeeper(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll: c.pollOperation,
+		GetResourceID: func(metadata proto.Message) string {
+			return metadata.(*clickhouse.MigrateClusterToKeeperMetadata).GetClusterId()
+		},
+		MetadataType: (*clickhouse.MigrateClusterToKeeperMetadata)(nil),
+		ResponseType: (*clickhouse.Cluster)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ClusterMigrateToKeeperOperation{*op}, nil
 }
 
 // ClusterStartOperation is used to monitor the state of Start operations.
@@ -1656,6 +1711,7 @@ var (
 	ClusterUpdate                   = protoreflect.FullName("yandex.cloud.mdb.clickhouse.v1.ClusterService.Update")
 	ClusterDelete                   = protoreflect.FullName("yandex.cloud.mdb.clickhouse.v1.ClusterService.Delete")
 	ClusterAddZookeeper             = protoreflect.FullName("yandex.cloud.mdb.clickhouse.v1.ClusterService.AddZookeeper")
+	ClusterMigrateToKeeper          = protoreflect.FullName("yandex.cloud.mdb.clickhouse.v1.ClusterService.MigrateToKeeper")
 	ClusterStart                    = protoreflect.FullName("yandex.cloud.mdb.clickhouse.v1.ClusterService.Start")
 	ClusterStop                     = protoreflect.FullName("yandex.cloud.mdb.clickhouse.v1.ClusterService.Stop")
 	ClusterMove                     = protoreflect.FullName("yandex.cloud.mdb.clickhouse.v1.ClusterService.Move")
