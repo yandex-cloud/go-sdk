@@ -17,6 +17,8 @@ import (
 type MigrationClient interface {
 	MigrationClientIterator
 	StartCloud(context.Context, *cloudregistry.StartCloudMigrationRequest, ...grpc.CallOption) (*MigrationStartCloudOperation, error)
+	StartFolder(context.Context, *cloudregistry.StartFolderMigrationRequest, ...grpc.CallOption) (*MigrationStartFolderOperation, error)
+	GetCloudMigrationStatusDashboard(context.Context, *cloudregistry.GetCloudMigrationStatusDashboardRequest, ...grpc.CallOption) (*cloudregistry.CloudMigrationStatusDashboard, error)
 }
 
 var _ MigrationClient = migrationClient{}
@@ -81,6 +83,66 @@ func (c migrationClient) StartCloud(ctx context.Context, in *cloudregistry.Start
 	return &MigrationStartCloudOperation{*op}, nil
 }
 
+// MigrationStartFolderOperation is used to monitor the state of StartFolder operations.
+type MigrationStartFolderOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *MigrationStartFolderOperation) Metadata() *cloudregistry.StartFolderMigrationMetadata {
+	return o.Operation.Metadata().(*cloudregistry.StartFolderMigrationMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *MigrationStartFolderOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *MigrationStartFolderOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *MigrationStartFolderOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// StartFolder is an operation of Yandex.Cloud Cloudregistry Migration service.
+// It returns an object which should be used to monitor the operation state.
+func (c migrationClient) StartFolder(ctx context.Context, in *cloudregistry.StartFolderMigrationRequest, opts ...grpc.CallOption) (*MigrationStartFolderOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, MigrationStartFolder, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := cloudregistry.NewMigrationServiceClient(connection).StartFolder(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*cloudregistry.StartFolderMigrationMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &MigrationStartFolderOperation{*op}, nil
+}
+
+// GetCloudMigrationStatusDashboard is an operation of Yandex.Cloud Cloudregistry Migration service.
+func (c migrationClient) GetCloudMigrationStatusDashboard(ctx context.Context, in *cloudregistry.GetCloudMigrationStatusDashboardRequest, opts ...grpc.CallOption) (*cloudregistry.CloudMigrationStatusDashboard, error) {
+	connection, err := c.connector.GetConnection(ctx, MigrationGetCloudMigrationStatusDashboard, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return cloudregistry.NewMigrationServiceClient(connection).GetCloudMigrationStatusDashboard(ctx, in, opts...)
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c migrationClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, MigrationOperationPoller, opts...)
@@ -91,6 +153,8 @@ func (c migrationClient) pollOperation(ctx context.Context, operationId string, 
 }
 
 var (
-	MigrationStartCloud      = protoreflect.FullName("yandex.cloud.cloudregistry.v1.MigrationService.StartCloud")
-	MigrationOperationPoller = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
+	MigrationStartCloud                       = protoreflect.FullName("yandex.cloud.cloudregistry.v1.MigrationService.StartCloud")
+	MigrationStartFolder                      = protoreflect.FullName("yandex.cloud.cloudregistry.v1.MigrationService.StartFolder")
+	MigrationGetCloudMigrationStatusDashboard = protoreflect.FullName("yandex.cloud.cloudregistry.v1.MigrationService.GetCloudMigrationStatusDashboard")
+	MigrationOperationPoller                  = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )
