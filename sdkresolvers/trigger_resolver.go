@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 
 	triggers "github.com/yandex-cloud/go-genproto/yandex/cloud/serverless/triggers/v1"
+	triggersv2 "github.com/yandex-cloud/go-genproto/yandex/cloud/serverless/triggers/v2"
 	ycsdk "github.com/yandex-cloud/go-sdk"
 )
 
@@ -29,6 +30,30 @@ func (r *triggerResolver) Run(ctx context.Context, sdk *ycsdk.SDK, opts ...grpc.
 	}
 
 	resp, err := sdk.Serverless().Triggers().Trigger().List(ctx, &triggers.ListTriggersRequest{
+		FolderId: r.FolderID(),
+		Filter:   CreateResolverFilter("name", r.Name),
+		PageSize: DefaultResolverPageSize,
+	}, opts...)
+	return r.findName(resp.GetTriggers(), err)
+}
+
+type triggerV2Resolver struct {
+	BaseNameResolver
+}
+
+func TriggerV2Resolver(name string, opts ...ResolveOption) ycsdk.Resolver {
+	return &triggerV2Resolver{
+		BaseNameResolver: NewBaseNameResolver(name, "trigger", opts...),
+	}
+}
+
+func (r *triggerV2Resolver) Run(ctx context.Context, sdk *ycsdk.SDK, opts ...grpc.CallOption) error {
+	err := r.ensureFolderID()
+	if err != nil {
+		return err
+	}
+
+	resp, err := sdk.Serverless().TriggersV2().Trigger().List(ctx, &triggersv2.ListTriggersRequest{
 		FolderId: r.FolderID(),
 		Filter:   CreateResolverFilter("name", r.Name),
 		PageSize: DefaultResolverPageSize,

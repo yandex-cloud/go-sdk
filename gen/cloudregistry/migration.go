@@ -20,6 +20,15 @@ type MigrationServiceClient struct {
 	getConn func(ctx context.Context) (*grpc.ClientConn, error)
 }
 
+// GetCloudMigrationStatusDashboard implements cloudregistry.MigrationServiceClient
+func (c *MigrationServiceClient) GetCloudMigrationStatusDashboard(ctx context.Context, in *cloudregistry.GetCloudMigrationStatusDashboardRequest, opts ...grpc.CallOption) (*cloudregistry.CloudMigrationStatusDashboard, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudregistry.NewMigrationServiceClient(conn).GetCloudMigrationStatusDashboard(ctx, in, opts...)
+}
+
 // StartCloud implements cloudregistry.MigrationServiceClient
 func (c *MigrationServiceClient) StartCloud(ctx context.Context, in *cloudregistry.StartCloudMigrationRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
@@ -27,4 +36,13 @@ func (c *MigrationServiceClient) StartCloud(ctx context.Context, in *cloudregist
 		return nil, err
 	}
 	return cloudregistry.NewMigrationServiceClient(conn).StartCloud(ctx, in, opts...)
+}
+
+// StartFolder implements cloudregistry.MigrationServiceClient
+func (c *MigrationServiceClient) StartFolder(ctx context.Context, in *cloudregistry.StartFolderMigrationRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudregistry.NewMigrationServiceClient(conn).StartFolder(ctx, in, opts...)
 }
