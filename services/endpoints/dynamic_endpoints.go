@@ -116,6 +116,7 @@ var DynamicEndpoints = map[protoreflect.FullName]string{
 	protoreflect.FullName("yandex.cloud.serverless.mcpgateway.v1"):                                           "mcp-gateway",
 	protoreflect.FullName("yandex.cloud.serverless.mdbproxy.v1"):                                             "mdbproxy",
 	protoreflect.FullName("yandex.cloud.serverless.triggers.v1"):                                             "serverless-triggers",
+	protoreflect.FullName("yandex.cloud.serverless.triggers.v2"):                                             "serverless-triggers",
 	protoreflect.FullName("yandex.cloud.serverless.workflows.v1"):                                            "serverless-workflows",
 	protoreflect.FullName("yandex.cloud.servicename.v1"):                                                     "servicename",
 	protoreflect.FullName("yandex.cloud.smartcaptcha.v1"):                                                    "smart-captcha",
