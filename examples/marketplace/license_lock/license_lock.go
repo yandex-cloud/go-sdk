@@ -13,10 +13,10 @@ import (
 	"time"
 
 	licensemanagerapi "github.com/yandex-cloud/go-genproto/yandex/cloud/marketplace/licensemanager/v1"
+	licensemanagersdk "github.com/yandex-cloud/go-sdk/services/marketplace/licensemanager/v1"
 	ycsdk "github.com/yandex-cloud/go-sdk/v2"
 	credentials "github.com/yandex-cloud/go-sdk/v2/credentials"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/options"
-	licensemanagersdk "github.com/yandex-cloud/go-sdk/services/marketplace/licensemanager/v1"
 )
 
 const (

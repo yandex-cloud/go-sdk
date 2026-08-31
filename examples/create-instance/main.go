@@ -10,11 +10,11 @@ import (
 
 	computeapi "github.com/yandex-cloud/go-genproto/yandex/cloud/compute/v1"
 	vpcapi "github.com/yandex-cloud/go-genproto/yandex/cloud/vpc/v1"
+	computesdk "github.com/yandex-cloud/go-sdk/services/compute/v1"
+	vpcsdk "github.com/yandex-cloud/go-sdk/services/vpc/v1"
 	ycsdk "github.com/yandex-cloud/go-sdk/v2"
 	"github.com/yandex-cloud/go-sdk/v2/credentials"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/options"
-	computesdk "github.com/yandex-cloud/go-sdk/services/compute/v1"
-	vpcsdk "github.com/yandex-cloud/go-sdk/services/vpc/v1"
 )
 
 const (

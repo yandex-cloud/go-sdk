@@ -9,10 +9,10 @@ import (
 	"time"
 
 	lockboxapi "github.com/yandex-cloud/go-genproto/yandex/cloud/lockbox/v1"
+	lockboxsdk "github.com/yandex-cloud/go-sdk/services/lockbox/v1"
 	ycsdk "github.com/yandex-cloud/go-sdk/v2"
 	"github.com/yandex-cloud/go-sdk/v2/credentials"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/options"
-	lockboxsdk "github.com/yandex-cloud/go-sdk/services/lockbox/v1"
 )
 
 const (

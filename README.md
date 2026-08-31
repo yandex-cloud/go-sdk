@@ -160,19 +160,20 @@ By default, SDK will use temporary mode, but you can change it through functiona
 SDK resolvers allows you to find resource id by its name.
 
 ```go
+package main
 
 import (
-    "context"
-    "flag"
-    "fmt"
-    "log"
-    "os"
-    
-    ycsdk "bb.yandex-team.ru/cloud/cloud-go/sdk-v2"
-    "bb.yandex-team.ru/cloud/cloud-go/sdk-v2/credentials"
-    "bb.yandex-team.ru/cloud/cloud-go/sdk-v2/pkg/options"
-    "bb.yandex-team.ru/cloud/cloud-go/sdk-v2/pkg/sdkresolvers"
-    computesdk "bb.yandex-team.ru/cloud/cloud-go/sdk-v2/sdkresolvers/compute/v1"
+	"context"
+	"flag"
+	"fmt"
+	"log"
+	"os"
+
+	computesdk "github.com/yandex-cloud/go-sdk/services/compute/v1"
+	ycsdk "github.com/yandex-cloud/go-sdk/v2"
+	"github.com/yandex-cloud/go-sdk/v2/credentials"
+	"github.com/yandex-cloud/go-sdk/v2/pkg/options"
+	"github.com/yandex-cloud/go-sdk/v2/pkg/sdkresolvers"
 )
 
 func main() {
@@ -188,8 +189,8 @@ func main() {
 	}
 
 	name := "test_name"
-	r := computesdk.DiskResolver(name, sdkresolvers.FolderID(*folderID))
-	if err = r.Run(ctx, sdk); err != nil {
+	r := computesdk.DiskResolver(name, computesdk.NewDiskClient(sdk), sdkresolvers.FolderID(*folderID))
+	if err = r.Run(ctx); err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("id of object %s is %s", name, r.ID())

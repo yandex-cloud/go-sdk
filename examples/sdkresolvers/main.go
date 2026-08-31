@@ -7,11 +7,11 @@ import (
 	"log"
 	"os"
 
+	computesdk "github.com/yandex-cloud/go-sdk/services/compute/v1"
 	ycsdk "github.com/yandex-cloud/go-sdk/v2"
 	"github.com/yandex-cloud/go-sdk/v2/credentials"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/options"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/sdkresolvers"
-	computesdk "github.com/yandex-cloud/go-sdk/services/compute/v1"
 )
 
 func main() {

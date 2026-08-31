@@ -12,11 +12,11 @@ import (
 
 	mdb "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/mongodb/v1"
 	vpc "github.com/yandex-cloud/go-genproto/yandex/cloud/vpc/v1"
+	mdbsdk "github.com/yandex-cloud/go-sdk/services/mdb/mongodb/v1"
+	vpcsdk "github.com/yandex-cloud/go-sdk/services/vpc/v1"
 	ycsdk "github.com/yandex-cloud/go-sdk/v2"
 	"github.com/yandex-cloud/go-sdk/v2/credentials"
 	"github.com/yandex-cloud/go-sdk/v2/pkg/options"
-	mdbsdk "github.com/yandex-cloud/go-sdk/services/mdb/mongodb/v1"
-	vpcsdk "github.com/yandex-cloud/go-sdk/services/vpc/v1"
 )
 
 func main() {
