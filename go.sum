@@ -38,6 +38,8 @@ github.com/yandex-cloud/go-genproto v0.116.0 h1:U858GLrA4z+zi7w8xUksN3CR2v7J91TS
 github.com/yandex-cloud/go-genproto v0.116.0/go.mod h1:0LDD/IZLIUIV4iPH+YcF+jysO3jkSvADFGm4dCAuwQo=
 github.com/yandex-cloud/go-genproto v0.117.0 h1:bgn/IoVZyUcXvVaXkP+MW30vTUL6A7t0DBnx9q30f88=
 github.com/yandex-cloud/go-genproto v0.117.0/go.mod h1:0LDD/IZLIUIV4iPH+YcF+jysO3jkSvADFGm4dCAuwQo=
+github.com/yandex-cloud/go-genproto v0.118.0 h1:UMmgRGyzECnqRR/HlAvZWGdtX5qnxVsdQZScz1hUP1E=
+github.com/yandex-cloud/go-genproto v0.118.0/go.mod h1:0LDD/IZLIUIV4iPH+YcF+jysO3jkSvADFGm4dCAuwQo=
 go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJySYA=
 go.opentelemetry.io/auto/sdk v1.1.0/go.mod h1:3wSPjt5PWp2RhlCcmmOial7AvC4DQqZb7a7wCow3W8A=
 go.opentelemetry.io/otel v1.35.0 h1:xKWKPxrxB6OtMCbmMY021CqC45J+3Onta9MqjhnusiQ=
