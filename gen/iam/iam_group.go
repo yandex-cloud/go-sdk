@@ -73,6 +73,11 @@ func (i *IAM) ServiceControl() *ServiceControlServiceClient {
 	return &ServiceControlServiceClient{getConn: i.getConn}
 }
 
+// SubjectDetails gets SubjectDetailsService client
+func (i *IAM) SubjectDetails() *SubjectDetailsServiceClient {
+	return &SubjectDetailsServiceClient{getConn: i.getConn}
+}
+
 // UserAccount gets UserAccountService client
 func (i *IAM) UserAccount() *UserAccountServiceClient {
 	return &UserAccountServiceClient{getConn: i.getConn}

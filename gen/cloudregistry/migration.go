@@ -46,3 +46,30 @@ func (c *MigrationServiceClient) StartFolder(ctx context.Context, in *cloudregis
 	}
 	return cloudregistry.NewMigrationServiceClient(conn).StartFolder(ctx, in, opts...)
 }
+
+// ToggleCloudRedirects implements cloudregistry.MigrationServiceClient
+func (c *MigrationServiceClient) ToggleCloudRedirects(ctx context.Context, in *cloudregistry.ToggleCloudRedirectsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudregistry.NewMigrationServiceClient(conn).ToggleCloudRedirects(ctx, in, opts...)
+}
+
+// ToggleFolderRedirects implements cloudregistry.MigrationServiceClient
+func (c *MigrationServiceClient) ToggleFolderRedirects(ctx context.Context, in *cloudregistry.ToggleFolderRedirectsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudregistry.NewMigrationServiceClient(conn).ToggleFolderRedirects(ctx, in, opts...)
+}
+
+// ToggleRegistryRedirects implements cloudregistry.MigrationServiceClient
+func (c *MigrationServiceClient) ToggleRegistryRedirects(ctx context.Context, in *cloudregistry.ToggleRegistryRedirectsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloudregistry.NewMigrationServiceClient(conn).ToggleRegistryRedirects(ctx, in, opts...)
+}
