@@ -4,8 +4,6 @@ go 1.23.0
 
 toolchain go1.24.0
 
-retract [v2.171.0, v2.173.0] // Published from the v1 branch with an incompatible module path.
-
 require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang-jwt/jwt/v4 v4.5.2
@@ -16,7 +14,7 @@ require (
 	github.com/mitchellh/go-testing-interface v1.14.1
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.10.0
-	github.com/yandex-cloud/go-genproto v0.118.0
+	github.com/yandex-cloud/go-genproto v0.120.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/sync v0.15.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250707201910-8d1bb00bc6a7

@@ -19,6 +19,9 @@ type MigrationClient interface {
 	StartCloud(context.Context, *cloudregistry.StartCloudMigrationRequest, ...grpc.CallOption) (*MigrationStartCloudOperation, error)
 	StartFolder(context.Context, *cloudregistry.StartFolderMigrationRequest, ...grpc.CallOption) (*MigrationStartFolderOperation, error)
 	GetCloudMigrationStatusDashboard(context.Context, *cloudregistry.GetCloudMigrationStatusDashboardRequest, ...grpc.CallOption) (*cloudregistry.CloudMigrationStatusDashboard, error)
+	ToggleRegistryRedirects(context.Context, *cloudregistry.ToggleRegistryRedirectsRequest, ...grpc.CallOption) (*MigrationToggleRegistryRedirectsOperation, error)
+	ToggleFolderRedirects(context.Context, *cloudregistry.ToggleFolderRedirectsRequest, ...grpc.CallOption) (*MigrationToggleFolderRedirectsOperation, error)
+	ToggleCloudRedirects(context.Context, *cloudregistry.ToggleCloudRedirectsRequest, ...grpc.CallOption) (*MigrationToggleCloudRedirectsOperation, error)
 }
 
 var _ MigrationClient = migrationClient{}
@@ -143,6 +146,159 @@ func (c migrationClient) GetCloudMigrationStatusDashboard(ctx context.Context, i
 	return cloudregistry.NewMigrationServiceClient(connection).GetCloudMigrationStatusDashboard(ctx, in, opts...)
 }
 
+// MigrationToggleRegistryRedirectsOperation is used to monitor the state of ToggleRegistryRedirects operations.
+type MigrationToggleRegistryRedirectsOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *MigrationToggleRegistryRedirectsOperation) Metadata() *cloudregistry.ToggleRegistryRedirectsMetadata {
+	return o.Operation.Metadata().(*cloudregistry.ToggleRegistryRedirectsMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *MigrationToggleRegistryRedirectsOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *MigrationToggleRegistryRedirectsOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *MigrationToggleRegistryRedirectsOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// ToggleRegistryRedirects is an operation of Yandex.Cloud Cloudregistry Migration service.
+// It returns an object which should be used to monitor the operation state.
+func (c migrationClient) ToggleRegistryRedirects(ctx context.Context, in *cloudregistry.ToggleRegistryRedirectsRequest, opts ...grpc.CallOption) (*MigrationToggleRegistryRedirectsOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, MigrationToggleRegistryRedirects, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := cloudregistry.NewMigrationServiceClient(connection).ToggleRegistryRedirects(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*cloudregistry.ToggleRegistryRedirectsMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &MigrationToggleRegistryRedirectsOperation{*op}, nil
+}
+
+// MigrationToggleFolderRedirectsOperation is used to monitor the state of ToggleFolderRedirects operations.
+type MigrationToggleFolderRedirectsOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *MigrationToggleFolderRedirectsOperation) Metadata() *cloudregistry.ToggleFolderRedirectsMetadata {
+	return o.Operation.Metadata().(*cloudregistry.ToggleFolderRedirectsMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *MigrationToggleFolderRedirectsOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *MigrationToggleFolderRedirectsOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *MigrationToggleFolderRedirectsOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// ToggleFolderRedirects is an operation of Yandex.Cloud Cloudregistry Migration service.
+// It returns an object which should be used to monitor the operation state.
+func (c migrationClient) ToggleFolderRedirects(ctx context.Context, in *cloudregistry.ToggleFolderRedirectsRequest, opts ...grpc.CallOption) (*MigrationToggleFolderRedirectsOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, MigrationToggleFolderRedirects, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := cloudregistry.NewMigrationServiceClient(connection).ToggleFolderRedirects(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*cloudregistry.ToggleFolderRedirectsMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &MigrationToggleFolderRedirectsOperation{*op}, nil
+}
+
+// MigrationToggleCloudRedirectsOperation is used to monitor the state of ToggleCloudRedirects operations.
+type MigrationToggleCloudRedirectsOperation struct {
+	sdkop.Operation
+}
+
+// Metadata retrieves the operation metadata.
+func (o *MigrationToggleCloudRedirectsOperation) Metadata() *cloudregistry.ToggleCloudRedirectsMetadata {
+	return o.Operation.Metadata().(*cloudregistry.ToggleCloudRedirectsMetadata)
+}
+
+// Response retrieves the operation response.
+func (o *MigrationToggleCloudRedirectsOperation) Response() *emptypb.Empty {
+	return o.Operation.Response().(*emptypb.Empty)
+}
+
+// Wait polls the operation until it's done.
+func (o *MigrationToggleCloudRedirectsOperation) Wait(ctx context.Context, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.Wait(ctx, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// WaitInterval polls the operation until it's done with custom interval.
+func (o *MigrationToggleCloudRedirectsOperation) WaitInterval(ctx context.Context, pollInterval sdkop.PollIntervalFunc, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	abstract, err := o.Operation.WaitInterval(ctx, pollInterval, opts...)
+	response, _ := abstract.(*emptypb.Empty)
+	return response, err
+}
+
+// ToggleCloudRedirects is an operation of Yandex.Cloud Cloudregistry Migration service.
+// It returns an object which should be used to monitor the operation state.
+func (c migrationClient) ToggleCloudRedirects(ctx context.Context, in *cloudregistry.ToggleCloudRedirectsRequest, opts ...grpc.CallOption) (*MigrationToggleCloudRedirectsOperation, error) {
+	connection, err := c.connector.GetConnection(ctx, MigrationToggleCloudRedirects, opts...)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := cloudregistry.NewMigrationServiceClient(connection).ToggleCloudRedirects(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
+		Poll:         c.pollOperation,
+		MetadataType: (*cloudregistry.ToggleCloudRedirectsMetadata)(nil),
+		ResponseType: (*emptypb.Empty)(nil),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &MigrationToggleCloudRedirectsOperation{*op}, nil
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c migrationClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, MigrationOperationPoller, opts...)
@@ -156,5 +312,8 @@ var (
 	MigrationStartCloud                       = protoreflect.FullName("yandex.cloud.cloudregistry.v1.MigrationService.StartCloud")
 	MigrationStartFolder                      = protoreflect.FullName("yandex.cloud.cloudregistry.v1.MigrationService.StartFolder")
 	MigrationGetCloudMigrationStatusDashboard = protoreflect.FullName("yandex.cloud.cloudregistry.v1.MigrationService.GetCloudMigrationStatusDashboard")
+	MigrationToggleRegistryRedirects          = protoreflect.FullName("yandex.cloud.cloudregistry.v1.MigrationService.ToggleRegistryRedirects")
+	MigrationToggleFolderRedirects            = protoreflect.FullName("yandex.cloud.cloudregistry.v1.MigrationService.ToggleFolderRedirects")
+	MigrationToggleCloudRedirects             = protoreflect.FullName("yandex.cloud.cloudregistry.v1.MigrationService.ToggleCloudRedirects")
 	MigrationOperationPoller                  = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

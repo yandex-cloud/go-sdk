@@ -41,8 +41,8 @@ type ChangeFreezeCreateOperation struct {
 }
 
 // Metadata retrieves the operation metadata.
-func (o *ChangeFreezeCreateOperation) Metadata() *mongodb.CreateChangeFreezeMetadata {
-	return o.Operation.Metadata().(*mongodb.CreateChangeFreezeMetadata)
+func (o *ChangeFreezeCreateOperation) Metadata() *maintenance.CreateChangeFreezeMetadata {
+	return o.Operation.Metadata().(*maintenance.CreateChangeFreezeMetadata)
 }
 
 // Response retrieves the operation response.
@@ -77,7 +77,7 @@ func (c changeFreezeClient) Create(ctx context.Context, in *maintenance.CreateCh
 	}
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll:         c.pollOperation,
-		MetadataType: (*mongodb.CreateChangeFreezeMetadata)(nil),
+		MetadataType: (*maintenance.CreateChangeFreezeMetadata)(nil),
 		ResponseType: (*maintenance.ChangeFreeze)(nil),
 	})
 	if err != nil {
@@ -110,8 +110,8 @@ type ChangeFreezeTerminateOperation struct {
 }
 
 // Metadata retrieves the operation metadata.
-func (o *ChangeFreezeTerminateOperation) Metadata() *mongodb.TerminateChangeFreezeMetadata {
-	return o.Operation.Metadata().(*mongodb.TerminateChangeFreezeMetadata)
+func (o *ChangeFreezeTerminateOperation) Metadata() *maintenance.TerminateChangeFreezeMetadata {
+	return o.Operation.Metadata().(*maintenance.TerminateChangeFreezeMetadata)
 }
 
 // Response retrieves the operation response.
@@ -147,9 +147,9 @@ func (c changeFreezeClient) Terminate(ctx context.Context, in *maintenance.Termi
 	op, err := sdkop.NewOperation(pb, &sdkop.Concretization{
 		Poll: c.pollOperation,
 		GetResourceID: func(metadata proto.Message) string {
-			return metadata.(*mongodb.TerminateChangeFreezeMetadata).GetChangeFreezeId()
+			return metadata.(*maintenance.TerminateChangeFreezeMetadata).GetChangeFreezeId()
 		},
-		MetadataType: (*mongodb.TerminateChangeFreezeMetadata)(nil),
+		MetadataType: (*maintenance.TerminateChangeFreezeMetadata)(nil),
 		ResponseType: (*maintenance.TerminateChangeFreezeResponse)(nil),
 	})
 	if err != nil {

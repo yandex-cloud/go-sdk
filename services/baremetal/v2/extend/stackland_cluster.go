@@ -24,6 +24,7 @@ type StacklandClusterClient interface {
 	DeleteStacklandCluster(context.Context, *extend.DeleteStacklandClusterRequest, ...grpc.CallOption) (*StacklandClusterDeleteStacklandClusterOperation, error)
 	GetStacklandClusterConfigs(context.Context, *extend.GetStacklandClusterConfigsRequest, ...grpc.CallOption) (*extend.GetStacklandClusterConfigsResponse, error)
 	ListStacklandClusterOperations(context.Context, *extend.ListStacklandClusterOperationsRequest, ...grpc.CallOption) (*extend.ListStacklandClusterOperationsResponse, error)
+	ListStacklandVersions(context.Context, *extend.ListStacklandVersionsRequest, ...grpc.CallOption) (*extend.ListStacklandVersionsResponse, error)
 }
 
 var _ StacklandClusterClient = stacklandClusterClient{}
@@ -235,6 +236,15 @@ func (c stacklandClusterClient) ListStacklandClusterOperations(ctx context.Conte
 	return extend.NewStacklandClusterServiceClient(connection).ListStacklandClusterOperations(ctx, in, opts...)
 }
 
+// ListStacklandVersions is an operation of Yandex.Cloud Extend StacklandCluster service.
+func (c stacklandClusterClient) ListStacklandVersions(ctx context.Context, in *extend.ListStacklandVersionsRequest, opts ...grpc.CallOption) (*extend.ListStacklandVersionsResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, StacklandClusterListStacklandVersions, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return extend.NewStacklandClusterServiceClient(connection).ListStacklandVersions(ctx, in, opts...)
+}
+
 // pollOperation returns the current state of the polled operation.
 func (c stacklandClusterClient) pollOperation(ctx context.Context, operationId string, opts ...grpc.CallOption) (sdkop.YCOperation, error) {
 	connection, err := c.connector.GetConnection(ctx, StacklandClusterOperationPoller, opts...)
@@ -252,5 +262,6 @@ var (
 	StacklandClusterDeleteStacklandCluster         = protoreflect.FullName("yandex.cloud.baremetal.v2.extend.StacklandClusterService.DeleteStacklandCluster")
 	StacklandClusterGetStacklandClusterConfigs     = protoreflect.FullName("yandex.cloud.baremetal.v2.extend.StacklandClusterService.GetStacklandClusterConfigs")
 	StacklandClusterListStacklandClusterOperations = protoreflect.FullName("yandex.cloud.baremetal.v2.extend.StacklandClusterService.ListStacklandClusterOperations")
+	StacklandClusterListStacklandVersions          = protoreflect.FullName("yandex.cloud.baremetal.v2.extend.StacklandClusterService.ListStacklandVersions")
 	StacklandClusterOperationPoller                = protoreflect.FullName("yandex.cloud.operation.OperationService.Get")
 )

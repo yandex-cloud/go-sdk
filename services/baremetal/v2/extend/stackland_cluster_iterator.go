@@ -13,6 +13,7 @@ import (
 type StacklandClusterClientIterator interface {
 	StacklandClustersIterator(context.Context, *extend.ListStacklandClustersRequest, ...grpc.CallOption) *iterator.Iterator[*extend.ListStacklandClustersRequest, *extend.StacklandCluster]
 	StacklandClusterOperationsIterator(context.Context, *extend.ListStacklandClusterOperationsRequest, ...grpc.CallOption) *iterator.Iterator[*extend.ListStacklandClusterOperationsRequest, *operation.Operation]
+	StacklandVersionsIterator(context.Context, *extend.ListStacklandVersionsRequest, ...grpc.CallOption) *iterator.Iterator[*extend.ListStacklandVersionsRequest, *extend.StacklandVersion]
 }
 
 type stacklandClusterServiceListStacklandClustersInternal struct {
@@ -50,5 +51,24 @@ func (c stacklandClusterClient) StacklandClusterOperationsIterator(ctx context.C
 				return nil, err
 			}
 			return stacklandClusterServiceListStacklandClusterOperationsInternal{resp}, nil
+		})
+}
+
+type stacklandClusterServiceListStacklandVersionsInternal struct {
+	*extend.ListStacklandVersionsResponse
+}
+
+func (r stacklandClusterServiceListStacklandVersionsInternal) Items() []*extend.StacklandVersion {
+	return r.ListStacklandVersionsResponse.StacklandVersions
+}
+
+func (c stacklandClusterClient) StacklandVersionsIterator(ctx context.Context, req *extend.ListStacklandVersionsRequest, opts ...grpc.CallOption) *iterator.Iterator[*extend.ListStacklandVersionsRequest, *extend.StacklandVersion] {
+	return iterator.NewIterator[*extend.ListStacklandVersionsRequest, *extend.StacklandVersion](ctx, req,
+		func(ctx context.Context, req *extend.ListStacklandVersionsRequest, opts ...grpc.CallOption) (iterator.PageResponse[*extend.StacklandVersion], error) {
+			resp, err := c.ListStacklandVersions(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return stacklandClusterServiceListStacklandVersionsInternal{resp}, nil
 		})
 }
