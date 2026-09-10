@@ -4,6 +4,8 @@ go 1.23.0
 
 toolchain go1.24.0
 
+retract [v2.171.0, v2.173.0] // Published from the v1 branch with an incompatible module path.
+
 require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang-jwt/jwt/v4 v4.5.2
