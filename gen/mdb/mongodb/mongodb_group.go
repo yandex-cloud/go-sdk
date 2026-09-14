@@ -28,6 +28,11 @@ func (m *MongoDB) BackupRetentionPolicy() *BackupRetentionPolicyServiceClient {
 	return &BackupRetentionPolicyServiceClient{getConn: m.getConn}
 }
 
+// ChangeFreeze gets ChangeFreezeService client
+func (m *MongoDB) ChangeFreeze() *ChangeFreezeServiceClient {
+	return &ChangeFreezeServiceClient{getConn: m.getConn}
+}
+
 // Cluster gets ClusterService client
 func (m *MongoDB) Cluster() *ClusterServiceClient {
 	return &ClusterServiceClient{getConn: m.getConn}

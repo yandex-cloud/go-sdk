@@ -18,6 +18,11 @@ func NewMetastore(g func(ctx context.Context) (*grpc.ClientConn, error)) *Metast
 	return &Metastore{g}
 }
 
+// ChangeFreeze gets ChangeFreezeService client
+func (m *Metastore) ChangeFreeze() *ChangeFreezeServiceClient {
+	return &ChangeFreezeServiceClient{getConn: m.getConn}
+}
+
 // Cluster gets ClusterService client
 func (m *Metastore) Cluster() *ClusterServiceClient {
 	return &ClusterServiceClient{getConn: m.getConn}

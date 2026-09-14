@@ -28,6 +28,11 @@ func (p *PostgreSQL) BackupRetentionPolicy() *BackupRetentionPolicyServiceClient
 	return &BackupRetentionPolicyServiceClient{getConn: p.getConn}
 }
 
+// ChangeFreeze gets ChangeFreezeService client
+func (p *PostgreSQL) ChangeFreeze() *ChangeFreezeServiceClient {
+	return &ChangeFreezeServiceClient{getConn: p.getConn}
+}
+
 // Cluster gets ClusterService client
 func (p *PostgreSQL) Cluster() *ClusterServiceClient {
 	return &ClusterServiceClient{getConn: p.getConn}

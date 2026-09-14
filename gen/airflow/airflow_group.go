@@ -18,6 +18,11 @@ func NewAirflow(g func(ctx context.Context) (*grpc.ClientConn, error)) *Airflow 
 	return &Airflow{g}
 }
 
+// ChangeFreeze gets ChangeFreezeService client
+func (a *Airflow) ChangeFreeze() *ChangeFreezeServiceClient {
+	return &ChangeFreezeServiceClient{getConn: a.getConn}
+}
+
 // Cluster gets ClusterService client
 func (a *Airflow) Cluster() *ClusterServiceClient {
 	return &ClusterServiceClient{getConn: a.getConn}

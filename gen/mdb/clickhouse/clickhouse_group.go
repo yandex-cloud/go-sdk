@@ -23,6 +23,11 @@ func (c *Clickhouse) Backup() *BackupServiceClient {
 	return &BackupServiceClient{getConn: c.getConn}
 }
 
+// ChangeFreeze gets ChangeFreezeService client
+func (c *Clickhouse) ChangeFreeze() *ChangeFreezeServiceClient {
+	return &ChangeFreezeServiceClient{getConn: c.getConn}
+}
+
 // Cluster gets ClusterService client
 func (c *Clickhouse) Cluster() *ClusterServiceClient {
 	return &ClusterServiceClient{getConn: c.getConn}

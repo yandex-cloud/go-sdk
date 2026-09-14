@@ -23,6 +23,11 @@ func (r *Redis) Cluster() *ClusterServiceClient {
 	return &ClusterServiceClient{getConn: r.getConn}
 }
 
+// ChangeFreeze gets ChangeFreezeService client
+func (r *Redis) ChangeFreeze() *ChangeFreezeServiceClient {
+	return &ChangeFreezeServiceClient{getConn: r.getConn}
+}
+
 // ResourcePreset gets ResourcePresetService client
 func (r *Redis) ResourcePreset() *ResourcePresetServiceClient {
 	return &ResourcePresetServiceClient{getConn: r.getConn}

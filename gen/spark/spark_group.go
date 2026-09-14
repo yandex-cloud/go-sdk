@@ -18,6 +18,11 @@ func NewSpark(g func(ctx context.Context) (*grpc.ClientConn, error)) *Spark {
 	return &Spark{g}
 }
 
+// ChangeFreeze gets ChangeFreezeService client
+func (s *Spark) ChangeFreeze() *ChangeFreezeServiceClient {
+	return &ChangeFreezeServiceClient{getConn: s.getConn}
+}
+
 // Cluster gets ClusterService client
 func (s *Spark) Cluster() *ClusterServiceClient {
 	return &ClusterServiceClient{getConn: s.getConn}

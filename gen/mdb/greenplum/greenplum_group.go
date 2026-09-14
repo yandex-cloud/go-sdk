@@ -18,6 +18,11 @@ func NewGreenplum(g func(ctx context.Context) (*grpc.ClientConn, error)) *Greenp
 	return &Greenplum{g}
 }
 
+// ChangeFreeze gets ChangeFreezeService client
+func (g *Greenplum) ChangeFreeze() *ChangeFreezeServiceClient {
+	return &ChangeFreezeServiceClient{getConn: g.getConn}
+}
+
 // Cluster gets ClusterService client
 func (g *Greenplum) Cluster() *ClusterServiceClient {
 	return &ClusterServiceClient{getConn: g.getConn}

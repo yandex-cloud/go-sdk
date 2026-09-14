@@ -23,6 +23,11 @@ func (o *OpenSearch) Cluster() *ClusterServiceClient {
 	return &ClusterServiceClient{getConn: o.getConn}
 }
 
+// ChangeFreeze gets ChangeFreezeService client
+func (o *OpenSearch) ChangeFreeze() *ChangeFreezeServiceClient {
+	return &ChangeFreezeServiceClient{getConn: o.getConn}
+}
+
 // ResourcePreset gets ResourcePresetService client
 func (o *OpenSearch) ResourcePreset() *ResourcePresetServiceClient {
 	return &ResourcePresetServiceClient{getConn: o.getConn}

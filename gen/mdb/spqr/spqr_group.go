@@ -23,6 +23,11 @@ func (s *SPQR) Backup() *BackupServiceClient {
 	return &BackupServiceClient{getConn: s.getConn}
 }
 
+// ChangeFreeze gets ChangeFreezeService client
+func (s *SPQR) ChangeFreeze() *ChangeFreezeServiceClient {
+	return &ChangeFreezeServiceClient{getConn: s.getConn}
+}
+
 // Cluster gets ClusterService client
 func (s *SPQR) Cluster() *ClusterServiceClient {
 	return &ClusterServiceClient{getConn: s.getConn}

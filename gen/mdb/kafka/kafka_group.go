@@ -18,6 +18,11 @@ func NewKafka(g func(ctx context.Context) (*grpc.ClientConn, error)) *Kafka {
 	return &Kafka{g}
 }
 
+// ChangeFreeze gets ChangeFreezeService client
+func (k *Kafka) ChangeFreeze() *ChangeFreezeServiceClient {
+	return &ChangeFreezeServiceClient{getConn: k.getConn}
+}
+
 // Cluster gets ClusterService client
 func (k *Kafka) Cluster() *ClusterServiceClient {
 	return &ClusterServiceClient{getConn: k.getConn}

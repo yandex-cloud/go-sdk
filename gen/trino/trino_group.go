@@ -18,6 +18,11 @@ func NewTrino(g func(ctx context.Context) (*grpc.ClientConn, error)) *Trino {
 	return &Trino{g}
 }
 
+// ChangeFreeze gets ChangeFreezeService client
+func (t *Trino) ChangeFreeze() *ChangeFreezeServiceClient {
+	return &ChangeFreezeServiceClient{getConn: t.getConn}
+}
+
 // Catalog gets CatalogService client
 func (t *Trino) Catalog() *CatalogServiceClient {
 	return &CatalogServiceClient{getConn: t.getConn}
