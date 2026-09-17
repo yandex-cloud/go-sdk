@@ -28,6 +28,11 @@ func (o *OpenSearch) ChangeFreeze() *ChangeFreezeServiceClient {
 	return &ChangeFreezeServiceClient{getConn: o.getConn}
 }
 
+// Maintenance gets MaintenanceService client
+func (o *OpenSearch) Maintenance() *MaintenanceServiceClient {
+	return &MaintenanceServiceClient{getConn: o.getConn}
+}
+
 // ResourcePreset gets ResourcePresetService client
 func (o *OpenSearch) ResourcePreset() *ResourcePresetServiceClient {
 	return &ResourcePresetServiceClient{getConn: o.getConn}

@@ -43,6 +43,11 @@ func (m *MySQL) Database() *DatabaseServiceClient {
 	return &DatabaseServiceClient{getConn: m.getConn}
 }
 
+// Maintenance gets MaintenanceService client
+func (m *MySQL) Maintenance() *MaintenanceServiceClient {
+	return &MaintenanceServiceClient{getConn: m.getConn}
+}
+
 // ResourcePreset gets ResourcePresetService client
 func (m *MySQL) ResourcePreset() *ResourcePresetServiceClient {
 	return &ResourcePresetServiceClient{getConn: m.getConn}

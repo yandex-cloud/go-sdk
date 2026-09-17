@@ -43,6 +43,11 @@ func (m *MongoDB) Database() *DatabaseServiceClient {
 	return &DatabaseServiceClient{getConn: m.getConn}
 }
 
+// Maintenance gets MaintenanceService client
+func (m *MongoDB) Maintenance() *MaintenanceServiceClient {
+	return &MaintenanceServiceClient{getConn: m.getConn}
+}
+
 // ResourcePreset gets ResourcePresetService client
 func (m *MongoDB) ResourcePreset() *ResourcePresetServiceClient {
 	return &ResourcePresetServiceClient{getConn: m.getConn}

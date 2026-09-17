@@ -28,6 +28,11 @@ func (r *Redis) ChangeFreeze() *ChangeFreezeServiceClient {
 	return &ChangeFreezeServiceClient{getConn: r.getConn}
 }
 
+// Maintenance gets MaintenanceService client
+func (r *Redis) Maintenance() *MaintenanceServiceClient {
+	return &MaintenanceServiceClient{getConn: r.getConn}
+}
+
 // ResourcePreset gets ResourcePresetService client
 func (r *Redis) ResourcePreset() *ResourcePresetServiceClient {
 	return &ResourcePresetServiceClient{getConn: r.getConn}

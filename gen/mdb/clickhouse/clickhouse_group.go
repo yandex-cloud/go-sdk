@@ -38,6 +38,11 @@ func (c *Clickhouse) Database() *DatabaseServiceClient {
 	return &DatabaseServiceClient{getConn: c.getConn}
 }
 
+// Maintenance gets MaintenanceService client
+func (c *Clickhouse) Maintenance() *MaintenanceServiceClient {
+	return &MaintenanceServiceClient{getConn: c.getConn}
+}
+
 // ResourcePreset gets ResourcePresetService client
 func (c *Clickhouse) ResourcePreset() *ResourcePresetServiceClient {
 	return &ResourcePresetServiceClient{getConn: c.getConn}

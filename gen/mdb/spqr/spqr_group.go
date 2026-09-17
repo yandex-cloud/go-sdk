@@ -38,6 +38,11 @@ func (s *SPQR) Database() *DatabaseServiceClient {
 	return &DatabaseServiceClient{getConn: s.getConn}
 }
 
+// Maintenance gets MaintenanceService client
+func (s *SPQR) Maintenance() *MaintenanceServiceClient {
+	return &MaintenanceServiceClient{getConn: s.getConn}
+}
+
 // ResourcePreset gets ResourcePresetService client
 func (s *SPQR) ResourcePreset() *ResourcePresetServiceClient {
 	return &ResourcePresetServiceClient{getConn: s.getConn}

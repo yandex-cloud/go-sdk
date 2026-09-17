@@ -28,6 +28,11 @@ func (g *Greenplum) Cluster() *ClusterServiceClient {
 	return &ClusterServiceClient{getConn: g.getConn}
 }
 
+// Maintenance gets MaintenanceService client
+func (g *Greenplum) Maintenance() *MaintenanceServiceClient {
+	return &MaintenanceServiceClient{getConn: g.getConn}
+}
+
 // ResourcePreset gets ResourcePresetService client
 func (g *Greenplum) ResourcePreset() *ResourcePresetServiceClient {
 	return &ResourcePresetServiceClient{getConn: g.getConn}

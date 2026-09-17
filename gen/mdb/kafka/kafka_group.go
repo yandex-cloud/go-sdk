@@ -33,6 +33,11 @@ func (k *Kafka) Topic() *TopicServiceClient {
 	return &TopicServiceClient{getConn: k.getConn}
 }
 
+// Maintenance gets MaintenanceService client
+func (k *Kafka) Maintenance() *MaintenanceServiceClient {
+	return &MaintenanceServiceClient{getConn: k.getConn}
+}
+
 // User gets UserService client
 func (k *Kafka) User() *UserServiceClient {
 	return &UserServiceClient{getConn: k.getConn}
