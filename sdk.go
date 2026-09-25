@@ -36,6 +36,7 @@ import (
 	organizationmanageridp "github.com/yandex-cloud/go-sdk/gen/organizationmanager/idp"
 	oauthapplication "github.com/yandex-cloud/go-sdk/gen/organizationmanager/idp/application/oauth"
 	samlapplication "github.com/yandex-cloud/go-sdk/gen/organizationmanager/idp/application/saml"
+	"github.com/yandex-cloud/go-sdk/gen/organizationmanager/policy"
 	organizationmanagersaml "github.com/yandex-cloud/go-sdk/gen/organizationmanager/saml"
 	"github.com/yandex-cloud/go-sdk/gen/resourcemanager"
 	"github.com/yandex-cloud/go-sdk/gen/storage-api"
@@ -255,6 +256,10 @@ func (sdk *SDK) OrganizationManagerIdpOAuthApp() *oauthapplication.OrganizationM
 
 func (sdk *SDK) OrganizationManagerIdpSAMLApp() *samlapplication.OrganizationManagerIdpSAMLApp {
 	return samlapplication.NewOrganizationManagerIdpSAMLApp(sdk.getConn(OrganizationManagementServiceID))
+}
+
+func (sdk *SDK) OrganizationManagerPolicy() *policy.OrganizationManagerPolicy {
+    return policy.NewOrganizationManagerPolicy(sdk.getConn(OrganizationManagementServiceID))
 }
 
 // ResourceManager returns ResourceManager object that is used to operate on Folders and Clouds

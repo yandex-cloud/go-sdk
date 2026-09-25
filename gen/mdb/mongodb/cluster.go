@@ -977,6 +977,15 @@ func (c *ClusterServiceClient) SetAccessBindings(ctx context.Context, in *access
 	return mongodb.NewClusterServiceClient(conn).SetAccessBindings(ctx, in, opts...)
 }
 
+// SetBalancerStatus implements mongodb.ClusterServiceClient
+func (c *ClusterServiceClient) SetBalancerStatus(ctx context.Context, in *mongodb.SetBalancerStatusRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return mongodb.NewClusterServiceClient(conn).SetBalancerStatus(ctx, in, opts...)
+}
+
 // Start implements mongodb.ClusterServiceClient
 func (c *ClusterServiceClient) Start(ctx context.Context, in *mongodb.StartClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
