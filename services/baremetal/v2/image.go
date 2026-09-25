@@ -15,6 +15,7 @@ type ImageClient interface {
 	ImageClientIterator
 	GetImage(context.Context, *baremetal.GetImageRequest, ...grpc.CallOption) (*baremetal.Image, error)
 	ListImages(context.Context, *baremetal.ListImagesRequest, ...grpc.CallOption) (*baremetal.ListImagesResponse, error)
+	ListCompatibleImages(context.Context, *baremetal.ListCompatibleImagesRequest, ...grpc.CallOption) (*baremetal.ListCompatibleImagesResponse, error)
 	ResolveImages(context.Context, *baremetal.ResolveImagesRequest, ...grpc.CallOption) (*baremetal.ResolveImagesResponse, error)
 }
 
@@ -47,6 +48,15 @@ func (c imageClient) ListImages(ctx context.Context, in *baremetal.ListImagesReq
 	return baremetal.NewImageServiceClient(connection).ListImages(ctx, in, opts...)
 }
 
+// ListCompatibleImages is an operation of Yandex.Cloud Baremetal Image service.
+func (c imageClient) ListCompatibleImages(ctx context.Context, in *baremetal.ListCompatibleImagesRequest, opts ...grpc.CallOption) (*baremetal.ListCompatibleImagesResponse, error) {
+	connection, err := c.connector.GetConnection(ctx, ImageListCompatibleImages, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return baremetal.NewImageServiceClient(connection).ListCompatibleImages(ctx, in, opts...)
+}
+
 // ResolveImages is an operation of Yandex.Cloud Baremetal Image service.
 func (c imageClient) ResolveImages(ctx context.Context, in *baremetal.ResolveImagesRequest, opts ...grpc.CallOption) (*baremetal.ResolveImagesResponse, error) {
 	connection, err := c.connector.GetConnection(ctx, ImageResolveImages, opts...)
@@ -57,7 +67,8 @@ func (c imageClient) ResolveImages(ctx context.Context, in *baremetal.ResolveIma
 }
 
 var (
-	ImageGetImage      = protoreflect.FullName("yandex.cloud.baremetal.v2.ImageService.GetImage")
-	ImageListImages    = protoreflect.FullName("yandex.cloud.baremetal.v2.ImageService.ListImages")
-	ImageResolveImages = protoreflect.FullName("yandex.cloud.baremetal.v2.ImageService.ResolveImages")
+	ImageGetImage             = protoreflect.FullName("yandex.cloud.baremetal.v2.ImageService.GetImage")
+	ImageListImages           = protoreflect.FullName("yandex.cloud.baremetal.v2.ImageService.ListImages")
+	ImageListCompatibleImages = protoreflect.FullName("yandex.cloud.baremetal.v2.ImageService.ListCompatibleImages")
+	ImageResolveImages        = protoreflect.FullName("yandex.cloud.baremetal.v2.ImageService.ResolveImages")
 )

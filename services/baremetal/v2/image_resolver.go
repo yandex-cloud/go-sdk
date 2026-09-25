@@ -28,3 +28,24 @@ func (r *imageImagesResolver) Run(ctx context.Context) error {
 	})
 	return r.FindName(resp.TakeAll())
 }
+
+type imageCompatibleImagesResolver struct {
+	client ImageClient
+	sdkresolvers.BaseNameResolver
+}
+
+func ImageCompatibleImagesResolver(name string, client ImageClient, opts ...sdkresolvers.ResolveOption) sdkresolvers.Resolver {
+	return &imageCompatibleImagesResolver{
+		client:           client,
+		BaseNameResolver: sdkresolvers.NewBaseNameResolver(name, "ImageCompatibleImages", opts...),
+	}
+}
+
+func (r *imageCompatibleImagesResolver) Run(ctx context.Context) error {
+	resp := r.client.CompatibleImagesIterator(ctx, &baremetal.ListCompatibleImagesRequest{
+		FolderId: r.FolderID(),
+
+		PageSize: sdkresolvers.DefaultResolverPageSize,
+	})
+	return r.FindName(resp.TakeAll())
+}

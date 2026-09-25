@@ -11,6 +11,7 @@ import (
 
 type ImageClientIterator interface {
 	ImagesIterator(context.Context, *baremetal.ListImagesRequest, ...grpc.CallOption) *iterator.Iterator[*baremetal.ListImagesRequest, *baremetal.Image]
+	CompatibleImagesIterator(context.Context, *baremetal.ListCompatibleImagesRequest, ...grpc.CallOption) *iterator.Iterator[*baremetal.ListCompatibleImagesRequest, *baremetal.Image]
 }
 
 type imageServiceListImagesInternal struct {
@@ -29,5 +30,24 @@ func (c imageClient) ImagesIterator(ctx context.Context, req *baremetal.ListImag
 				return nil, err
 			}
 			return imageServiceListImagesInternal{resp}, nil
+		})
+}
+
+type imageServiceListCompatibleImagesInternal struct {
+	*baremetal.ListCompatibleImagesResponse
+}
+
+func (r imageServiceListCompatibleImagesInternal) Items() []*baremetal.Image {
+	return r.ListCompatibleImagesResponse.Images
+}
+
+func (c imageClient) CompatibleImagesIterator(ctx context.Context, req *baremetal.ListCompatibleImagesRequest, opts ...grpc.CallOption) *iterator.Iterator[*baremetal.ListCompatibleImagesRequest, *baremetal.Image] {
+	return iterator.NewIterator[*baremetal.ListCompatibleImagesRequest, *baremetal.Image](ctx, req,
+		func(ctx context.Context, req *baremetal.ListCompatibleImagesRequest, opts ...grpc.CallOption) (iterator.PageResponse[*baremetal.Image], error) {
+			resp, err := c.ListCompatibleImages(ctx, req, opts...)
+			if err != nil {
+				return nil, err
+			}
+			return imageServiceListCompatibleImagesInternal{resp}, nil
 		})
 }
