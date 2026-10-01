@@ -93,6 +93,24 @@ func (c *ClusterServiceClient) DeleteOpenSearchNodeGroup(ctx context.Context, in
 	return opensearch.NewClusterServiceClient(conn).DeleteOpenSearchNodeGroup(ctx, in, opts...)
 }
 
+// DisableProtection implements opensearch.ClusterServiceClient
+func (c *ClusterServiceClient) DisableProtection(ctx context.Context, in *opensearch.DisableProtectionRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return opensearch.NewClusterServiceClient(conn).DisableProtection(ctx, in, opts...)
+}
+
+// EnableProtection implements opensearch.ClusterServiceClient
+func (c *ClusterServiceClient) EnableProtection(ctx context.Context, in *opensearch.EnableProtectionRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return opensearch.NewClusterServiceClient(conn).EnableProtection(ctx, in, opts...)
+}
+
 // Get implements opensearch.ClusterServiceClient
 func (c *ClusterServiceClient) Get(ctx context.Context, in *opensearch.GetClusterRequest, opts ...grpc.CallOption) (*opensearch.Cluster, error) {
 	conn, err := c.getConn(ctx)

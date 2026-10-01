@@ -162,3 +162,12 @@ func (it *DatabaseIterator) Value() *clickhouse.Database {
 func (it *DatabaseIterator) Error() error {
 	return it.err
 }
+
+// Update implements clickhouse.DatabaseServiceClient
+func (c *DatabaseServiceClient) Update(ctx context.Context, in *clickhouse.UpdateDatabaseRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return clickhouse.NewDatabaseServiceClient(conn).Update(ctx, in, opts...)
+}
