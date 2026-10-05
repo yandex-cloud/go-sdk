@@ -3,8 +3,8 @@ module github.com/yandex-cloud/go-sdk/services/mdb/mysql
 go 1.25.10
 
 require (
-	github.com/yandex-cloud/go-genproto v0.125.0
-	github.com/yandex-cloud/go-sdk/v2 v2.179.0
+	github.com/yandex-cloud/go-genproto v0.126.0
+	github.com/yandex-cloud/go-sdk/v2 v2.180.0
 	google.golang.org/grpc v1.74.0-dev
 	google.golang.org/protobuf v1.36.6
 )
