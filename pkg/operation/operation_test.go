@@ -26,6 +26,15 @@ import (
 
 var _ PollIntervalFunc = defaultPollIntervalFunc
 
+func TestNewOperationAllowsMissingMetadata(t *testing.T) {
+	op, err := NewOperation(
+		&operation.Operation{Id: "op-id"},
+		&Concretization{MetadataType: &durationpb.Duration{}},
+	)
+	require.NoError(t, err)
+	require.Nil(t, op.Metadata())
+}
+
 func TestWaitSkipsPollWhenAlreadyDone(t *testing.T) {
 	pollErr := errors.New("poll error")
 	pollCalled := false
