@@ -18,11 +18,6 @@ func NewDataproc(g func(ctx context.Context) (*grpc.ClientConn, error)) *Datapro
 	return &Dataproc{g}
 }
 
-// ChangeFreeze gets ChangeFreezeService client
-func (d *Dataproc) ChangeFreeze() *ChangeFreezeServiceClient {
-	return &ChangeFreezeServiceClient{getConn: d.getConn}
-}
-
 // Cluster gets ClusterService client
 func (d *Dataproc) Cluster() *ClusterServiceClient {
 	return &ClusterServiceClient{getConn: d.getConn}
