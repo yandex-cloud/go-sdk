@@ -39,6 +39,15 @@ func (c *SnapshotServiceClient) Delete(ctx context.Context, in *compute.DeleteSn
 	return compute.NewSnapshotServiceClient(conn).Delete(ctx, in, opts...)
 }
 
+// Export implements compute.SnapshotServiceClient
+func (c *SnapshotServiceClient) Export(ctx context.Context, in *compute.ExportSnapshotRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return compute.NewSnapshotServiceClient(conn).Export(ctx, in, opts...)
+}
+
 // Get implements compute.SnapshotServiceClient
 func (c *SnapshotServiceClient) Get(ctx context.Context, in *compute.GetSnapshotRequest, opts ...grpc.CallOption) (*compute.Snapshot, error) {
 	conn, err := c.getConn(ctx)

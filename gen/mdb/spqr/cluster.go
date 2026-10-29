@@ -1021,3 +1021,12 @@ func (c *ClusterServiceClient) UpdateHosts(ctx context.Context, in *spqr.UpdateC
 	}
 	return spqr.NewClusterServiceClient(conn).UpdateHosts(ctx, in, opts...)
 }
+
+// UpdateShard implements spqr.ClusterServiceClient
+func (c *ClusterServiceClient) UpdateShard(ctx context.Context, in *spqr.UpdateClusterShardRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return spqr.NewClusterServiceClient(conn).UpdateShard(ctx, in, opts...)
+}

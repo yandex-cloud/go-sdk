@@ -39,6 +39,15 @@ func (c *ImageServiceClient) Delete(ctx context.Context, in *compute.DeleteImage
 	return compute.NewImageServiceClient(conn).Delete(ctx, in, opts...)
 }
 
+// Export implements compute.ImageServiceClient
+func (c *ImageServiceClient) Export(ctx context.Context, in *compute.ExportImageRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return compute.NewImageServiceClient(conn).Export(ctx, in, opts...)
+}
+
 // Get implements compute.ImageServiceClient
 func (c *ImageServiceClient) Get(ctx context.Context, in *compute.GetImageRequest, opts ...grpc.CallOption) (*compute.Image, error) {
 	conn, err := c.getConn(ctx)
