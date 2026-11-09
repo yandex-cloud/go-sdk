@@ -3,8 +3,8 @@ module github.com/yandex-cloud/go-sdk/services/loadtesting/agent
 go 1.25.10
 
 require (
-	github.com/yandex-cloud/go-genproto v0.136.0
-	github.com/yandex-cloud/go-sdk/v2 v2.187.0
+	github.com/yandex-cloud/go-genproto v0.137.0
+	github.com/yandex-cloud/go-sdk/v2 v2.188.0
 	google.golang.org/grpc v1.74.0-dev
 	google.golang.org/protobuf v1.36.6
 )
