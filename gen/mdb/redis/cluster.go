@@ -950,6 +950,15 @@ func (c *ClusterServiceClient) RescheduleMaintenance(ctx context.Context, in *re
 	return redis.NewClusterServiceClient(conn).RescheduleMaintenance(ctx, in, opts...)
 }
 
+// RestartHosts implements redis.ClusterServiceClient
+func (c *ClusterServiceClient) RestartHosts(ctx context.Context, in *redis.RestartHostsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return redis.NewClusterServiceClient(conn).RestartHosts(ctx, in, opts...)
+}
+
 // Restore implements redis.ClusterServiceClient
 func (c *ClusterServiceClient) Restore(ctx context.Context, in *redis.RestoreClusterRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
 	conn, err := c.getConn(ctx)
