@@ -47,6 +47,15 @@ func (c *InstanceServiceClient) Get(ctx context.Context, in *gitlab.GetInstanceR
 	return gitlab.NewInstanceServiceClient(conn).Get(ctx, in, opts...)
 }
 
+// GetBackupDownloadUrls implements gitlab.InstanceServiceClient
+func (c *InstanceServiceClient) GetBackupDownloadUrls(ctx context.Context, in *gitlab.GetBackupDownloadUrlsRequest, opts ...grpc.CallOption) (*gitlab.GetBackupDownloadUrlsResponse, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return gitlab.NewInstanceServiceClient(conn).GetBackupDownloadUrls(ctx, in, opts...)
+}
+
 // List implements gitlab.InstanceServiceClient
 func (c *InstanceServiceClient) List(ctx context.Context, in *gitlab.ListInstancesRequest, opts ...grpc.CallOption) (*gitlab.ListInstancesResponse, error) {
 	conn, err := c.getConn(ctx)
@@ -161,6 +170,15 @@ func (it *InstanceIterator) Value() *gitlab.Instance {
 
 func (it *InstanceIterator) Error() error {
 	return it.err
+}
+
+// PrepareBackupUpload implements gitlab.InstanceServiceClient
+func (c *InstanceServiceClient) PrepareBackupUpload(ctx context.Context, in *gitlab.PrepareBackupUploadRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return gitlab.NewInstanceServiceClient(conn).PrepareBackupUpload(ctx, in, opts...)
 }
 
 // Start implements gitlab.InstanceServiceClient
