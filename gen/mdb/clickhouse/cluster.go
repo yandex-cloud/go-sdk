@@ -1353,3 +1353,12 @@ func (c *ClusterServiceClient) UpdateShardGroup(ctx context.Context, in *clickho
 	}
 	return clickhouse.NewClusterServiceClient(conn).UpdateShardGroup(ctx, in, opts...)
 }
+
+// UpdateShardGroups implements clickhouse.ClusterServiceClient
+func (c *ClusterServiceClient) UpdateShardGroups(ctx context.Context, in *clickhouse.UpdateClusterShardGroupsRequest, opts ...grpc.CallOption) (*operation.Operation, error) {
+	conn, err := c.getConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return clickhouse.NewClusterServiceClient(conn).UpdateShardGroups(ctx, in, opts...)
+}
