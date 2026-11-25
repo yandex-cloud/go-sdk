@@ -1,0 +1,17 @@
+service: cli
+title: cloud/cloud-go/cli
+arcanum:
+  review:
+    auto_assign: true
+    skip_review_for: robot
+    groups:
+      - name: "cli-reviewers"
+        roles:
+         - "ycapigataway:code_reviewer"  # Trying to assign current duty at first
+         - "yccli:developer"
+    rules:
+      - reviewers:
+          name: cli-reviewers
+          ship: 1
+          assign: 1
+          ignore_self_ship: false
